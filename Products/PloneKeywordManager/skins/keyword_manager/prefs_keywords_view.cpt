@@ -1,0 +1,199 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US"
+      lang="en-US"
+      metal:use-macro="here/prefs_main_template/macros/master"
+      i18n:domain="plone">
+  
+  <tal:block metal:fill-slot="top_slot">
+    <tal:block tal:define="dummy python:request.set('disable_border',1)" />
+  </tal:block>
+
+  <body>
+    <div metal:fill-slot="prefs_configlet_main"
+         tal:define="search python:request.get('search', '');
+                     limit  python:request.get('limit',  '');
+                     score  python:request.get('score',  0.6);
+                     num    python:request.get('num',7);
+                     many_kws python: 100;
+                     pkm here/portal_keyword_manager;
+                     catalogSubjects python:pkm.getKeywords(context=context);
+                     show_filters python: len(catalogSubjects) > many_kws;">
+
+      <h1 i18n:translate="heading_keyword_manager">Keyword Manager</h1>
+      
+      <a href=""
+         class="link-parent"
+         tal:attributes="href string: $portal_url/plone_control_panel"
+         i18n:translate="label_up_to_plone_setup">
+        Up to Plone Setup
+      </a>
+      
+      <div class="portalMessage"
+           tal:condition="not:pkm/usingLevenshtein"
+           i18n:translate="description_levenshtein"> Note: It appears
+           that this installation of the Keyword Manager is not using
+           the "Levenshtein" Python module for detecting similar
+           keywords.  This does not affect the end result of the
+           Keyword Manager, but can make this page render up to 10
+           times more quickly.  If you notice that this page is slow
+           to load, ask your site admin to install the Levenshtein
+           Python module; a copy is included with PloneKeywordManager
+           and installation instructions are in the README.
+      </div>
+    
+      <div class="documentDescription"
+           i18n:translate="description_keyword_manager">
+        The Keyword Manager allows you to delete and merge keywords in your portal.
+      </div>
+      
+      <tal:site_has_keywords condition="python:len(catalogSubjects) > 0">
+        <form action="prefs_keywords_view" method="get"
+              tal:condition="show_filters">
+          <fieldset>
+            <legend i18n:translate="label_list_alphabetically">
+              List alphabetically
+            </legend>
+            
+            <div class="field">
+              <label for="select_alphabet_list"
+                     i18n:translate="label_view_range">
+                View range
+              </label>
+              
+              <select id="select_alphabet_list"
+                      name="limit" tabindex="1">
+                
+                <option value="a-z">a - z</option>
+                
+                <tal:block tal:repeat="item python:range(ord('a'),ord('z')+1)">
+                  <option value="a" tal:attributes="value python:chr(item);" tal:content="python:chr(item)">a</option>
+                </tal:block>
+                
+              </select>
+            </div>
+            
+            <div class="formControls">
+              <input class="standalone"
+                     type="submit"
+                     value="View keywords"
+                     i18n:attributes="value" />
+            </div>
+            
+          </fieldset>
+        </form>
+        
+        <form action="prefs_keywords_view"
+              tal:condition="show_filters">
+          <fieldset>
+            <legend i18n:translate="label_search_by_keyword">
+              Search by keyword
+            </legend>
+            
+            <div class="field">
+              
+              <label for="select_keyword_list"
+                     i18n:translate="label_keyword">
+                Keyword
+              </label>
+              
+              <select id="select_keyword_list" name="search">
+                <option value="" i18n:translate="label_select">Select...</option>
+                <tal:block tal:repeat="subject catalogSubjects">
+                  <option tal:content="subject">Subject</option>
+                </tal:block>
+              </select>
+              
+            </div>
+            
+            <div class="formControls">
+              
+              <input class="context"
+                     type="submit"
+                     value="Search"
+                     i18n:attributes="value" />
+              
+            </div>
+            
+          </fieldset>
+        </form>
+        
+        <form method="post" action="#" name="keyword_edit_form"
+	      tal:define="errors options/state/getErrors"
+              tal:condition="python:not show_filters or search or limit"
+              tal:attributes="action string:${here/absolute_url}/${template/id}">
+          
+          <input type="hidden" name="form.submitted" value="1" />  
+          <fieldset>
+            <legend i18n:translate="label_keyword_assignments">
+              Keyword assignments
+            </legend>
+            
+	    <div class="error"
+		 tal:define="err errors/keywords|nothing"
+		 tal:condition="err"
+		 tal:content="err" i18n:translate="">
+	      Error message goes here
+	    </div>
+            <dl tal:repeat="subject python:test(search, [search], catalogSubjects)">
+              <tal:block condition="python:not show_filters or search or limit=='a-z' or (subject and limit==subject.lower()[0])">
+                <dt>
+                  <input type="checkbox" name="keywords:list"
+                         tal:attributes="value subject;
+                                         onclick string: document.forms['keyword_edit_form'].changeto.value='${subject}';; return true;;" />
+                  <div tal:replace="subject">Subject</div>
+                </dt>  
+                <dd>
+                  <span tal:repeat="item python:pkm.getScoredMatches(subject, catalogSubjects, num, score, context=context)"
+                        style="white-space: nowrap;">
+                    <span tal:condition="python:subject<>item">
+                      <input type="checkbox" name="keywords:list"
+                             tal:attributes="value item;
+                                             onclick string: document.forms['keyword_edit_form'].changeto.value='${item}';; return true;;" />
+                      <tal:block tal:content="item">Subject</tal:block>
+                    </span>
+                  </span>
+                </dd>
+                
+              </tal:block>
+              
+            </dl>
+            
+            <div class="field">
+	      <div class="error"
+		   tal:define="err errors/changeto|nothing"
+		   tal:condition="err"
+		   tal:content="err" i18n:translate="">
+		Error message goes here
+	      </div>
+              <label for="input_change_to" i18n:translate="label_keyword">Keyword</label>
+              <input id="input_change_to" type="text" name="changeto" />
+            </div>
+            
+            <div class="formControls">
+              <input class="destructive"
+                     type="submit"
+                     name="form.button.Merge"
+                     i18n:attributes="value"
+                     value="Merge" />
+              
+              <input class="destructive"
+                     type="submit"
+                     name="form.button.Delete"
+                     i18n:attributes="value"
+                     value="Delete" />
+              
+            </div>
+          </fieldset>
+        </form> 
+      </tal:site_has_keywords>
+      
+      <tal:no_keywords_yet condition="python:len(catalogSubjects) == 0">
+        <div i18n:translate="description_no_keywords">
+          No content in this site has any keywords assigned yet, so there's nothing
+          to manage at this time.  (To assign keywords to a piece of content, use
+          the item's "Properties" tab.)
+        </div>
+      </tal:no_keywords_yet>
+      
+    </div>
+  </body>
+</html>

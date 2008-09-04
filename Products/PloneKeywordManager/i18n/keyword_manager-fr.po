@@ -1,0 +1,108 @@
+# Internationalizable messages for the PloneKeywordManager product.
+msgid ""
+msgstr ""
+"Project-Id-Version: PloneKeywordManager 0.3\n"
+"PO-Revision-Date: 2005-04-06 16:14+0200\n"
+"Last-Translator: Alexandre POIRIER <alexandre.porier@edfgdf.fr>\n"
+"Language-Team: EDF\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language-code: fr\n"
+"Language-name: Français\n"
+"Preferred-encodings: utf-8 latin1\n"
+"Domain: plone\n"
+"X-Is-Fallback-For: fr-be fr-ca fr-lu fr-mc fr-ch fr-fr\n"
+
+#: PloneKeywordManager/skins/keyword_manager/prefs_keywords_view.pt
+#. <input class="context" i18n:attributes="value" type="submit" value="Search"/>
+msgid "Search"
+msgstr "Rechercher"
+
+
+# /skins/keyword_manager/prefs_keywords_view.pt
+#. <input class="standalone" i18n:attributes="value" type="submit" value="View keywords"/>
+msgid "View keywords"
+msgstr "Voir les mots-clés"
+
+
+#: PloneKeywordManager/skins/keyword_manager/prefs_keywords_view.pt
+#. <div class="documentDescription" i18n:translate="description_keyword_manager">
+#.     The Keyword Manager allows you to delete and merge keywords in your portal.
+#. </div>
+msgid "description_keyword_manager"
+msgstr "Le gestionnaire de mots-clés vous offre la possibilité d'effacer et de fusionner les mots-clés au sein de votre portail."
+
+
+#: PloneKeywordManager/skins/keyword_manager/prefs_keywords_view.pt
+#. <h1 i18n:translate="heading_keyword_manager">
+#.  Keyword Manager
+#. </h1>
+msgid "heading_keyword_manager"
+msgstr "Gestionnaire de mots-clés"
+
+
+#: PloneKeywordManager/skins/keyword_manager/prefs_keywords_view.pt
+#. <label for="select_keyword_list" i18n:translate="label_keyword">
+#.        Keyword
+#. </label>
+msgid "label_keyword"
+msgstr "Mots-clés"
+
+
+#: PloneKeywordManager/skins/keyword_manager/prefs_keywords_view.pt
+#. <legend i18n:translate="label_keyword_assignments">
+#.       Keyword assignments
+#. </legend>
+msgid "label_keyword_assignments"
+msgstr "Affectation de mots-clés"
+
+
+#: PloneKeywordManager/skins/keyword_manager/prefs_keywords_view.pt
+#. <legend i18n:translate="label_list_alphabetically">
+#.             List alphabetically
+#. </legend>
+msgid "label_list_alphabetically"
+msgstr "Liste alphabétique"
+
+
+#: PloneKeywordManager/skins/keyword_manager/prefs_keywords_view.pt
+#. <legend i18n:translate="label_search_by_keyword">
+#.           Search by keyword
+#. </legend>
+msgid "label_search_by_keyword"
+msgstr "Recherche par mots-clés"
+
+
+#: PloneKeywordManager/skins/keyword_manager/prefs_keywords_view.pt
+#. <label for="select_alphabet_list" i18n:translate="label_view_range">
+#.             View range
+#. </label>
+msgid "label_view_range"
+msgstr "Intervalle de visualisation"
+
+
+#: PloneKeywordManager/skins/keyword_manager/prefs_keywords_view.pt
+#. <input class="destructive"
+#.        type="submit"
+#.        name="prefs_keywords_action_change:action"
+#.        i18n:attributes="value"
+#.        value="Merge" />
+msgid "Merge"
+msgstr "Fusionner"
+
+
+#: PloneKeywordManager/skins/keyword_manager/prefs_keywords_view.pt
+#. <input class="destructive"
+#.        id="input_delete_keyword"
+#.        type="submit"
+#.        name="prefs_keywords_action_delete:action"
+#.        i18n:attributes="value"
+#.        value="Delete" />
+msgid "Delete"
+msgstr "Supprimer"
+
+# ### Manuel added strings ####
+
+msgid "Keyword Manager"
+msgstr "Gestionnaire de mots-clés"

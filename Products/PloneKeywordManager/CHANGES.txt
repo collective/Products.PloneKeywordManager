@@ -1,0 +1,16 @@
+Plone Keyword Manager changes
+
+Changes in Version 0.4
+
+    *   Added Brazilian Portuguese i18n support
+        by Rafahela Bazzanella - rafabazzanella@yahoo.com.br
+
+Changes in Version 0.3
+
+    *   Refactored code to run from a portal tool
+
+    *   Minor clean ups
+
+    *   Introduced the permission "Manage Keywords" to have better control
+        about who can manage keywords
+

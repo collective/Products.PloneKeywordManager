@@ -1,0 +1,8 @@
+<tal:header tal:replace="structure here/manage_page_header">header</tal:header>
+<tal:tabs tal:replace="structure here/manage_tabs">tabs</tal:tabs>
+
+<h3> <code>portal_keyword_manager</code> Tool </h3>
+
+<p>This tool provides an API for managing keywords in a Plone site.</p>
+
+<tal:footer tal:replace="structure here/manage_page_footer">footer</tal:footer>
