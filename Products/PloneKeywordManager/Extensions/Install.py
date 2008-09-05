@@ -5,7 +5,7 @@
 from StringIO import StringIO
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.DirectoryView import addDirectoryViews
-from Products.CMFCore.CMFCorePermissions import ManagePortal
+from Products.CMFCore.permissions import ManagePortal
 from Products.PloneKeywordManager import cmf_keyword_manager_globals, config
 from OFS.ObjectManager import BadRequestException
 
@@ -18,7 +18,7 @@ configlets = (
               {'id': 'keywordmanager',
                'name': 'Keyword Manager',
                'action': 'string:${portal_url}/prefs_keywords_view',
-               'category': 'Plone',
+               'category': 'Products',
                'appId': 'PloneKeywordManager',
                'permission': config.MANAGE_KEYWORDS_PERMISSION,
                'imageUrl'  : 'book_icon.gif'
@@ -62,7 +62,7 @@ def install(self):
 
     try:
         self.manage_addProduct['PloneKeywordManager']. \
-            manage_addTool('Plone Keyword Manager Tool')
+            manage_addTool(config.TOOL_NAME)
     except BadRequestException:
         print >>out, "Already installed, not adding tool to portal root."
 

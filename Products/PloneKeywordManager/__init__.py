@@ -29,7 +29,7 @@ from Products.CMFCore.utils import ToolInit
 # Sibling imports
 from Products.PloneKeywordManager import config
 from Products.PloneKeywordManager import tool
-
+    
 global cmf_keyword_manager_globals
 cmf_keyword_manager_globals=globals()
 
@@ -38,14 +38,8 @@ registerPermissions([(config.MANAGE_KEYWORDS_PERMISSION,[])],
 
 def initialize(context):
     registerDirectory('skins', cmf_keyword_manager_globals)
-    try:
-        ToolInit('Plone Keyword Manager Tool',
-                 tools=(tool.PloneKeywordManager, ),
-                 icon='tool.gif').initialize(context)
-    except TypeError:
-        # BBB product_name is required by CMF 1.4.x (part of Plone 2.0.x).
-        ToolInit('Plone Keyword Manager Tool',
-                 tools=(tool.PloneKeywordManager, ),
-                 product_name='PloneKeywordManager',
-                 icon='tool.gif').initialize(context)
 
+    new_tool = ToolInit(config.TOOL_NAME,
+                    tools=(tool.PloneKeywordManager, ),
+                    icon='tool.gif')
+    new_tool.initialize(context)

@@ -1,6 +1,6 @@
 # Copyright (c) 2005 gocept gmbh & co. kg
 # See also LICENSE.txt
-# $Id$
+# $Id: tool.py 47645 2007-08-20 14:59:10Z glenfant $
 
 # Python imports
 try:
@@ -13,7 +13,7 @@ except ImportError:
 # Zope imports
 import Globals
 from OFS.SimpleItem import SimpleItem
-from AccessControl import ClassSecurityInfo
+from AccessControl import ClassSecurityInfo 
 from AccessControl import getSecurityManager
 from AccessControl import Unauthorized
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
@@ -22,10 +22,9 @@ from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from Products.CMFCore.utils import UniqueObject, getToolByName
 from Products.CMFCore.Expression import Expression
 try:
-    from Products.CMFCore import permissions
-except ImportError:
-    #BBB Use CMFCorePermissions from CMF 1.4.x (part of Plone 2.0.x) instead.
-    from Products.CMFCore import CMFCorePermissions as permissions
+    from Products.CMFCore import CMFCorePermissions
+except ImportError, e:
+    from Products.CMFCore import permissions as CMFCorePermissions
 
 # Sibling imports
 from Products.PloneKeywordManager.interfaces import IPloneKeywordManager
@@ -39,13 +38,13 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
     id = "portal_keyword_manager"
     meta_type = "Plone Keyword Manager Tool"
     security = ClassSecurityInfo()
-
+    
     __implements__ = (IPloneKeywordManager,)
 
     manage_options = ({'label' : 'Overview', 'action' : 'manage_overview'},)
 
-    security.declareProtected(permissions.ManagePortal, 'manage_overview')
-    manage_overview = PageTemplateFile('www/explainTool', globals(),
+    security.declareProtected(CMFCorePermissions.ManagePortal, 'manage_overview')
+    manage_overview = PageTemplateFile('www/explainTool', globals(), 
             __name__='manage_overview')
 
     security.declarePublic('usingLevenshtein')
@@ -55,8 +54,22 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         """
         return USE_LEVENSHTEIN
 
+    security.declarePrivate('getSetter')
+    def getSetter(self,obj,field):
+        """Gets the setter function for the field.
+        
+        Returns None if it can't get the function
+        """
+        if field.startswith("get"):
+            setter = field.replace("get","set",1)
+        else:
+            setter = "set" + field.capitalize() #"Subject" => "setSubject"
+        
+        return getattr(obj,setter,None)
+        
+        
     security.declarePublic('change')
-    def change(self, old_keywords, new_keyword, context=None):
+    def change(self, old_keywords, new_keyword, context=None,field='Subject'):
         """Updates all objects using the old_keywords.
 
         Objects using the old_keywords will be using the new_keywords
@@ -65,14 +78,16 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         Returns the number of objects that have been updated.
         """
         self._checkPermission(context)
-        query = {'Subject': old_keywords}
+        ##MOD Dynamic field getting
+        query = {field: old_keywords}
         if context is not None:
             query['path'] = '/'.join(context.getPhysicalPath())
         querySet = self._query(**query)
 
         for item in querySet:
             obj = item.getObject()
-            subjectList = list(obj.Subject())
+            ##MOD Dynamic field getting
+            subjectList = list(getattr(obj,field,'Subject')())      
 
             for element in old_keywords:
                 while (element in subjectList) and (element <> new_keyword):
@@ -80,50 +95,69 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
 
             # dedupe new Keyword list (an issue when combining multiple keywords)
             subjectList = list(set(subjectList))
-            obj.setSubject(subjectList)
-            obj.reindexObject(idxs=['Subject'])
-
+            
+            ##MOD Dynamic field update
+            updateField = self.getSetter(obj,field)
+            if updateField is not None:
+                updateField(subjectList)
+                idxs=[field].extend([i for i in config.ALWAYS_REINDEX if i != field])
+                obj.reindexObject(idxs=idxs)
+        
         return len(querySet)
 
     security.declarePublic('delete')
-    def delete(self, keywords, context=None):
+    def delete(self, keywords, context=None, field='Subject'):
         """Removes the keywords from all objects using it.
-
+        
         Returns the number of objects that have been updated.
         """
         self._checkPermission(context)
-        query = {'Subject': keywords}
+        ##Mod Dynamic field
+        query = {field: keywords}
         if context is not None:
             query['path'] = '/'.join(context.getPhysicalPath())
         querySet = self._query(**query)
 
         for item in querySet:
             obj = item.getObject()
-            subjectList = list(obj.Subject())
+            
+            subjectList = list(getattr(obj,field)())
 
             for element in keywords:
                 while element in subjectList:
                     subjectList.remove(element)
+            
+            updateField = self.getSetter(obj,field)
+            if updateField is not None:
+                updateField(subjectList)
+                idxs=[field].extend([i for i in config.ALWAYS_REINDEX if i != field])
+                obj.reindexObject(idxs=idxs)
 
-            obj.setSubject(subjectList)
-            obj.reindexObject(idxs=['Subject'])
         return len(querySet)
 
     security.declarePublic('getKeywords')
-    def getKeywords(self, context=None):
+    def getKeywords(self, context=None, field='Subject'):
         self._checkPermission(context)
-        query = {}
-        if context is not None:
-            query['path'] = '/'.join(context.getPhysicalPath())
-
-        subjects = {}
-        for b in self._query(**query):
-            for subject in b.Subject:
-                subjects[subject] = True
-
-        subjects = subjects.keys()
-        subjects.sort()
-        return subjects
+        if field not in self.getKeywordIndexes():
+            raise ValueError, "%s is not a valid field" % field
+        
+        catalog = getToolByName(self, 'portal_catalog')
+        
+        #why work hard if we don't have to?
+        if hasattr(catalog,'uniqueValuesFor'):
+            keywords = list(catalog.uniqueValuesFor(field))
+        else:
+            query = {}
+            if context is not None:
+                query['path'] = '/'.join(context.getPhysicalPath())
+            keywords = {}
+            for b in self._query(**query):
+                for keyword in getattr(b,field)():
+                    keywords[keyword] = True
+            keywords = keywords.keys()
+        
+        keywords.sort()
+        return keywords
 
     security.declarePublic('getScoredMatches')
     def getScoredMatches(self, word, possibilities, num, score, context=None):
@@ -135,10 +169,10 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         if not USE_LEVENSHTEIN:
             # No levenshtein module around. Fall back to difflib
             return difflib.get_close_matches(word, possibilities, num, score)
-
+        
         # Levenshtein is around, so let's use it.
         res = []
-
+        
         # Search for all similar terms in possibilities
         for item in possibilities:
             lscore = Levenshtein.ratio(word, item)
@@ -164,5 +198,17 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
             config.MANAGE_KEYWORDS_PERMISSION, context):
             raise Unauthorized("You don't have the necessary permissions to "
                                "access %r." % (context,))
+
+    def getKeywordIndexes(self):
+        """Gets a list of indexes from the catalog. Uses config.py to choose the
+        meta type and filters out a subset of known indexes that should not be
+        managed.
+        """
+        catalog = getToolByName(self, 'portal_catalog')
+        idxs = catalog.index_objects()
+        idxs = [i.id for i in idxs if i.meta_type==config.META_TYPE and
+                i.id not in config.IGNORE_INDEXES]
+        idxs.sort()
+        return idxs
 
 Globals.InitializeClass(PloneKeywordManager)
