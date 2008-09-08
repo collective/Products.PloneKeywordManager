@@ -69,10 +69,3 @@ Plone Keyword Manager
   We would also like to thank Maik for letting us put this code in the 
   "Collective":http://plone.org/collective - so it can be improved and 
   expanded by the Collective developers.
-
- History
-
-  v0.2 -- Improved UI, now installs as a Plone Setup panel, compatible
-          with Plone 2.0.
-
-  v0.1 -- Initial release of Plone Keyword Manager

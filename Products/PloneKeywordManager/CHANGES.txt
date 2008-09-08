@@ -1,5 +1,23 @@
 Plone Keyword Manager changes
 
+Changes in version 1.6 (SVN/Unreleased)
+
+
+Changes in version 1.6b1
+
+    *   Eggification. PKM is only supported under Plone 3 now. It may or may not
+        work in Plone 2.5.
+        [dunlapm]
+    
+    *   Added support for multiple keyword indexes. If you have more than one
+        keyword field on your content type(s) then you will still be able to
+        manage all of your keywords. If you only use the single default field
+        then you will get the normal interface.
+
+Changes in version 0.4-plone3compat branch
+
+    *   Plone 2.5 and Plone 3 compatibility (glenfant)
+
 Changes in Version 0.4
 
     *   Added Brazilian Portuguese i18n support
