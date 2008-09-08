@@ -144,17 +144,17 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         catalog = getToolByName(self, 'portal_catalog')
         
         #why work hard if we don't have to?
-        if hasattr(catalog,'uniqueValuesFor'):
-            keywords = list(catalog.uniqueValuesFor(field))
-        else:
-            query = {}
-            if context is not None:
-                query['path'] = '/'.join(context.getPhysicalPath())
-            keywords = {}
-            for b in self._query(**query):
-                for keyword in getattr(b,field)():
-                    keywords[keyword] = True
-            keywords = keywords.keys()
+        #if hasattr(catalog,'uniqueValuesFor'):
+        keywords = list(catalog.uniqueValuesFor(field))
+        #else:
+        #    query = {}
+        #    if context is not None:
+        #        query['path'] = '/'.join(context.getPhysicalPath())
+        #    keywords = {}
+        #    for b in self._query(**query):
+        #        for keyword in getattr(b,field)():
+        #            keywords[keyword] = True
+        #    keywords = keywords.keys()
         
         keywords.sort()
         return keywords

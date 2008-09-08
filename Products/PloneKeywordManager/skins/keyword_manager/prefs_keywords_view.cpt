@@ -47,7 +47,8 @@
     
       <tal:kw_fields tal:define="kwfields pkm/getKeywordIndexes"
                      tal:condition="python:len(kwfields)>1">
-        <form action="prefs_keywords_view" method="get">
+        <form action="prefs_keywords_view" method="get"
+              tal:attributes="action string:${context/absolute_url}/${template/id}">
             <fieldset>
                 <legend>
                  Chose Keyword Field/Index
@@ -79,7 +80,8 @@
 
 	<tal:site_has_keywords condition="python:len(catalogSubjects) > 0">
 		<form action="prefs_keywords_view" method="get"
-			  tal:condition="show_filters">
+                      tal:attributes="action string:${context/absolute_url}/${template/id}"
+                      tal:condition="show_filters">
                     <input type="hidden" name="field" tal:attributes="value field" />
 		    <fieldset>
 				<legend i18n:translate="label_list_alphabetically">
@@ -115,7 +117,8 @@
 		</form>
 
 		<form action="prefs_keywords_view"
-			  tal:condition="show_filters">
+                      tal:attributes="action string:${context/absolute_url}/${template/id}"
+                      tal:condition="show_filters">
                         <input type="hidden" name="field" tal:attributes="value field" />
 			<fieldset>
 				<legend i18n:translate="label_search_by_keyword">
@@ -173,7 +176,7 @@
 			   <dt>
 			    <input type="checkbox" name="keywords:list" 
 			           tal:attributes="value subject;
-			           				   onclick string: document.forms['keyword_edit_form'].changeto.value='${subject}';; return true;;" />
+                                                   onclick string:document.forms['keyword_edit_form'].changeto.value='${subject}';; return true;;" />
 			    <div tal:replace="subject">Subject</div>
 			   </dt>     
 			   <dd>
