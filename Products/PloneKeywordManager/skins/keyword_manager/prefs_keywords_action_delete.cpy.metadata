@@ -1,0 +1,9 @@
+[default]
+title=Deleting keywords
+
+[security]
+View=0:Manager
+
+[actions]
+#action.success = redirect_to:string:prefs_keywords_view
+action.failure = redirect_to:string:prefs_keywords_view

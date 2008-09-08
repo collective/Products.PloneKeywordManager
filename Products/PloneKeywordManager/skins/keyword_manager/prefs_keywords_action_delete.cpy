@@ -4,13 +4,18 @@
 ##bind namespace=
 ##bind script=script
 ##bind subpath=traverse_subpath
-##parameters=keywords
+##parameters=keywords, field
 ##title=
 ##
+from Products.CMFPlone import PloneMessageFactory as _
+
 from Products.CMFCore.utils import getToolByName
 pkm = getToolByName(context, "portal_keyword_manager")
-changed_objects = pkm.delete(keywords, context=context.aq_inner)
+changed_objects = pkm.delete(keywords, context=context.aq_inner,field=field)
 
-msg = "Deleted %s for %d object(s)." % (','.join(keywords), changed_objects)
-context.REQUEST.RESPONSE.redirect('prefs_keywords_view' +
-                                  '?portal_status_message=%s' % (msg,))
+msg = _(u"Deleted %s for %d object(s).") % (','.join(keywords), changed_objects)
+
+state.setNextAction('redirect_to:string:prefs_keywords_view?field=%s' % field)
+
+context.plone_utils.addPortalMessage(msg)
+return state

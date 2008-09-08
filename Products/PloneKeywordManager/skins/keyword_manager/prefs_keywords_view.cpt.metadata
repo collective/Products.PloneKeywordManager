@@ -1,0 +1,16 @@
+[default]
+title=Keyword Manager
+
+[security]
+View=0:Manager
+
+[validators]
+validators...Merge = validate_prefs_keywords
+validators...Delete = validate_prefs_keywords
+validators. = validate_prefs_keywords
+
+
+[actions]
+action.success..Merge=traverse_to:string:prefs_keywords_action_change
+action.success..Delete=traverse_to:string:prefs_keywords_action_delete
+action.success=traverse_to:string:prefs_keywords_action_change
