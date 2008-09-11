@@ -1,24 +1,30 @@
 /*
-  Levenshtein.c v2003-09-06
-  Python extension computing Levenshtein distances, string similarities,
-  median strings and other goodies.
-
-  Copyright (C) 2002-2003 David Necas (Yeti) <yeti@physics.muni.cz>.
-
-  This program is free software; you can redistribute it and/or modify it
-  under the terms of the GNU General Public License as published by the Free
-  Software Foundation; either version 2 of the License, or (at your option)
-  any later version.
-
-  This program is distributed in the hope that it will be useful, but WITHOUT
-  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-  more details.
-
-  You should have received a copy of the GNU General Public License along
-  with this program; if not, write to the Free Software Foundation, Inc.,
-  59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
-*/
+ * Levenshtein.c
+ * @(#) $Id: Levenshtein.c,v 1.41 2005/01/13 20:05:36 yeti Exp $
+ * Python extension computing Levenshtein distances, string similarities,
+ * median strings and other goodies.
+ *
+ * Copyright (C) 2002-2003 David Necas (Yeti) <yeti@physics.muni.cz>.
+ *
+ * The Taus113 random generator:
+ * Copyright (C) 2002 Atakan Gurkan
+ * Copyright (C) 1996, 1997, 1998, 1999, 2000 James Theiler, Brian Gough
+ * (see below for more)
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
+ **/
 
 /**
  * TODO:
@@ -38,6 +44,10 @@
  *        trying.  This is very appealing, but hard to do properly
  *        (requires some inequality strong enough to allow practical exclusion
  *        of certain symbols -- at certain positions)
+ *
+ * - Editops should be an object that only *looks* like a list (which means
+ *   it is a list in duck typing) to avoid never-ending conversions from
+ *   Python lists to LevEditOp arrays and back
  *
  * - Optimize munkers_blackman(), it's pretty dumb (no memory of visited
  *   columns/rows)
@@ -81,39 +91,68 @@
 #define _GNU_SOURCE
 #include <string.h>
 #include <math.h>
+/* for debugging */
+#include <stdio.h>
 #else /* NO_PYTHON */
-#define LEV_STATIC_PY static
+#define _LEV_STATIC_PY static
 #define lev_wchar Py_UNICODE
 #include <Python.h>
 #endif /* NO_PYTHON */
+
 #include <assert.h>
-#include <stdio.h>
 #include "Levenshtein.h"
 
 /* FIXME: inline avaliability should be solved in setup.py, somehow, or
- * even better in Python.h */
+ * even better in Python.h, like const is...
+ * this should inline at least with gcc and msvc */
 #ifndef __GNUC__
-#define inline /* */
+#  ifdef _MSC_VER
+#    define inline __inline
+#  else
+#    define inline /* */
+#  endif
+#  define __attribute__(x) /* */
 #endif
 
-/* local functions */
-static lev_wchar*
-make_usymlist(size_t n,
-              const size_t *lengths,
-              const lev_wchar *strings[],
-              size_t *symlistlen);
+#define LEV_EPSILON 1e-14
+#define LEV_INFINITY 1e100
 
+/* Me thinks the second argument of PyArg_UnpackTuple() should be const.
+ * Anyway I habitually pass a constant string.
+ * A cast to placate the compiler. */
+#define PYARGCFIX(x) (char*)(x)
+
+/* local functions */
 static size_t*
 munkers_blackman(size_t n1,
                  size_t n2,
                  double *dists);
 
+#define TAUS113_LCG(n) ((69069UL * n) & 0xffffffffUL)
+#define TAUS113_MASK 0xffffffffUL
+
+typedef struct {
+  unsigned long int z1, z2, z3, z4;
+} taus113_state_t;
+
+static inline unsigned long int
+taus113_get(taus113_state_t *state);
+
+static void
+taus113_set(taus113_state_t *state,
+            unsigned long int s);
+
 #ifndef NO_PYTHON
 /* python interface and wrappers */
+/* declarations and docstrings {{{ */
 static PyObject* distance_py(PyObject *self, PyObject *args);
 static PyObject* ratio_py(PyObject *self, PyObject *args);
+static PyObject* hamming_py(PyObject *self, PyObject *args);
+static PyObject* jaro_py(PyObject *self, PyObject *args);
+static PyObject* jaro_winkler_py(PyObject *self, PyObject *args);
 static PyObject* median_py(PyObject *self, PyObject *args);
 static PyObject* median_improve_py(PyObject *self, PyObject *args);
+static PyObject* quickmedian_py(PyObject *self, PyObject *args);
 static PyObject* setmedian_py(PyObject *self, PyObject *args);
 static PyObject* seqratio_py(PyObject *self, PyObject *args);
 static PyObject* setratio_py(PyObject *self, PyObject *args);
@@ -122,6 +161,7 @@ static PyObject* opcodes_py(PyObject *self, PyObject *args);
 static PyObject* inverse_py(PyObject *self, PyObject *args);
 static PyObject* apply_edit_py(PyObject *self, PyObject *args);
 static PyObject* matching_blocks_py(PyObject *self, PyObject *args);
+static PyObject* subtract_edit_py(PyObject *self, PyObject *args);
 
 #define Levenshtein_DESC \
   "A C extension module for fast computation of:\n" \
@@ -172,6 +212,60 @@ static PyObject* matching_blocks_py(PyObject *self, PyObject *args);
   "\n" \
   "Really?  I thought there was some similarity.\n"
 
+#define hamming_DESC \
+  "Compute Hamming distance of two strings.\n" \
+  "\n" \
+  "hamming(string1, string2)\n" \
+  "\n" \
+  "The Hamming distance is simply the number of differing characters.\n" \
+  "That means the length of the strings must be the same.\n" \
+  "\n" \
+  "Examples:\n" \
+  ">>> hamming('Hello world!', 'Holly grail!')\n" \
+  "7\n" \
+  ">>> hamming('Brian', 'Jesus')\n" \
+  "5\n"
+
+#define jaro_DESC \
+  "Compute Jaro string similarity metric of two strings.\n" \
+  "\n" \
+  "jaro(string1, string2)\n" \
+  "\n" \
+  "The Jaro string similarity metric is intended for short strings like\n" \
+  "personal last names.  It is 0 for completely different strings and\n" \
+  "1 for identical strings.\n" \
+  "\n" \
+  "Examples:\n" \
+  ">>> jaro('Brian', 'Jesus')\n" \
+  "0.0\n" \
+  ">>> jaro('Thorkel', 'Thorgier')\n" \
+  "0.77976190476190477\n" \
+  ">>> jaro('Dinsdale', 'D')\n" \
+  "0.70833333333333337\n"
+
+#define jaro_winkler_DESC \
+  "Compute Jaro string similarity metric of two strings.\n" \
+  "\n" \
+  "jaro_winkler(string1, string2[, prefix_weight])\n" \
+  "\n" \
+  "The Jaro-Winkler string similarity metric is a modification of Jaro\n" \
+  "metric giving more weight to common prefix, as spelling mistakes are\n" \
+  "more likely to occur near ends of words.\n" \
+  "\n" \
+  "The prefix weight is inverse value of common prefix length sufficient\n" \
+  "to consider the strings `identical'.  If no prefix weight is\n" \
+  "specified, 1/10 is used.\n" \
+  "\n" \
+  "Examples:\n" \
+  ">>> jaro_winkler('Brian', 'Jesus')\n" \
+  "0.0\n" \
+  ">>> jaro_winkler('Thorkel', 'Thorgier')\n" \
+  "0.86785714285714288\n" \
+  ">>> jaro_winkler('Dinsdale', 'D')\n" \
+  "0.73750000000000004\n" \
+  ">>> jaro_winkler('Thorkel', 'Thorgier', 0.25)\n" \
+  "1.0\n"
+
 #define median_DESC \
   "Find an approximate generalized median string using greedy algorithm.\n" \
   "\n" \
@@ -219,12 +313,29 @@ static PyObject* matching_blocks_py(PyObject *self, PyObject *args);
   "\n" \
   "It takes some work to change spam to Levenshtein.\n"
 
+#define quickmedian_DESC \
+  "Find a very approximate generalized median string, but fast.\n" \
+  "\n" \
+  "quickmedian(string[, weight_sequence])\n" \
+  "\n" \
+  "See median() for argument description.\n" \
+  "\n" \
+  "This method is somewhere between setmedian() and picking a random\n" \
+  "string from the set; both speedwise and quality-wise.\n" \
+  "\n" \
+  "Examples:\n" \
+  ">>> fixme = ['Levnhtein', 'Leveshein', 'Leenshten',\n" \
+  "...          'Leveshtei', 'Lenshtein', 'Lvenstein',\n" \
+  "...          'Levenhtin', 'evenshtei']\n" \
+  ">>> quickmedian(fixme)\n" \
+  "'Levnshein'\n"
+
 #define setmedian_DESC \
   "Find set median of a string set (passed as a sequence).\n" \
   "\n" \
   "setmedian(string[, weight_sequence])\n" \
   "\n" \
-  "See median(), for argument description.\n" \
+  "See median() for argument description.\n" \
   "\n" \
   "The returned string is always one of the strings in the sequence.\n" \
   "\n" \
@@ -318,7 +429,7 @@ static PyObject* matching_blocks_py(PyObject *self, PyObject *args);
   "inverse(edit_operations)\n" \
   "\n" \
   "In other words, it returns a list of edit operations transforming the\n" \
-  "second (destination) string to the first (source).  It can be uses\n" \
+  "second (destination) string to the first (source).  It can be used\n" \
   "with both editops and opcodes.\n" \
   "\n" \
   "Examples:\n" \
@@ -364,22 +475,65 @@ static PyObject* matching_blocks_py(PyObject *self, PyObject *args);
   "\n" \
   "The result is a list of triples with the same meaning as in\n" \
   "SequenceMatcher's get_matching_blocks() output.  It can be used with\n" \
-  "both editops and opcodes.  The second and third arguments dont't\n" \
-  "to be actually strings, their lengths are enough.\n" \
+  "both editops and opcodes.  The second and third arguments don't\n" \
+  "have to be actually strings, their lengths are enough.\n" \
   "\n" \
   "Examples:\n" \
   ">>> a, b = 'spam', 'park'\n" \
   ">>> matching_blocks(editops(a, b), a, b)\n" \
   "[(1, 0, 2), (4, 4, 0)]\n" \
   ">>> matching_blocks(editops(a, b), len(a), len(b))\n" \
-  "[(1, 0, 2), (4, 4, 0)]\n"
+  "[(1, 0, 2), (4, 4, 0)]\n" \
+  "\n" \
+  "The last zero-length block is not an error, but it's there for\n" \
+  "compatibility with difflib which always emits it.\n" \
+  "\n" \
+  "One can join the matching blocks to get two identical strings:\n" \
+  ">>> a, b = 'dog kennels', 'mattresses'\n" \
+  ">>> mb = matching_blocks(editops(a,b), a, b)\n" \
+  ">>> ''.join([a[x[0]:x[0]+x[2]] for x in mb])\n" \
+  "'ees'\n" \
+  ">>> ''.join([b[x[1]:x[1]+x[2]] for x in mb])\n" \
+  "'ees'\n"
+
+#define subtract_edit_DESC \
+  "Subtract an edit subsequence from a sequence.\n" \
+  "\n" \
+  "subtract_edit(edit_operations, subsequence)\n" \
+  "\n" \
+  "The result is equivalent to\n" \
+  "editops(apply_edit(subsequence, s1, s2), s2), except that is\n" \
+  "constructed directly from the edit operations.  That is, if you apply\n" \
+  "it to the result of subsequence application, you get the same final\n" \
+  "string as from application complete edit_operations.  It may be not\n" \
+  "identical, though (in amibuous cases, like insertion of a character\n" \
+  "next to the same character).\n" \
+  "\n" \
+  "The subtracted subsequence must be an ordered subset of\n" \
+  "edit_operations.\n" \
+  "\n" \
+  "Note this function does not accept difflib-style opcodes as no one in\n" \
+  "his right mind wants to create subsequences from them.\n" \
+  "\n" \
+  "Examples:\n" \
+  ">>> e = editops('man', 'scotsman')\n" \
+  ">>> e1 = e[:3]\n" \
+  ">>> bastard = apply_edit(e1, 'man', 'scotsman')\n" \
+  ">>> bastard\n" \
+  "'scoman'\n" \
+  ">>> apply_edit(subtract_edit(e, e1), bastard, 'scotsman')\n" \
+  "'scotsman'\n" \
 
 #define METHODS_ITEM(x) { #x, x##_py, METH_VARARGS, x##_DESC }
-PyMethodDef methods[] = {
+static PyMethodDef methods[] = {
   METHODS_ITEM(distance),
   METHODS_ITEM(ratio),
+  METHODS_ITEM(hamming),
+  METHODS_ITEM(jaro),
+  METHODS_ITEM(jaro_winkler),
   METHODS_ITEM(median),
   METHODS_ITEM(median_improve),
+  METHODS_ITEM(quickmedian),
   METHODS_ITEM(setmedian),
   METHODS_ITEM(seqratio),
   METHODS_ITEM(setratio),
@@ -388,6 +542,7 @@ PyMethodDef methods[] = {
   METHODS_ITEM(inverse),
   METHODS_ITEM(apply_edit),
   METHODS_ITEM(matching_blocks),
+  METHODS_ITEM(subtract_edit),
   { NULL, NULL, 0, NULL },
 };
 
@@ -458,7 +613,7 @@ typedef struct {
 
 static long int
 levenshtein_common(PyObject *args,
-                   char *name,
+                   const char *name,
                    size_t xcost,
                    size_t *lensum);
 
@@ -489,21 +644,23 @@ setseq_common(PyObject *args,
               const char *name,
               SetSeqFuncs foo,
               size_t *lensum);
+/* }}} */
 
 /****************************************************************************
  *
  * Python interface and subroutines
  *
  ****************************************************************************/
+/* {{{ */
 
 static long int
-levenshtein_common(PyObject *args, char *name, size_t xcost,
+levenshtein_common(PyObject *args, const char *name, size_t xcost,
                    size_t *lensum)
 {
   PyObject *arg1, *arg2;
   size_t len1, len2;
 
-  if (!PyArg_UnpackTuple(args, name, 2, 2, &arg1, &arg2))
+  if (!PyArg_UnpackTuple(args, PYARGCFIX(name), 2, 2, &arg1, &arg2))
     return -1;
 
   if (PyObject_TypeCheck(arg1, &PyString_Type)
@@ -543,7 +700,7 @@ levenshtein_common(PyObject *args, char *name, size_t xcost,
     }
   }
   else {
-    PyErr_Format(PyExc_ValueError,
+    PyErr_Format(PyExc_TypeError,
                  "%s expected two Strings or two Unicodes", name);
     return -1;
   }
@@ -577,6 +734,147 @@ ratio_py(PyObject *self, PyObject *args)
 }
 
 static PyObject*
+hamming_py(PyObject *self, PyObject *args)
+{
+  PyObject *arg1, *arg2;
+  const char *name = "hamming";
+  size_t len1, len2;
+  long int dist;
+
+  if (!PyArg_UnpackTuple(args, PYARGCFIX(name), 2, 2, &arg1, &arg2))
+    return NULL;
+
+  if (PyObject_TypeCheck(arg1, &PyString_Type)
+      && PyObject_TypeCheck(arg2, &PyString_Type)) {
+    lev_byte *string1, *string2;
+
+    len1 = PyString_GET_SIZE(arg1);
+    len2 = PyString_GET_SIZE(arg2);
+    if (len1 != len2) {
+      PyErr_Format(PyExc_ValueError,
+                   "%s expected two strings of the same length", name);
+      return NULL;
+    }
+    string1 = PyString_AS_STRING(arg1);
+    string2 = PyString_AS_STRING(arg2);
+    dist = lev_hamming_distance(len1, string1, string2);
+    return PyInt_FromLong(dist);
+  }
+  else if (PyObject_TypeCheck(arg1, &PyUnicode_Type)
+      && PyObject_TypeCheck(arg2, &PyUnicode_Type)) {
+    Py_UNICODE *string1, *string2;
+
+    len1 = PyUnicode_GET_SIZE(arg1);
+    len2 = PyUnicode_GET_SIZE(arg2);
+    if (len1 != len2) {
+      PyErr_Format(PyExc_ValueError,
+                   "%s expected two unicodes of the same length", name);
+      return NULL;
+    }
+    string1 = PyUnicode_AS_UNICODE(arg1);
+    string2 = PyUnicode_AS_UNICODE(arg2);
+    dist = lev_u_hamming_distance(len1, string1, string2);
+    return PyInt_FromLong(dist);
+  }
+  else {
+    PyErr_Format(PyExc_TypeError,
+                 "%s expected two Strings or two Unicodes", name);
+    return NULL;
+  }
+}
+
+static PyObject*
+jaro_py(PyObject *self, PyObject *args)
+{
+  PyObject *arg1, *arg2;
+  const char *name = "jaro";
+  size_t len1, len2;
+
+  if (!PyArg_UnpackTuple(args, PYARGCFIX(name), 2, 2, &arg1, &arg2))
+    return NULL;
+
+  if (PyObject_TypeCheck(arg1, &PyString_Type)
+      && PyObject_TypeCheck(arg2, &PyString_Type)) {
+    lev_byte *string1, *string2;
+
+    len1 = PyString_GET_SIZE(arg1);
+    len2 = PyString_GET_SIZE(arg2);
+    string1 = PyString_AS_STRING(arg1);
+    string2 = PyString_AS_STRING(arg2);
+    return PyFloat_FromDouble(lev_jaro_ratio(len1, string1, len2, string2));
+  }
+  else if (PyObject_TypeCheck(arg1, &PyUnicode_Type)
+      && PyObject_TypeCheck(arg2, &PyUnicode_Type)) {
+    Py_UNICODE *string1, *string2;
+
+    len1 = PyUnicode_GET_SIZE(arg1);
+    len2 = PyUnicode_GET_SIZE(arg2);
+    string1 = PyUnicode_AS_UNICODE(arg1);
+    string2 = PyUnicode_AS_UNICODE(arg2);
+    return PyFloat_FromDouble(lev_u_jaro_ratio(len1, string1, len2, string2));
+  }
+  else {
+    PyErr_Format(PyExc_TypeError,
+                 "%s expected two Strings or two Unicodes", name);
+    return NULL;
+  }
+}
+
+static PyObject*
+jaro_winkler_py(PyObject *self, PyObject *args)
+{
+  PyObject *arg1, *arg2, *arg3 = NULL;
+  double pfweight = 0.1;
+  const char *name = "jaro_winkler";
+  size_t len1, len2;
+
+  if (!PyArg_UnpackTuple(args, PYARGCFIX(name), 2, 3, &arg1, &arg2, &arg3))
+    return NULL;
+
+  if (arg3) {
+    if (!PyObject_TypeCheck(arg3, &PyFloat_Type)) {
+      PyErr_Format(PyExc_TypeError, "%s third argument must be a Float", name);
+      return NULL;
+    }
+    pfweight = PyFloat_AS_DOUBLE(arg3);
+    if (pfweight < 0.0) {
+      PyErr_Format(PyExc_ValueError, "%s negative prefix weight", name);
+      return NULL;
+    }
+  }
+
+  if (PyObject_TypeCheck(arg1, &PyString_Type)
+      && PyObject_TypeCheck(arg2, &PyString_Type)) {
+    lev_byte *string1, *string2;
+
+    len1 = PyString_GET_SIZE(arg1);
+    len2 = PyString_GET_SIZE(arg2);
+    string1 = PyString_AS_STRING(arg1);
+    string2 = PyString_AS_STRING(arg2);
+    return PyFloat_FromDouble(lev_jaro_winkler_ratio(len1, string1,
+                                                     len2, string2,
+                                                     pfweight));
+  }
+  else if (PyObject_TypeCheck(arg1, &PyUnicode_Type)
+      && PyObject_TypeCheck(arg2, &PyUnicode_Type)) {
+    Py_UNICODE *string1, *string2;
+
+    len1 = PyUnicode_GET_SIZE(arg1);
+    len2 = PyUnicode_GET_SIZE(arg2);
+    string1 = PyUnicode_AS_UNICODE(arg1);
+    string2 = PyUnicode_AS_UNICODE(arg2);
+    return PyFloat_FromDouble(lev_u_jaro_winkler_ratio(len1, string1,
+                                                       len2, string2,
+                                                       pfweight));
+  }
+  else {
+    PyErr_Format(PyExc_TypeError,
+                 "%s expected two Strings or two Unicodes", name);
+    return NULL;
+  }
+}
+
+static PyObject*
 median_py(PyObject *self, PyObject *args)
 {
   MedianFuncs engines = { lev_greedy_median, lev_u_greedy_median };
@@ -588,6 +886,13 @@ median_improve_py(PyObject *self, PyObject *args)
 {
   MedianImproveFuncs engines = { lev_median_improve, lev_u_median_improve };
   return median_improve_common(args, "median_improve", engines);
+}
+
+static PyObject*
+quickmedian_py(PyObject *self, PyObject *args)
+{
+  MedianFuncs engines = { lev_quick_median, lev_u_quick_median };
+  return median_common(args, "quickmedian", engines);
 }
 
 static PyObject*
@@ -610,11 +915,11 @@ median_common(PyObject *args, const char *name, MedianFuncs foo)
   int stringtype;
   PyObject *result = NULL;
 
-  if (!PyArg_UnpackTuple(args, name, 1, 2, &strlist, &wlist))
+  if (!PyArg_UnpackTuple(args, PYARGCFIX(name), 1, 2, &strlist, &wlist))
     return NULL;
 
   if (!PySequence_Check(strlist)) {
-    PyErr_Format(PyExc_ValueError,
+    PyErr_Format(PyExc_TypeError,
                  "%s first argument must be a Sequence", name);
     return NULL;
   }
@@ -682,7 +987,7 @@ median_improve_common(PyObject *args, const char *name, MedianImproveFuncs foo)
   int stringtype;
   PyObject *result = NULL;
 
-  if (!PyArg_UnpackTuple(args, name, 2, 3, &arg1, &strlist, &wlist))
+  if (!PyArg_UnpackTuple(args, PYARGCFIX(name), 2, 3, &arg1, &strlist, &wlist))
     return NULL;
 
   if (PyObject_TypeCheck(arg1, &PyString_Type))
@@ -690,13 +995,13 @@ median_improve_common(PyObject *args, const char *name, MedianImproveFuncs foo)
   else if (PyObject_TypeCheck(arg1, &PyUnicode_Type))
     stringtype = 1;
   else {
-    PyErr_Format(PyExc_ValueError,
+    PyErr_Format(PyExc_TypeError,
                  "%s first argument must be a String or Unicode", name);
     return NULL;
   }
 
   if (!PySequence_Check(strlist)) {
-    PyErr_Format(PyExc_ValueError,
+    PyErr_Format(PyExc_TypeError,
                  "%s second argument must be a Sequence", name);
     return NULL;
   }
@@ -717,7 +1022,7 @@ median_improve_common(PyObject *args, const char *name, MedianImproveFuncs foo)
   }
 
   if (extract_stringlist(strseq, name, n, &sizes, &strings) != stringtype) {
-    PyErr_Format(PyExc_ValueError,
+    PyErr_Format(PyExc_TypeError,
                  "%s argument types don't match", name);
     free(weights);
     return NULL;
@@ -764,7 +1069,7 @@ extract_weightlist(PyObject *wlist, const char *name, size_t n)
 
   if (wlist) {
     if (!PySequence_Check(wlist)) {
-      PyErr_Format(PyExc_ValueError,
+      PyErr_Format(PyExc_TypeError,
                   "%s second argument must be a Sequence", name);
       return NULL;
     }
@@ -785,7 +1090,7 @@ extract_weightlist(PyObject *wlist, const char *name, size_t n)
 
       if (!number) {
         free(weights);
-        PyErr_Format(PyExc_ValueError,
+        PyErr_Format(PyExc_TypeError,
                      "%s weight #%i is not a Number", name, i);
         Py_DECREF(seq);
         return NULL;
@@ -863,7 +1168,7 @@ extract_stringlist(PyObject *list, const char *name,
       if (!PyObject_TypeCheck(item, &PyString_Type)) {
         free(strings);
         free(sizes);
-        PyErr_Format(PyExc_ValueError,
+        PyErr_Format(PyExc_TypeError,
                      "%s item #%i is not a String", name, i);
         return -1;
       }
@@ -899,7 +1204,7 @@ extract_stringlist(PyObject *list, const char *name,
       if (!PyObject_TypeCheck(item, &PyUnicode_Type)) {
         free(strings);
         free(sizes);
-        PyErr_Format(PyExc_ValueError,
+        PyErr_Format(PyExc_TypeError,
                      "%s item #%i is not a Unicode", name, i);
         return -1;
       }
@@ -912,7 +1217,7 @@ extract_stringlist(PyObject *list, const char *name,
     return 1;
   }
 
-  PyErr_Format(PyExc_ValueError,
+  PyErr_Format(PyExc_TypeError,
                "%s expected list of Strings or Unicodes", name);
   return -1;
 }
@@ -959,16 +1264,16 @@ setseq_common(PyObject *args, const char *name, SetSeqFuncs foo,
   int stringtype1, stringtype2;
   double r = -1.0;
 
-  if (!PyArg_UnpackTuple(args, name, 2, 2, &strlist1, &strlist2))
+  if (!PyArg_UnpackTuple(args, PYARGCFIX(name), 2, 2, &strlist1, &strlist2))
     return r;
 
   if (!PySequence_Check(strlist1)) {
-    PyErr_Format(PyExc_ValueError,
+    PyErr_Format(PyExc_TypeError,
                  "%s first argument must be a Sequence", name);
     return r;
   }
   if (!PySequence_Check(strlist2)) {
-    PyErr_Format(PyExc_ValueError,
+    PyErr_Format(PyExc_TypeError,
                  "%s second argument must be a Sequence", name);
     return r;
   }
@@ -1005,7 +1310,7 @@ setseq_common(PyObject *args, const char *name, SetSeqFuncs foo,
   }
 
   if (stringtype1 != stringtype2) {
-    PyErr_Format(PyExc_ValueError,
+    PyErr_Format(PyExc_TypeError,
                   "%s both sequences must consist of items of the same type",
                   name);
   }
@@ -1219,11 +1524,9 @@ editops_py(PyObject *self, PyObject *args)
   LevEditOp *ops;
   LevOpCode *bops;
 
-  if (!PyArg_UnpackTuple(args, "editops", 2, 3, &arg1, &arg2, &arg3)) {
-    PyErr_Format(PyExc_ValueError,
-                 "editops expected two Strings or two Unicodes");
+  if (!PyArg_UnpackTuple(args, PYARGCFIX("editops"), 2, 3,
+                         &arg1, &arg2, &arg3))
     return NULL;
-  }
 
   /* convert: we were called (bops, s1, s2) */
   if (arg3) {
@@ -1274,7 +1577,7 @@ editops_py(PyObject *self, PyObject *args)
       return arg1;
     }
     if (!PyErr_Occurred())
-      PyErr_Format(PyExc_ValueError,
+      PyErr_Format(PyExc_TypeError,
                   "editops first argument must be a List of edit operations");
     return NULL;
   }
@@ -1301,7 +1604,7 @@ editops_py(PyObject *self, PyObject *args)
     ops = lev_u_editops_find(len1, string1, len2, string2, &n);
   }
   else {
-    PyErr_Format(PyExc_ValueError,
+    PyErr_Format(PyExc_TypeError,
                  "editops expected two Strings or two Unicodes");
     return NULL;
   }
@@ -1343,16 +1646,14 @@ opcodes_py(PyObject *self, PyObject *args)
   LevEditOp *ops;
   LevOpCode *bops;
 
-  if (!PyArg_UnpackTuple(args, "opcodes", 2, 3, &arg1, &arg2, &arg3)) {
-    PyErr_Format(PyExc_ValueError,
-                 "opcodes expected two Strings or two Unicodes");
+  if (!PyArg_UnpackTuple(args, PYARGCFIX("opcodes"), 2, 3,
+                         &arg1, &arg2, &arg3))
     return NULL;
-  }
 
   /* convert: we were called (ops, s1, s2) */
   if (arg3) {
     if (!PyList_Check(arg1)) {
-      PyErr_Format(PyExc_ValueError,
+      PyErr_Format(PyExc_TypeError,
                   "opcodes first argument must be a List of edit operations");
       return NULL;
     }
@@ -1394,7 +1695,7 @@ opcodes_py(PyObject *self, PyObject *args)
       return arg1;
     }
     if (!PyErr_Occurred())
-      PyErr_Format(PyExc_ValueError,
+      PyErr_Format(PyExc_TypeError,
                   "opcodes first argument must be a List of edit operations");
     return NULL;
   }
@@ -1421,7 +1722,7 @@ opcodes_py(PyObject *self, PyObject *args)
     ops = lev_u_editops_find(len1, string1, len2, string2, &n);
   }
   else {
-    PyErr_Format(PyExc_ValueError,
+    PyErr_Format(PyExc_TypeError,
                  "opcodes expected two Strings or two Unicodes");
     return NULL;
   }
@@ -1444,12 +1745,9 @@ inverse_py(PyObject *self, PyObject *args)
   LevEditOp *ops;
   LevOpCode *bops;
 
-  if (!PyArg_UnpackTuple(args, "inverse", 1, 1, &list)
-      || !PyList_Check(list)) {
-    PyErr_Format(PyExc_ValueError,
-                 "inverse expected a List of edit operations");
+  if (!PyArg_UnpackTuple(args, PYARGCFIX("inverse"), 1, 1, &list)
+      || !PyList_Check(list))
     return NULL;
-  }
 
   n = PyList_GET_SIZE(list);
   if (!n) {
@@ -1457,20 +1755,20 @@ inverse_py(PyObject *self, PyObject *args)
     return list;
   }
   if ((ops = extract_editops(list)) != NULL) {
-    lev_editops_inverse(n, ops);
+    lev_editops_invert(n, ops);
     result = editops_to_tuple_list(n, ops);
     free(ops);
     return result;
   }
   if ((bops = extract_opcodes(list)) != NULL) {
-    lev_opcodes_inverse(n, bops);
+    lev_opcodes_invert(n, bops);
     result = opcodes_to_tuple_list(n, bops);
     free(bops);
     return result;
   }
 
   if (!PyErr_Occurred())
-    PyErr_Format(PyExc_ValueError,
+    PyErr_Format(PyExc_TypeError,
                 "inverse expected a list of edit operations");
   return NULL;
 }
@@ -1483,13 +1781,12 @@ apply_edit_py(PyObject *self, PyObject *args)
   LevEditOp *ops;
   LevOpCode *bops;
 
-  if (!PyArg_UnpackTuple(args, "apply_edit", 3, 3, &list, &arg1, &arg2)) {
-    PyErr_Format(PyExc_ValueError,
-                 "apply_edit expected a three arguments");
+  if (!PyArg_UnpackTuple(args, PYARGCFIX("apply_edit"), 3, 3,
+                         &list, &arg1, &arg2))
     return NULL;
-  }
+
   if (!PyList_Check(list)) {
-    PyErr_Format(PyExc_ValueError,
+    PyErr_Format(PyExc_TypeError,
                  "apply_edit first argument must be a List of edit operations");
     return NULL;
   }
@@ -1542,7 +1839,7 @@ apply_edit_py(PyObject *self, PyObject *args)
     }
 
     if (!PyErr_Occurred())
-      PyErr_Format(PyExc_ValueError,
+      PyErr_Format(PyExc_TypeError,
                   "apply_edit first argument must be "
                   "a List of edit operations");
     return NULL;
@@ -1594,13 +1891,13 @@ apply_edit_py(PyObject *self, PyObject *args)
     }
 
     if (!PyErr_Occurred())
-      PyErr_Format(PyExc_ValueError,
+      PyErr_Format(PyExc_TypeError,
                    "apply_edit first argument must be "
                    "a List of edit operations");
     return NULL;
   }
 
-  PyErr_Format(PyExc_ValueError,
+  PyErr_Format(PyExc_TypeError,
                "apply_edit expected two Strings or two Unicodes");
   return NULL;
 }
@@ -1614,16 +1911,13 @@ matching_blocks_py(PyObject *self, PyObject *args)
   LevOpCode *bops;
   LevMatchingBlock *mblocks;
 
-  if (!PyArg_UnpackTuple(args, "matching_blocks", 3, 3, &list, &arg1, &arg2)
-      || !PyList_Check(list)) {
-    PyErr_Format(PyExc_ValueError,
-                 "matching_blocks expected a List of edit operations "
-                 "and two sizes");
+  if (!PyArg_UnpackTuple(args, PYARGCFIX("matching_blocks"), 3, 3,
+                         &list, &arg1, &arg2)
+      || !PyList_Check(list))
     return NULL;
-  }
 
   if (!PyList_Check(list)) {
-    PyErr_Format(PyExc_ValueError,
+    PyErr_Format(PyExc_TypeError,
                  "matching_blocks first argument must be "
                  "a List of edit operations");
     return NULL;
@@ -1670,8 +1964,58 @@ matching_blocks_py(PyObject *self, PyObject *args)
   }
 
   if (!PyErr_Occurred())
-    PyErr_Format(PyExc_ValueError,
+    PyErr_Format(PyExc_TypeError,
                 "inverse expected a list of edit operations");
+  return NULL;
+}
+
+static PyObject*
+subtract_edit_py(PyObject *self, PyObject *args)
+{
+  PyObject *list, *sub, *result;
+  size_t n, ns, nr;
+  LevEditOp *ops, *osub, *orem;
+
+  if (!PyArg_UnpackTuple(args, PYARGCFIX("subtract_edit"), 2, 2, &list, &sub)
+      || !PyList_Check(list))
+    return NULL;
+
+  ns = PyList_GET_SIZE(sub);
+  if (!ns) {
+    Py_INCREF(list);
+    return list;
+  }
+  n = PyList_GET_SIZE(list);
+  if (!n) {
+    PyErr_Format(PyExc_ValueError,
+                 "subtract_edit subsequence is not a subsequence "
+                 "or is invalid");
+    return NULL;
+  }
+
+  if ((ops = extract_editops(list)) != NULL) {
+      if ((osub = extract_editops(sub)) != NULL) {
+          orem = lev_editops_subtract(n, ops, ns, osub, &nr);
+          free(ops);
+          free(osub);
+
+          if (!orem && nr == -1) {
+              PyErr_Format(PyExc_ValueError,
+                           "subtract_edit subsequence is not a subsequence "
+                           "or is invalid");
+              return NULL;
+          }
+          result = editops_to_tuple_list(nr, orem);
+          free(orem);
+
+          return result;
+      }
+      free(ops);
+  }
+
+  if (!PyErr_Occurred())
+    PyErr_Format(PyExc_TypeError,
+                "subtract_edit expected two lists of edit operations");
   return NULL;
 }
 
@@ -1691,7 +2035,9 @@ initLevenshtein(void)
       = PyString_InternFromString(opcode_names[i].cstring);
     opcode_names[i].len = strlen(opcode_names[i].cstring);
   }
+  lev_init_rng(0);
 }
+/* }}} */
 #endif /* not NO_PYTHON */
 
 /****************************************************************************
@@ -1702,21 +2048,119 @@ initLevenshtein(void)
 
 /****************************************************************************
  *
+ * Taus113
+ *
+ ****************************************************************************/
+/* {{{ */
+
+/*
+ * Based on Tausworthe random generator implementation rng/taus113.c
+ * from the GNU Scientific Library (http://sources.redhat.com/gsl/)
+ * which has the notice
+ * Copyright (C) 2002 Atakan Gurkan
+ * Based on the file taus.c which has the notice
+ * Copyright (C) 1996, 1997, 1998, 1999, 2000 James Theiler, Brian Gough
+ */
+
+static inline unsigned long
+taus113_get(taus113_state_t *state)
+{
+  unsigned long b1, b2, b3, b4;
+
+  b1 = ((((state->z1 << 6UL) & TAUS113_MASK) ^ state->z1) >> 13UL);
+  state->z1 = ((((state->z1 & 4294967294UL) << 18UL) & TAUS113_MASK) ^ b1);
+
+  b2 = ((((state->z2 << 2UL) & TAUS113_MASK) ^ state->z2) >> 27UL);
+  state->z2 = ((((state->z2 & 4294967288UL) << 2UL) & TAUS113_MASK) ^ b2);
+
+  b3 = ((((state->z3 << 13UL) & TAUS113_MASK) ^ state->z3) >> 21UL);
+  state->z3 = ((((state->z3 & 4294967280UL) << 7UL) & TAUS113_MASK) ^ b3);
+
+  b4 = ((((state->z4 << 3UL) & TAUS113_MASK) ^ state->z4) >> 12UL);
+  state->z4 = ((((state->z4 & 4294967168UL) << 13UL) & TAUS113_MASK) ^ b4);
+
+  return (state->z1 ^ state->z2 ^ state->z3 ^ state->z4);
+
+}
+
+static void
+taus113_set(taus113_state_t *state,
+            unsigned long int s)
+{
+  if (!s)
+    s = 1UL;                    /* default seed is 1 */
+
+  state->z1 = TAUS113_LCG(s);
+  if (state->z1 < 2UL)
+    state->z1 += 2UL;
+
+  state->z2 = TAUS113_LCG(state->z1);
+  if (state->z2 < 8UL)
+    state->z2 += 8UL;
+
+  state->z3 = TAUS113_LCG(state->z2);
+  if (state->z3 < 16UL)
+    state->z3 += 16UL;
+
+  state->z4 = TAUS113_LCG(state->z3);
+  if (state->z4 < 128UL)
+    state->z4 += 128UL;
+
+  /* Calling RNG ten times to satify recurrence condition */
+  taus113_get(state);
+  taus113_get(state);
+  taus113_get(state);
+  taus113_get(state);
+  taus113_get(state);
+  taus113_get(state);
+  taus113_get(state);
+  taus113_get(state);
+  taus113_get(state);
+  taus113_get(state);
+}
+
+
+/**
+ * lev_init_rng:
+ * @seed: A seed.  If zero, a default value (currently 1) is used instead.
+ *
+ * Initializes the random generator used by some Levenshtein functions.
+ *
+ * This does NOT happen automatically when these functions are used.
+ **/
+_LEV_STATIC_PY void
+lev_init_rng(unsigned long int seed)
+{
+  static taus113_state_t state;
+
+  taus113_set(&state, seed);
+}
+/* }}} */
+
+/****************************************************************************
+ *
  * Basic stuff, Levenshtein distance
  *
  ****************************************************************************/
+/* {{{ */
 
-#define EPSILON 1e-14
-
-/*
- * Levenshtein distance between string1 and string2.
+/**
+ * lev_edit_distance:
+ * @len1: The length of @string1.
+ * @string1: A sequence of bytes of length @len1, may contain NUL characters.
+ * @len2: The length of @string2.
+ * @string2: A sequence of bytes of length @len2, may contain NUL characters.
+ * @xcost: If nonzero, the replace operation has weight 2, otherwise all
+ *         edit operations have equal weights of 1.
  *
- * Replace cost is normally 1, and 2 with nonzero xcost.
- */
-LEV_STATIC_PY size_t
+ * Computes Levenshtein edit distance of two strings.
+ *
+ * Returns: The edit distance.
+ **/
+_LEV_STATIC_PY size_t
 lev_edit_distance(size_t len1, const lev_byte *string1,
                   size_t len2, const lev_byte *string2,
-                  size_t xcost)
+                  int xcost)
 {
   size_t i;
   size_t *row;  /* we only need to keep one row of costs */
@@ -1856,15 +2300,44 @@ lev_edit_distance(size_t len1, const lev_byte *string1,
   return i;
 }
 
-/*
- * Levenshtein distance between string1 and string2 (Unicode).
+_LEV_STATIC_PY double
+lev_edit_distance_sod(size_t len, const lev_byte *string,
+                      size_t n, const size_t *lengths,
+                      const lev_byte *strings[],
+                      const double *weights,
+                      int xcost)
+{
+  size_t i, d;
+  double sum = 0.0;
+
+  for (i = 0; i < n; i++) {
+    d = lev_edit_distance(len, string, lengths[i], strings[i], xcost);
+    if (d == (size_t)-1)
+      return -1.0;
+    sum += weights[i]*d;
+  }
+  return sum;
+}
+
+/**
+ * lev_u_edit_distance:
+ * @len1: The length of @string1.
+ * @string1: A sequence of Unicode characters of length @len1, may contain NUL
+ *           characters.
+ * @len2: The length of @string2.
+ * @string2: A sequence of Unicode characters of length @len2, may contain NUL
+ *           characters.
+ * @xcost: If nonzero, the replace operation has weight 2, otherwise all
+ *         edit operations have equal weights of 1.
  *
- * Replace cost is normally 1, and 2 with nonzero xcost.
- */
-LEV_STATIC_PY size_t
+ * Computes Levenshtein edit distance of two Unicode strings.
+ *
+ * Returns: The edit distance.
+ **/
+_LEV_STATIC_PY size_t
 lev_u_edit_distance(size_t len1, const lev_wchar *string1,
                     size_t len2, const lev_wchar *string2,
-                    size_t xcost)
+                    int xcost)
 {
   size_t i;
   size_t *row;  /* we only need to keep one row of costs */
@@ -2006,15 +2479,349 @@ lev_u_edit_distance(size_t len1, const lev_wchar *string1,
   return i;
 }
 
+_LEV_STATIC_PY double
+lev_u_edit_distance_sod(size_t len, const lev_wchar *string,
+                        size_t n, const size_t *lengths,
+                        const lev_wchar *strings[],
+                        const double *weights,
+                        int xcost)
+{
+  size_t i, d;
+  double sum = 0.0;
+
+  for (i = 0; i < n; i++) {
+    d = lev_u_edit_distance(len, string, lengths[i], strings[i], xcost);
+    if (d == (size_t)-1)
+      return -1.0;
+    sum += weights[i]*d;
+  }
+  return sum;
+}
+/* }}} */
+
+
 /****************************************************************************
  *
- * Medians (greedy, set, ...)
+ * Other simple distances: Hamming, Jaro, Jaro-Winkler
  *
  ****************************************************************************/
+/* {{{ */
+/**
+ * lev_hamming_distance:
+ * @len: The length of @string1 and @string2.
+ * @string1: A sequence of bytes of length @len1, may contain NUL characters.
+ * @string2: A sequence of bytes of length @len2, may contain NUL characters.
+ *
+ * Computes Hamming distance of two strings.
+ *
+ * The strings must have the same length.
+ *
+ * Returns: The Hamming distance.
+ **/
+_LEV_STATIC_PY size_t
+lev_hamming_distance(size_t len,
+                     const lev_byte *string1,
+                     const lev_byte *string2)
+{
+  size_t dist, i;
+
+  dist = 0;
+  for (i = len; i; i--) {
+    if (*(string1++) != *(string2++))
+      dist++;
+  }
+
+  return dist;
+}
+
+/**
+ * lev_u_hamming_distance:
+ * @len: The length of @string1 and @string2.
+ * @string1: A sequence of Unicode characters of length @len1, may contain NUL
+ *           characters.
+ * @string2: A sequence of Unicode characters of length @len2, may contain NUL
+ *           characters.
+ *
+ * Computes Hamming distance of two strings.
+ *
+ * The strings must have the same length.
+ *
+ * Returns: The Hamming distance.
+ **/
+_LEV_STATIC_PY size_t
+lev_u_hamming_distance(size_t len,
+                       const lev_wchar *string1,
+                       const lev_wchar *string2)
+{
+  size_t dist, i;
+
+  dist = 0;
+  for (i = len; i; i--) {
+    if (*(string1++) != *(string2++))
+      dist++;
+  }
+
+  return dist;
+}
+
+/**
+ * lev_jaro_ratio:
+ * @len1: The length of @string1.
+ * @string1: A sequence of bytes of length @len1, may contain NUL characters.
+ * @len2: The length of @string2.
+ * @string2: A sequence of bytes of length @len2, may contain NUL characters.
+ *
+ * Computes Jaro string similarity metric of two strings.
+ *
+ * Returns: The Jaro metric of @string1 and @string2.
+ **/
+_LEV_STATIC_PY double
+lev_jaro_ratio(size_t len1, const lev_byte *string1,
+               size_t len2, const lev_byte *string2)
+{
+  size_t i, j, halflen, trans, match, to;
+  size_t *idx;
+  double md;
+
+  if (len1 == 0 || len2 == 0) {
+    if (len1 == 0 && len2 == 0)
+      return 1.0;
+    return 0.0;
+  }
+  /* make len1 always shorter (or equally long) */
+  if (len1 > len2) {
+    const lev_byte *b;
+
+    b = string1;
+    string1 = string2;
+    string2 = b;
+
+    i = len1;
+    len1 = len2;
+    len2 = i;
+  }
+
+  halflen = (len1 + 1)/2;
+  idx = (size_t*)calloc(len1, sizeof(size_t));
+  if (!idx)
+    return -1.0;
+
+  /* The literature about Jaro metric is confusing as the method of assigment
+   * of common characters is nowhere specified.  There are several possible
+   * deterministic mutual assignments of common characters of two strings.
+   * We use earliest-position method, which is however suboptimal (e.g., it
+   * gives two transpositions in jaro("Jaro", "Joaro") because of assigment
+   * of the first `o').  No reasonable algorithm for the optimal one is
+   * currently known to me. */
+  match = 0;
+  /* the part with allowed range overlapping left */
+  for (i = 0; i < halflen; i++) {
+    for (j = 0; j <= i+halflen; j++) {
+      if (string1[j] == string2[i] && !idx[j]) {
+        match++;
+        idx[j] = match;
+        break;
+      }
+    }
+  }
+  /* the part with allowed range overlapping right */
+  to = len1+halflen < len2 ? len1+halflen : len2;
+  for (i = halflen; i < to; i++) {
+    for (j = i - halflen; j < len1; j++) {
+      if (string1[j] == string2[i] && !idx[j]) {
+        match++;
+        idx[j] = match;
+        break;
+      }
+    }
+  }
+  if (!match) {
+    free(idx);
+    return 0.0;
+  }
+  /* count transpositions */
+  i = 0;
+  trans = 0;
+  for (j = 0; j < len1; j++) {
+    if (idx[j]) {
+      i++;
+      if (idx[j] != i)
+        trans++;
+    }
+  }
+  free(idx);
+
+  md = (double)match;
+  return (md/len1 + md/len2 + 1.0 - trans/md/2.0)/3.0;
+}
+
+/**
+ * lev_u_jaro_ratio:
+ * @len1: The length of @string1.
+ * @string1: A sequence of Unicode characters of length @len1, may contain NUL
+ *           characters.
+ * @len2: The length of @string2.
+ * @string2: A sequence of Unicode characters of length @len2, may contain NUL
+ *           characters.
+ *
+ * Computes Jaro string similarity metric of two Unicode strings.
+ *
+ * Returns: The Jaro metric of @string1 and @string2.
+ **/
+_LEV_STATIC_PY double
+lev_u_jaro_ratio(size_t len1, const lev_wchar *string1,
+                 size_t len2, const lev_wchar *string2)
+{
+  size_t i, j, halflen, trans, match, to;
+  size_t *idx;
+  double md;
+
+  if (len1 == 0 || len2 == 0) {
+    if (len1 == 0 && len2 == 0)
+      return 1.0;
+    return 0.0;
+  }
+  /* make len1 always shorter (or equally long) */
+  if (len1 > len2) {
+    const lev_wchar *b;
+
+    b = string1;
+    string1 = string2;
+    string2 = b;
+
+    i = len1;
+    len1 = len2;
+    len2 = i;
+  }
+
+  halflen = (len1 + 1)/2;
+  idx = (size_t*)calloc(len1, sizeof(size_t));
+  if (!idx)
+    return -1.0;
+
+  match = 0;
+  /* the part with allowed range overlapping left */
+  for (i = 0; i < halflen; i++) {
+    for (j = 0; j <= i+halflen; j++) {
+      if (string1[j] == string2[i] && !idx[j]) {
+        match++;
+        idx[j] = match;
+        break;
+      }
+    }
+  }
+  /* the part with allowed range overlapping right */
+  to = len1+halflen < len2 ? len1+halflen : len2;
+  for (i = halflen; i < to; i++) {
+    for (j = i - halflen; j < len1; j++) {
+      if (string1[j] == string2[i] && !idx[j]) {
+        match++;
+        idx[j] = match;
+        break;
+      }
+    }
+  }
+  if (!match) {
+    free(idx);
+    return 0.0;
+  }
+  /* count transpositions */
+  i = 0;
+  trans = 0;
+  for (j = 0; j < len1; j++) {
+    if (idx[j]) {
+      i++;
+      if (idx[j] != i)
+        trans++;
+    }
+  }
+  free(idx);
+
+  md = (double)match;
+  return (md/len1 + md/len2 + 1.0 - trans/md/2.0)/3.0;
+}
+
+/**
+ * lev_jaro_winkler_ratio:
+ * @len1: The length of @string1.
+ * @string1: A sequence of bytes of length @len1, may contain NUL characters.
+ * @len2: The length of @string2.
+ * @string2: A sequence of bytes of length @len2, may contain NUL characters.
+ * @pfweight: Prefix weight, i.e., how much weight should be given to a
+ *            common prefix.
+ *
+ * Computes Jaro-Winkler string similarity metric of two strings.
+ *
+ * The formula is J+@pfweight*P*(1-J), where J is Jaro metric and P is the
+ * length of common prefix.
+ *
+ * Returns: The Jaro-Winkler metric of @string1 and @string2.
+ **/
+_LEV_STATIC_PY double
+lev_jaro_winkler_ratio(size_t len1, const lev_byte *string1,
+                       size_t len2, const lev_byte *string2,
+                       double pfweight)
+{
+  double j;
+  size_t p, m;
+
+  j = lev_jaro_ratio(len1, string1, len2, string2);
+  m = len1 < len2 ? len1 : len2;
+  for (p = 0; p < m; p++) {
+    if (string1[p] != string2[p])
+      break;
+  }
+  j += (1.0 - j)*p*pfweight;
+  return j > 1.0 ? 1.0 : j;
+}
+
+/**
+ * lev_u_jaro_winkler_ratio:
+ * @len1: The length of @string1.
+ * @string1: A sequence of Unicode characters of length @len1, may contain NUL
+ *           characters.
+ * @len2: The length of @string2.
+ * @string2: A sequence of Unicode characters of length @len2, may contain NUL
+ *           characters.
+ * @pfweight: Prefix weight, i.e., how much weight should be given to a
+ *            common prefix.
+ *
+ * Computes Jaro-Winkler string similarity metric of two Unicode strings.
+ *
+ * The formula is J+@pfweight*P*(1-J), where J is Jaro metric and P is the
+ * length of common prefix.
+ *
+ * Returns: The Jaro-Winkler metric of @string1 and @string2.
+ **/
+_LEV_STATIC_PY double
+lev_u_jaro_winkler_ratio(size_t len1, const lev_wchar *string1,
+                         size_t len2, const lev_wchar *string2,
+                         double pfweight)
+{
+  double j;
+  size_t p, m;
+
+  j = lev_u_jaro_ratio(len1, string1, len2, string2);
+  m = len1 < len2 ? len1 : len2;
+  for (p = 0; p < m; p++) {
+    if (string1[p] != string2[p])
+      break;
+  }
+  j += (1.0 - j)*p*pfweight;
+  return j > 1.0 ? 1.0 : j;
+}
+/* }}} */
+
+/****************************************************************************
+ *
+ * Generalized medians, the greedy algorithm, and greedy improvements
+ *
+ ****************************************************************************/
+/* {{{ */
 
 /* compute the sets of symbols each string contains, and the set of symbols
-  * in any of them (symset).  meanwhile, count how many different symbols
-  * there are (used below for symlist). */
+ * in any of them (symset).  meanwhile, count how many different symbols
+ * there are (used below for symlist). */
 static lev_byte*
 make_symlist(size_t n, const size_t *lengths,
              const lev_byte *strings[], size_t *symlistlen)
@@ -2034,9 +2841,10 @@ make_symlist(size_t n, const size_t *lengths,
     const lev_byte *stri = strings[i];
     for (j = 0; j < lengths[i]; j++) {
       int c = stri[j];
-      if (!symset[c])
+      if (!symset[c]) {
         (*symlistlen)++;
-      symset[c] = 1;
+        symset[c] = 1;
+      }
     }
   }
   if (!*symlistlen) {
@@ -2064,12 +2872,24 @@ make_symlist(size_t n, const size_t *lengths,
   return symlist;
 }
 
-/*
- * Generalized set median, using greedy algorithm for string set strings[].
+/**
+ * lev_greedy_median:
+ * @n: The size of @lengths, @strings, and @weights.
+ * @lengths: The lengths of @strings.
+ * @strings: An array of strings, that may contain NUL characters.
+ * @weights: The string weights (they behave exactly as multiplicities, though
+ *           any positive value is allowed, not just integers).
+ * @medlength: Where the length of the median should be stored.
  *
- * Returns a newly allocated string.
- */
-LEV_STATIC_PY lev_byte*
+ * Finds a generalized median string of @strings using the greedy algorithm.
+ *
+ * Note it's considerably more efficient to give a string with weight 2
+ * than to store two identical strings in @strings (with weights 1).
+ *
+ * Returns: The generalized median, as a newly allocated string; its length
+ *          is stored in @medlength.
+ **/
+_LEV_STATIC_PY lev_byte*
 lev_greedy_median(size_t n, const size_t *lengths,
                   const lev_byte *strings[],
                   const double *weights,
@@ -2169,7 +2989,7 @@ lev_greedy_median(size_t n, const size_t *lengths,
    * XXX: we actually exit on break below, but on the same condition */
   for (len = 1; len <= stoplen; len++) {
     lev_byte symbol;
-    double minminsum = 1e100;
+    double minminsum = LEV_INFINITY;
     row[0] = len;
     /* iterate over all symbols we may want to add */
     for (j = 0; j < symlistlen; j++) {
@@ -2272,7 +3092,7 @@ lev_greedy_median(size_t n, const size_t *lengths,
  */
 static double
 finish_distance_computations(size_t len1, lev_byte *string1,
-                             size_t n, const size_t *lenghts,
+                             size_t n, const size_t *lengths,
                              const lev_byte **strings,
                              const double *weights, size_t **rows,
                              size_t *row)
@@ -2285,14 +3105,14 @@ finish_distance_computations(size_t len1, lev_byte *string1,
   /* catch trivia case */
   if (len1 == 0) {
     for (j = 0; j < n; j++)
-      distsum += rows[j][lenghts[j]]*weights[j];
+      distsum += rows[j][lengths[j]]*weights[j];
     return distsum;
   }
 
   /* iterate through the strings and sum the distances */
   for (j = 0; j < n; j++) {
     size_t *rowi = rows[j];  /* current row */
-    size_t leni = lenghts[j];  /* current length */
+    size_t leni = lengths[j];  /* current length */
     size_t len = len1;  /* temporary len1 for suffix stripping */
     const lev_byte *stringi = strings[j];  /* current string */
 
@@ -2342,12 +3162,27 @@ finish_distance_computations(size_t len1, lev_byte *string1,
   return distsum;
 }
 
-/*
- * Try to improve a generalized set median with one-character perturbations.
+/**
+ * lev_median_improve:
+ * @len: The length of @s.
+ * @s: The approximate generalized median string to be improved.
+ * @n: The size of @lengths, @strings, and @weights.
+ * @lengths: The lengths of @strings.
+ * @strings: An array of strings, that may contain NUL characters.
+ * @weights: The string weights (they behave exactly as multiplicities, though
+ *           any positive value is allowed, not just integers).
+ * @medlength: Where the new length of the median should be stored.
  *
- * Returns a newly allocated string.
- */
-LEV_STATIC_PY lev_byte*
+ * Tries to make @s a better generalized median string of @strings with
+ * small perturbations.
+ *
+ * It never returns a string with larger SOD than @s; in the worst case, a
+ * string identical to @s is returned.
+ *
+ * Returns: The improved generalized median, as a newly allocated string; its
+ *          length is stored in @medlength.
+ **/
+_LEV_STATIC_PY lev_byte*
 lev_median_improve(size_t len, const lev_byte *s,
                    size_t n, const size_t *lengths,
                    const lev_byte *strings[],
@@ -2586,8 +3421,8 @@ free_usymlist_hash(HItem *symmap)
 }
 
 /* compute the sets of symbols each string contains, and the set of symbols
-  * in any of them (symset).  meanwhile, count how many different symbols
-  * there are (used below for symlist). */
+ * in any of them (symset).  meanwhile, count how many different symbols
+ * there are (used below for symlist). */
 static lev_wchar*
 make_usymlist(size_t n, const size_t *lengths,
               const lev_wchar *strings[], size_t *symlistlen)
@@ -2670,13 +3505,24 @@ make_usymlist(size_t n, const size_t *lengths,
   return symlist;
 }
 
-/*
- * Generalized set median, using greedy algorithm for string set strings[]
- * (Unicode)
+/**
+ * lev_u_greedy_median:
+ * @n: The size of @lengths, @strings, and @weights.
+ * @lengths: The lengths of @strings.
+ * @strings: An array of strings, that may contain NUL characters.
+ * @weights: The string weights (they behave exactly as multiplicities, though
+ *           any positive value is allowed, not just integers).
+ * @medlength: Where the length of the median should be stored.
  *
- * Returns a newly allocated string.
- */
-LEV_STATIC_PY lev_wchar*
+ * Finds a generalized median string of @strings using the greedy algorithm.
+ *
+ * Note it's considerably more efficient to give a string with weight 2
+ * than to store two identical strings in @strings (with weights 1).
+ *
+ * Returns: The generalized median, as a newly allocated string; its length
+ *          is stored in @medlength.
+ **/
+_LEV_STATIC_PY lev_wchar*
 lev_u_greedy_median(size_t n, const size_t *lengths,
                     const lev_wchar *strings[],
                     const double *weights,
@@ -2776,7 +3622,7 @@ lev_u_greedy_median(size_t n, const size_t *lengths,
    * XXX: we actually exit on break below, but on the same condition */
   for (len = 1; len <= stoplen; len++) {
     lev_wchar symbol;
-    double minminsum = 1e100;
+    double minminsum = LEV_INFINITY;
     row[0] = len;
     /* iterate over all symbols we may want to add */
     for (j = 0; j < symlistlen; j++) {
@@ -2879,7 +3725,7 @@ lev_u_greedy_median(size_t n, const size_t *lengths,
  */
 static double
 finish_udistance_computations(size_t len1, lev_wchar *string1,
-                             size_t n, const size_t *lenghts,
+                             size_t n, const size_t *lengths,
                              const lev_wchar **strings,
                              const double *weights, size_t **rows,
                              size_t *row)
@@ -2892,14 +3738,14 @@ finish_udistance_computations(size_t len1, lev_wchar *string1,
   /* catch trivia case */
   if (len1 == 0) {
     for (j = 0; j < n; j++)
-      distsum += rows[j][lenghts[j]]*weights[j];
+      distsum += rows[j][lengths[j]]*weights[j];
     return distsum;
   }
 
   /* iterate through the strings and sum the distances */
   for (j = 0; j < n; j++) {
     size_t *rowi = rows[j];  /* current row */
-    size_t leni = lenghts[j];  /* current length */
+    size_t leni = lengths[j];  /* current length */
     size_t len = len1;  /* temporary len1 for suffix stripping */
     const lev_wchar *stringi = strings[j];  /* current string */
 
@@ -2949,12 +3795,27 @@ finish_udistance_computations(size_t len1, lev_wchar *string1,
   return distsum;
 }
 
-/*
- * Try to improve a generalized set median with one-character perturbations.
+/**
+ * lev_u_median_improve:
+ * @len: The length of @s.
+ * @s: The approximate generalized median string to be improved.
+ * @n: The size of @lengths, @strings, and @weights.
+ * @lengths: The lengths of @strings.
+ * @strings: An array of strings, that may contain NUL characters.
+ * @weights: The string weights (they behave exactly as multiplicities, though
+ *           any positive value is allowed, not just integers).
+ * @medlength: Where the new length of the median should be stored.
  *
- * Returns a newly allocated string.
- */
-LEV_STATIC_PY lev_wchar*
+ * Tries to make @s a better generalized median string of @strings with
+ * small perturbations.
+ *
+ * It never returns a string with larger SOD than @s; in the worst case, a
+ * string identical to @s is returned.
+ *
+ * Returns: The improved generalized median, as a newly allocated string; its
+ *          length is stored in @medlength.
+ **/
+_LEV_STATIC_PY lev_wchar*
 lev_u_median_improve(size_t len, const lev_wchar *s,
                      size_t n, const size_t *lengths,
                      const lev_wchar *strings[],
@@ -3163,26 +4024,419 @@ lev_u_median_improve(size_t len, const lev_wchar *s,
     return result;
   }
 }
+/* }}} */
 
-/*
- * Plain set median.
+/****************************************************************************
  *
- * Returns a newly allocated string.
- */
-LEV_STATIC_PY lev_byte*
-lev_set_median(size_t n, const size_t *lengths,
-               const lev_byte *strings[],
-               const double *weights,
-               size_t *medlength)
+ * Quick (voting) medians
+ *
+ ****************************************************************************/
+/* {{{ */
+
+/* compute the sets of symbols each string contains, and the set of symbols
+ * in any of them (symset).  meanwhile, count how many different symbols
+ * there are (used below for symlist).
+ * the symset is passed as an argument to avoid its allocation and
+ * deallocation when it's used in the caller too */
+static lev_byte*
+make_symlistset(size_t n, const size_t *lengths,
+                const lev_byte *strings[], size_t *symlistlen,
+                double *symset)
+{
+  size_t i, j;
+  lev_byte *symlist;
+
+  if (!symset) {
+    *symlistlen = (size_t)(-1);
+    return NULL;
+  }
+  memset(symset, 0, 0x100*sizeof(double));  /* XXX: needs IEEE doubles?! */
+  *symlistlen = 0;
+  for (i = 0; i < n; i++) {
+    const lev_byte *stri = strings[i];
+    for (j = 0; j < lengths[i]; j++) {
+      int c = stri[j];
+      if (!symset[c]) {
+        (*symlistlen)++;
+        symset[c] = 1.0;
+      }
+    }
+  }
+  if (!*symlistlen)
+    return NULL;
+
+  /* create dense symbol table, so we can easily iterate over only characters
+   * present in the strings */
+  {
+    size_t pos = 0;
+    symlist = (lev_byte*)malloc((*symlistlen)*sizeof(lev_byte));
+    if (!symlist) {
+      *symlistlen = (size_t)(-1);
+      return NULL;
+    }
+    for (j = 0; j < 0x100; j++) {
+      if (symset[j])
+        symlist[pos++] = (lev_byte)j;
+    }
+  }
+
+  return symlist;
+}
+
+_LEV_STATIC_PY lev_byte*
+lev_quick_median(size_t n,
+                 const size_t *lengths,
+                 const lev_byte *strings[],
+                 const double *weights,
+                 size_t *medlength)
+{
+  size_t symlistlen, len, i, j, k;
+  lev_byte *symlist;
+  lev_byte *median;  /* the resulting string */
+  double *symset;
+  double ml, wl;
+
+  /* first check whether the result would be an empty string 
+   * and compute resulting string length */
+  ml = wl = 0.0;
+  for (i = 0; i < n; i++) {
+    ml += lengths[i]*weights[i];
+    wl += weights[i];
+  }
+  if (wl == 0.0)
+    return (lev_byte*)calloc(1, sizeof(lev_byte));
+  ml = floor(ml/wl + 0.499999);
+  *medlength = len = ml;
+  if (!len)
+    return (lev_byte*)calloc(1, sizeof(lev_byte));
+  median = (lev_byte*)malloc(len*sizeof(lev_byte));
+  if (!median)
+    return NULL;
+
+  /* find the symbol set;
+   * now an empty symbol set is really a failure */
+  symset = (double*)calloc(0x100, sizeof(double));
+  if (!symset) {
+    free(median);
+    return NULL;
+  }
+  symlist = make_symlistset(n, lengths, strings, &symlistlen, symset);
+  if (!symlist) {
+    free(median);
+    free(symset);
+    return NULL;
+  }
+
+  for (j = 0; j < len; j++) {
+    /* clear the symbol probabilities */
+    if (symlistlen < 32) {
+      for (i = 0; i < symlistlen; i++)
+        symset[symlist[i]] = 0.0;
+    }
+    else
+      memset(symset, 0, 0x100*sizeof(double));
+
+    /* let all strings vote */
+    for (i = 0; i < n; i++) {
+      const lev_byte *stri = strings[i];
+      double weighti = weights[i];
+      size_t lengthi = lengths[i];
+      double start = lengthi/ml*j;
+      double end = start + lengthi/ml;
+      size_t istart = floor(start);
+      size_t iend = ceil(end);
+
+      /* rounding errors can overflow the buffer */
+      if (iend > lengthi)
+        iend = lengthi;
+
+      for (k = istart+1; k < iend; k++)
+        symset[stri[k]] += weighti;
+      symset[stri[istart]] += weighti*(1+istart - start);
+      symset[stri[iend-1]] -= weighti*(iend - end);
+    }
+
+    /* find the elected symbol */
+    k = symlist[0];
+    for (i = 1; i < symlistlen; i++) {
+      if (symset[symlist[i]] > symset[k])
+        k = symlist[i];
+    }
+    median[j] = k;
+  }
+
+  free(symset);
+  free(symlist);
+
+  return median;
+}
+
+/* used internally in make_usymlistset */
+typedef struct _HQItem HQItem;
+struct _HQItem {
+  lev_wchar c;
+  double s;
+  HQItem *n;
+};
+
+/* free usmylistset hash
+ * this is a separate function because we need it in more than one place */
+static void
+free_usymlistset_hash(HQItem *symmap)
+{
+  size_t j;
+
+  for (j = 0; j < 0x100; j++) {
+    HQItem *p = symmap + j;
+    if (p->n == symmap || p->n == NULL)
+      continue;
+    p = p->n;
+    while (p) {
+      HQItem *q = p;
+      p = p->n;
+      free(q);
+    }
+  }
+  free(symmap);
+}
+
+/* compute the sets of symbols each string contains, and the set of symbols
+ * in any of them (symset).  meanwhile, count how many different symbols
+ * there are (used below for symlist).
+ * the symset is passed as an argument to avoid its allocation and
+ * deallocation when it's used in the caller too */
+static lev_wchar*
+make_usymlistset(size_t n, const size_t *lengths,
+                 const lev_wchar *strings[], size_t *symlistlen,
+                 HQItem *symmap)
+{
+  lev_wchar *symlist;
+  size_t i, j;
+
+  j = 0;
+  for (i = 0; i < n; i++)
+    j += lengths[i];
+
+  *symlistlen = 0;
+  if (j == 0)
+    return NULL;
+
+  /* this is an ugly memory allocation avoiding hack: most hash elements
+   * will probably contain none or one symbols only so, when p->n is equal
+   * to symmap, it means there're no symbols yet, afters insterting the
+   * first one, p->n becomes normally NULL and then it behaves like an
+   * usual singly linked list */
+  for (i = 0; i < 0x100; i++)
+    symmap[i].n = symmap;
+  for (i = 0; i < n; i++) {
+    const lev_wchar *stri = strings[i];
+    for (j = 0; j < lengths[i]; j++) {
+      int c = stri[j];
+      int key = (c + (c >> 7)) & 0xff;
+      HQItem *p = symmap + key;
+      if (p->n == symmap) {
+        p->c = c;
+        p->n = NULL;
+        (*symlistlen)++;
+        continue;
+      }
+      while (p->c != c && p->n != NULL)
+        p = p->n;
+      if (p->c != c) {
+        p->n = (HQItem*)malloc(sizeof(HQItem));
+        if (!p->n) {
+          *symlistlen = (size_t)(-1);
+          return NULL;
+        }
+        p = p->n;
+        p->n = NULL;
+        p->c = c;
+        (*symlistlen)++;
+      }
+    }
+  }
+  /* create dense symbol table, so we can easily iterate over only characters
+   * present in the strings */
+  {
+    size_t pos = 0;
+    symlist = (lev_wchar*)malloc((*symlistlen)*sizeof(lev_wchar));
+    if (!symlist) {
+      *symlistlen = (size_t)(-1);
+      return NULL;
+    }
+    for (j = 0; j < 0x100; j++) {
+      HQItem *p = symmap + j;
+      while (p != NULL && p->n != symmap) {
+        symlist[pos++] = p->c;
+        p = p->n;
+      }
+    }
+  }
+
+  return symlist;
+}
+
+_LEV_STATIC_PY lev_wchar*
+lev_u_quick_median(size_t n,
+                   const size_t *lengths,
+                   const lev_wchar *strings[],
+                   const double *weights,
+                   size_t *medlength)
+{
+  size_t symlistlen, len, i, j, k;
+  lev_wchar *symlist;
+  lev_wchar *median;  /* the resulting string */
+  HQItem *symmap;
+  double ml, wl;
+
+  /* first check whether the result would be an empty string 
+   * and compute resulting string length */
+  ml = wl = 0.0;
+  for (i = 0; i < n; i++) {
+    ml += lengths[i]*weights[i];
+    wl += weights[i];
+  }
+  if (wl == 0.0)
+    return (lev_wchar*)calloc(1, sizeof(lev_wchar));
+  ml = floor(ml/wl + 0.499999);
+  *medlength = len = ml;
+  if (!len)
+    return (lev_wchar*)calloc(1, sizeof(lev_wchar));
+  median = (lev_wchar*)malloc(len*sizeof(lev_wchar));
+  if (!median)
+    return NULL;
+
+  /* find the symbol set;
+   * now an empty symbol set is really a failure */
+  symmap = (HQItem*)malloc(0x100*sizeof(HQItem));
+  if (!symmap) {
+    free(median);
+    return NULL;
+  }
+  symlist = make_usymlistset(n, lengths, strings, &symlistlen, symmap);
+  if (!symlist) {
+    free(median);
+    free_usymlistset_hash(symmap);
+    return NULL;
+  }
+
+  for (j = 0; j < len; j++) {
+    /* clear the symbol probabilities */
+    for (i = 0; i < 0x100; i++) {
+      HQItem *p = symmap + i;
+      if (p->n == symmap)
+        continue;
+      while (p) {
+        p->s = 0.0;
+        p = p->n;
+      }
+    }
+
+    /* let all strings vote */
+    for (i = 0; i < n; i++) {
+      const lev_wchar *stri = strings[i];
+      double weighti = weights[i];
+      size_t lengthi = lengths[i];
+      double start = lengthi/ml*j;
+      double end = start + lengthi/ml;
+      size_t istart = floor(start);
+      size_t iend = ceil(end);
+
+      /* rounding errors can overflow the buffer */
+      if (iend > lengthi)
+        iend = lengthi;
+
+      /* the inner part, including the complete last character */
+      for (k = istart+1; k < iend; k++) {
+        int c = stri[k];
+        int key = (c + (c >> 7)) & 0xff;
+        HQItem *p = symmap + key;
+        while (p->c != c)
+          p = p->n;
+        p->s += weighti;
+      }
+      /* the initial fraction */
+      {
+        int c = stri[istart];
+        int key = (c + (c >> 7)) & 0xff;
+        HQItem *p = symmap + key;
+        while (p->c != c)
+          p = p->n;
+        p->s += weighti*(1+istart - start);
+      }
+      /* subtract what we counted from the last character but doesn't
+       * actually belong here.
+       * this strategy works also when istart+1 == iend (i.e., everything
+       * happens inside a one character) */
+      {
+        int c = stri[iend-1];
+        int key = (c + (c >> 7)) & 0xff;
+        HQItem *p = symmap + key;
+        while (p->c != c)
+          p = p->n;
+        p->s -= weighti*(iend - end);
+      }
+    }
+
+    /* find the elected symbol */
+    {
+      HQItem *max = NULL;
+
+      for (i = 0; i < 0x100; i++) {
+        HQItem *p = symmap + i;
+        if (p->n == symmap)
+          continue;
+        while (p) {
+          if (!max || p->s > max->s)
+            max = p;
+          p = p->n;
+        }
+      }
+      median[j] = max->c;
+    }
+  }
+
+  free_usymlistset_hash(symmap);
+  free(symlist);
+
+  return median;
+}
+/* }}} */
+
+/****************************************************************************
+ *
+ * Set medians
+ *
+ ****************************************************************************/
+/* {{{ */
+
+/**
+ * lev_set_median_index:
+ * @n: The size of @lengths, @strings, and @weights.
+ * @lengths: The lengths of @strings.
+ * @strings: An array of strings, that may contain NUL characters.
+ * @weights: The string weights (they behave exactly as multiplicities, though
+ *           any positive value is allowed, not just integers).
+ *
+ * Finds the median string of a string set @strings.
+ *
+ * Returns: An index in @strings pointing to the set median, -1 in case of
+ *          failure.
+ **/
+_LEV_STATIC_PY size_t
+lev_set_median_index(size_t n, const size_t *lengths,
+                     const lev_byte *strings[],
+                     const double *weights)
 {
   size_t minidx = 0;
-  double mindist = 1e100;
+  double mindist = LEV_INFINITY;
   size_t i;
   long int *distances;
 
   distances = (long int*)malloc((n*(n - 1)/2)*sizeof(long int));
   if (!distances)
-    return NULL;
+    return (size_t)-1;
+
   memset(distances, 0xff, (n*(n - 1)/2)*sizeof(long int)); /* XXX */
   for (i = 0; i < n; i++) {
     size_t j = 0;
@@ -3199,7 +4453,7 @@ lev_set_median(size_t n, const size_t *lengths,
         d = lev_edit_distance(lengths[j], strings[j], leni, stri, 0);
         if (d < 0) {
           free(distances);
-          return NULL;
+          return (size_t)-1;
         }
       }
       dist += weights[j]*d;
@@ -3213,7 +4467,7 @@ lev_set_median(size_t n, const size_t *lengths,
                                             leni, stri, 0);
       if (distances[dindex] < 0) {
         free(distances);
-        return NULL;
+        return (size_t)-1;
       }
       dist += weights[j]*distances[dindex];
       j++;
@@ -3226,36 +4480,36 @@ lev_set_median(size_t n, const size_t *lengths,
   }
 
   free(distances);
-  *medlength = lengths[minidx];
-  if (!lengths[minidx])
-    return (lev_byte*)calloc(1, sizeof(lev_byte));
-  {
-    lev_byte *result = (lev_byte*)malloc(lengths[minidx]*sizeof(lev_byte));
-    if (!result)
-      return NULL;
-    return memcpy(result, strings[minidx], lengths[minidx]*sizeof(lev_byte));
-  }
+  return minidx;
 }
 
-/*
- * Plain set median (Unicode).
+/**
+ * lev_u_set_median_index:
+ * @n: The size of @lengths, @strings, and @weights.
+ * @lengths: The lengths of @strings.
+ * @strings: An array of strings, that may contain NUL characters.
+ * @weights: The string weights (they behave exactly as multiplicities, though
+ *           any positive value is allowed, not just integers).
  *
- * Returns a newly allocated string.
- */
-LEV_STATIC_PY lev_wchar*
-lev_u_set_median(size_t n, const size_t *lengths,
-                 const lev_wchar *strings[],
-                 const double *weights,
-                 size_t *medlength)
+ * Finds the median string of a string set @strings.
+ *
+ * Returns: An index in @strings pointing to the set median, -1 in case of
+ *          failure.
+ **/
+_LEV_STATIC_PY size_t
+lev_u_set_median_index(size_t n, const size_t *lengths,
+                       const lev_wchar *strings[],
+                       const double *weights)
 {
   size_t minidx = 0;
-  double mindist = 1e100;
+  double mindist = LEV_INFINITY;
   size_t i;
   long int *distances;
 
   distances = (long int*)malloc((n*(n - 1)/2)*sizeof(long int));
   if (!distances)
-    return NULL;
+    return (size_t)-1;
+
   memset(distances, 0xff, (n*(n - 1)/2)*sizeof(long int)); /* XXX */
   for (i = 0; i < n; i++) {
     size_t j = 0;
@@ -3272,7 +4526,7 @@ lev_u_set_median(size_t n, const size_t *lengths,
         d = lev_u_edit_distance(lengths[j], strings[j], leni, stri, 0);
         if (d < 0) {
           free(distances);
-          return NULL;
+          return (size_t)-1;
         }
       }
       dist += weights[j]*d;
@@ -3286,7 +4540,7 @@ lev_u_set_median(size_t n, const size_t *lengths,
                                               leni, stri, 0);
       if (distances[dindex] < 0) {
         free(distances);
-        return NULL;
+        return (size_t)-1;
       }
       dist += weights[j]*distances[dindex];
       j++;
@@ -3299,29 +4553,108 @@ lev_u_set_median(size_t n, const size_t *lengths,
   }
 
   free(distances);
+  return minidx;
+}
+
+/**
+ * lev_set_median:
+ * @n: The size of @lengths, @strings, and @weights.
+ * @lengths: The lengths of @strings.
+ * @strings: An array of strings, that may contain NUL characters.
+ * @weights: The string weights (they behave exactly as multiplicities, though
+ *           any positive value is allowed, not just integers).
+ * @medlength: Where the length of the median string should be stored.
+ *
+ * Finds the median string of a string set @strings.
+ *
+ * Returns: The set median as a newly allocate string, its length is stored
+ *          in @medlength.  %NULL in the case of failure.
+ **/
+_LEV_STATIC_PY lev_byte*
+lev_set_median(size_t n, const size_t *lengths,
+               const lev_byte *strings[],
+               const double *weights,
+               size_t *medlength)
+{
+  size_t minidx = lev_set_median_index(n, lengths, strings, weights);
+  lev_byte *result;
+
+  if (minidx == (size_t)-1)
+    return NULL;
+
+  *medlength = lengths[minidx];
+  if (!lengths[minidx])
+    return (lev_byte*)calloc(1, sizeof(lev_byte));
+
+  result = (lev_byte*)malloc(lengths[minidx]*sizeof(lev_byte));
+  if (!result)
+    return NULL;
+  return memcpy(result, strings[minidx], lengths[minidx]*sizeof(lev_byte));
+}
+
+/**
+ * lev_u_set_median:
+ * @n: The size of @lengths, @strings, and @weights.
+ * @lengths: The lengths of @strings.
+ * @strings: An array of strings, that may contain NUL characters.
+ * @weights: The string weights (they behave exactly as multiplicities, though
+ *           any positive value is allowed, not just integers).
+ * @medlength: Where the length of the median string should be stored.
+ *
+ * Finds the median string of a string set @strings.
+ *
+ * Returns: The set median as a newly allocate string, its length is stored
+ *          in @medlength.  %NULL in the case of failure.
+ **/
+_LEV_STATIC_PY lev_wchar*
+lev_u_set_median(size_t n, const size_t *lengths,
+                 const lev_wchar *strings[],
+                 const double *weights,
+                 size_t *medlength)
+{
+  size_t minidx = lev_u_set_median_index(n, lengths, strings, weights);
+  lev_wchar *result;
+
+  if (minidx == (size_t)-1)
+    return NULL;
+
   *medlength = lengths[minidx];
   if (!lengths[minidx])
     return (lev_wchar*)calloc(1, sizeof(lev_wchar));
-  {
-    lev_wchar *result = (lev_wchar*)malloc(lengths[minidx]*sizeof(lev_wchar));
-    if (!result)
-      return NULL;
-    return memcpy(result, strings[minidx], lengths[minidx]*sizeof(lev_wchar));
-  }
+
+  result = (lev_wchar*)malloc(lengths[minidx]*sizeof(lev_wchar));
+  if (!result)
+    return NULL;
+  return memcpy(result, strings[minidx], lengths[minidx]*sizeof(lev_wchar));
 }
+/* }}} */
 
 /****************************************************************************
  *
  * Set, sequence distances
  *
  ****************************************************************************/
+/* {{{ */
 
-/*
- * Levenshtein distance of two string sequences.
+/**
+ * lev_edit_seq_distance:
+ * @n1: The length of @lengths1 and @strings1.
+ * @lengths1: The lengths of strings in @strings1.
+ * @strings1: An array of strings that may contain NUL characters.
+ * @n2: The length of @lengths2 and @strings2.
+ * @lengths2: The lengths of strings in @strings2.
+ * @strings2: An array of strings that may contain NUL characters.
  *
- * I.e. double-Levenshtein.
- */
-LEV_STATIC_PY double
+ * Finds the distance between string sequences @strings1 and @strings2.
+ *
+ * In other words, this is a double-Levenshtein algorithm.
+ *
+ * The cost of string replace operation is based on string similarity: it's
+ * zero for identical strings and 2 for completely unsimilar strings.
+ *
+ * Returns: The distance of the two sequences.
+ **/
+_LEV_STATIC_PY double
 lev_edit_seq_distance(size_t n1, const size_t *lengths1,
                       const lev_byte *strings1[],
                       size_t n2, const size_t *lengths2,
@@ -3423,12 +4756,25 @@ lev_edit_seq_distance(size_t n1, const size_t *lengths1,
   }
 }
 
-/*
- * Levenshtein distance of two string sequences. (Unicode)
+/**
+ * lev_u_edit_seq_distance:
+ * @n1: The length of @lengths1 and @strings1.
+ * @lengths1: The lengths of strings in @strings1.
+ * @strings1: An array of strings that may contain NUL characters.
+ * @n2: The length of @lengths2 and @strings2.
+ * @lengths2: The lengths of strings in @strings2.
+ * @strings2: An array of strings that may contain NUL characters.
  *
- * I.e. double-Levenshtein.
- */
-LEV_STATIC_PY double
+ * Finds the distance between string sequences @strings1 and @strings2.
+ *
+ * In other words, this is a double-Levenshtein algorithm.
+ *
+ * The cost of string replace operation is based on string similarity: it's
+ * zero for identical strings and 2 for completely unsimilar strings.
+ *
+ * Returns: The distance of the two sequences.
+ **/
+_LEV_STATIC_PY double
 lev_u_edit_seq_distance(size_t n1, const size_t *lengths1,
                         const lev_wchar *strings1[],
                         size_t n2, const size_t *lengths2,
@@ -3530,12 +4876,26 @@ lev_u_edit_seq_distance(size_t n1, const size_t *lengths1,
   }
 }
 
-/*
- * Distance of two string sets.
+/**
+ * lev_set_distance:
+ * @n1: The length of @lengths1 and @strings1.
+ * @lengths1: The lengths of strings in @strings1.
+ * @strings1: An array of strings that may contain NUL characters.
+ * @n2: The length of @lengths2 and @strings2.
+ * @lengths2: The lengths of strings in @strings2.
+ * @strings2: An array of strings that may contain NUL characters.
+ *
+ * Finds the distance between string sets @strings1 and @strings2.
+ *
+ * The difference from lev_edit_seq_distance() is that order doesn't matter.
+ * The optimal association of @strings1 and @strings2 is found first and
+ * the similarity is computed for that.
  *
  * Uses sequential Munkers-Blackman algorithm.
- */
-LEV_STATIC_PY double
+ *
+ * Returns: The distance of the two sets.
+ **/
+_LEV_STATIC_PY double
 lev_set_distance(size_t n1, const size_t *lengths1,
                  const lev_byte *strings1[],
                  size_t n2, const size_t *lengths2,
@@ -3616,12 +4976,26 @@ lev_set_distance(size_t n1, const size_t *lengths1,
   return sum;
 }
 
-/*
- * Distance of two string sets. (Unicode)
+/**
+ * lev_u_set_distance:
+ * @n1: The length of @lengths1 and @strings1.
+ * @lengths1: The lengths of strings in @strings1.
+ * @strings1: An array of strings that may contain NUL characters.
+ * @n2: The length of @lengths2 and @strings2.
+ * @lengths2: The lengths of strings in @strings2.
+ * @strings2: An array of strings that may contain NUL characters.
+ *
+ * Finds the distance between string sets @strings1 and @strings2.
+ *
+ * The difference from lev_u_edit_seq_distance() is that order doesn't matter.
+ * The optimal association of @strings1 and @strings2 is found first and
+ * the similarity is computed for that.
  *
  * Uses sequential Munkers-Blackman algorithm.
- */
-LEV_STATIC_PY double
+ *
+ * Returns: The distance of the two sets.
+ **/
+_LEV_STATIC_PY double
 lev_u_set_distance(size_t n1, const size_t *lengths1,
                    const lev_wchar *strings1[],
                    size_t n2, const size_t *lengths2,
@@ -3747,7 +5121,7 @@ munkers_blackman(size_t n1, size_t n2, double *dists)
     return NULL;
   }
 
-  /* step 0 (substract minimal distance) and step 1 (find zeroes) */
+  /* step 0 (subtract minimal distance) and step 1 (find zeroes) */
   for (j = 0; j < n1; j++) {
     size_t minidx = 0;
     double *col = dists + j;
@@ -3760,11 +5134,11 @@ munkers_blackman(size_t n1, size_t n2, double *dists)
       }
       p += n1;
     }
-    /* substract */
+    /* subtract */
     p = col;
     for (i = 0; i < n2; i++) {
       *p -= min;
-      if (*p < EPSILON)
+      if (*p < LEV_EPSILON)
         *p = 0.0;
       p += n1;
     }
@@ -3835,7 +5209,7 @@ munkers_blackman(size_t n1, size_t n2, double *dists)
        * we can't get here, unless no zero is found at all */
       {
         /* find the smallest uncovered entry */
-        double min = 1e100;
+        double min = LEV_INFINITY;
         for (j = 0; j < n1; j++) {
           double *p = dists + j;
           if (covc[j])
@@ -3855,14 +5229,14 @@ munkers_blackman(size_t n1, size_t n2, double *dists)
           for (j = 0; j < n1; j++)
             *(p++) += min;
         }
-        /* substract if from all uncovered columns */
+        /* subtract if from all uncovered columns */
         for (j = 0; j < n1; j++) {
           double *p = dists + j;
           if (covc[j])
             continue;
           for (i = 0; i < n2; i++) {
             *p -= min;
-            if (*p < EPSILON)
+            if (*p < LEV_EPSILON)
               *p = 0.0;
             p += n1;
           }
@@ -3899,19 +5273,30 @@ munkers_blackman(size_t n1, size_t n2, double *dists)
     zstarc[j]--;
   return zstarc;
 }
+/* }}} */
 
 /****************************************************************************
  *
  * Editops and other difflib-like stuff.
  *
  ****************************************************************************/
+/* {{{ */
 
-/*
- * Returns zero if ops are applicable as len1 -> len2 partial edit.
- */
-LEV_STATIC_PY int
+/**
+ * lev_editops_check_errors:
+ * @len1: The length of an eventual @ops source string.
+ * @len2: The length of an eventual @ops destination string.
+ * @n: The length of @ops.
+ * @ops: An array of elementary edit operations.
+ *
+ * Checks whether @ops is consistent and applicable as a partial edit from a
+ * string of length @len1 to a string of length @len2.
+ *
+ * Returns: Zero if @ops seems OK, a nonzero error code otherwise.
+ **/
+_LEV_STATIC_PY int
 lev_editops_check_errors(size_t len1, size_t len2,
-                          size_t n, const LevEditOp *ops)
+                         size_t n, const LevEditOp *ops)
 {
   const LevEditOp *o;
   size_t i;
@@ -3942,10 +5327,19 @@ lev_editops_check_errors(size_t len1, size_t len2,
   return LEV_EDIT_ERR_OK;
 }
 
-/*
- * Returns zero if block ops are applicable as len1 -> len2 partial edit.
- */
-LEV_STATIC_PY int
+/**
+ * lev_opcodes_check_errors:
+ * @len1: The length of an eventual @ops source string.
+ * @len2: The length of an eventual @ops destination string.
+ * @nb: The length of @bops.
+ * @bops: An array of difflib block edit operation codes.
+ *
+ * Checks whether @bops is consistent and applicable as an edit from a
+ * string of length @len1 to a string of length @len2.
+ *
+ * Returns: Zero if @bops seems OK, a nonzero error code otherwise.
+ **/
+_LEV_STATIC_PY int
 lev_opcodes_check_errors(size_t len1, size_t len2,
                          size_t nb, const LevOpCode *bops)
 {
@@ -3998,13 +5392,18 @@ lev_opcodes_check_errors(size_t len1, size_t len2,
   return LEV_EDIT_ERR_OK;
 }
 
-/*
- * Invert the sense of ops (src <-> dest).
+/**
+ * lev_editops_invert:
+ * @n: The length of @ops.
+ * @ops: An array of elementary edit operations.
  *
- * Changed in place.
- */
-LEV_STATIC_PY void
-lev_editops_inverse(size_t n, LevEditOp *ops)
+ * Inverts the sense of @ops.  It is modified in place.
+ *
+ * In other words, @ops becomes a valid partial edit for the original source
+ * and destination strings with their roles exchanged.
+ **/
+_LEV_STATIC_PY void
+lev_editops_invert(size_t n, LevEditOp *ops)
 {
   size_t i;
 
@@ -4019,12 +5418,24 @@ lev_editops_inverse(size_t n, LevEditOp *ops)
   }
 }
 
-/*
- * Apply a subsequence of editing operations to a string.
+/**
+ * lev_editops_apply:
+ * @len1: The length of @string1.
+ * @string1: A string of length @len1, may contain NUL characters.
+ * @len2: The length of @string2.
+ * @string2: A string of length @len2, may contain NUL characters.
+ * @n: The size of @ops.
+ * @ops: An array of elementary edit operations.
+ * @len: Where the size of the resulting string should be stored.
  *
- * Returns a newly allocated string.  ops is not checked!
- */
-LEV_STATIC_PY lev_byte*
+ * Applies a partial edit @ops from @string1 to @string2.
+ *
+ * NB: @ops is not checked for applicability.
+ *
+ * Returns: The result of the partial edit as a newly allocated string, its
+ *          length is stored in @len.
+ **/
+_LEV_STATIC_PY lev_byte*
 lev_editops_apply(size_t len1, const lev_byte *string1,
                   __attribute__((unused)) size_t len2, const lev_byte *string2,
                   size_t n, const LevEditOp *ops,
@@ -4078,12 +5489,24 @@ lev_editops_apply(size_t len1, const lev_byte *string1,
   return realloc(dst, *len*sizeof(lev_byte));
 }
 
-/*
- * Apply a subsequence of editing operations to a string. (Unicode)
+/**
+ * lev_u_editops_apply:
+ * @len1: The length of @string1.
+ * @string1: A string of length @len1, may contain NUL characters.
+ * @len2: The length of @string2.
+ * @string2: A string of length @len2, may contain NUL characters.
+ * @n: The size of @ops.
+ * @ops: An array of elementary edit operations.
+ * @len: Where the size of the resulting string should be stored.
  *
- * Returns a newly allocated string.  ops is not checked!
- */
-LEV_STATIC_PY lev_wchar*
+ * Applies a partial edit @ops from @string1 to @string2.
+ *
+ * NB: @ops is not checked for applicability.
+ *
+ * Returns: The result of the partial edit as a newly allocated string, its
+ *          length is stored in @len.
+ **/
+_LEV_STATIC_PY lev_wchar*
 lev_u_editops_apply(size_t len1, const lev_wchar *string1,
                     __attribute__((unused)) size_t len2,
                     const lev_wchar *string2,
@@ -4126,20 +5549,39 @@ lev_u_editops_apply(size_t len1, const lev_wchar *string1,
       break;
     }
   }
+  j = len1 - (spos - string1);
+  if (j) {
+    memcpy(dpos, spos, j*sizeof(lev_wchar));
+    spos += j;
+    dpos += j;
+  }
 
   *len = dpos - dst;
   /* possible realloc failure is detected with *len != 0 */
   return realloc(dst, *len*sizeof(lev_wchar));
 }
 
-/*
- * Get the editops from the cost matrix.
+/**
+ * editops_from_cost_matrix:
+ * @len1: The length of @string1.
+ * @string1: A string of length @len1, may contain NUL characters.
+ * @o1: The offset where the matrix starts from the start of @string1.
+ * @len2: The length of @string2.
+ * @string2: A string of length @len2, may contain NUL characters.
+ * @o2: The offset where the matrix starts from the start of @string2.
+ * @matrix: The cost matrix.
+ * @n: Where the number of edit operations should be stored.
  *
- * Frees the matrix after use.
- */
+ * Reconstructs the optimal edit sequence from the cost matrix @matrix.
+ *
+ * The matrix is freed.
+ *
+ * Returns: The optimal edit sequence, as a newly allocated array of
+ *          elementary edit operations, it length is stored in @n.
+ **/
 static LevEditOp*
-editops_from_cost_matrix(size_t len1, const lev_byte *string1, size_t o1,
-                         size_t len2, const lev_byte *string2, size_t o2,
+editops_from_cost_matrix(size_t len1, const lev_byte *string1, size_t off1,
+                         size_t len2, const lev_byte *string2, size_t off2,
                          size_t *matrix, size_t *n)
 {
   size_t *p;
@@ -4166,16 +5608,16 @@ editops_from_cost_matrix(size_t len1, const lev_byte *string1, size_t o1,
     if (dir < 0 && j && *p == *(p - 1) + 1) {
       pos--;
       ops[pos].type = LEV_EDIT_INSERT;
-      ops[pos].spos = i + o1;
-      ops[pos].dpos = --j + o2;
+      ops[pos].spos = i + off1;
+      ops[pos].dpos = --j + off2;
       p--;
       continue;
     }
     if (dir > 0 && i && *p == *(p - len2) + 1) {
       pos--;
       ops[pos].type = LEV_EDIT_DELETE;
-      ops[pos].spos = --i + o1;
-      ops[pos].dpos = j + o2;
+      ops[pos].spos = --i + off1;
+      ops[pos].dpos = j + off2;
       p -= len2;
       continue;
     }
@@ -4191,8 +5633,8 @@ editops_from_cost_matrix(size_t len1, const lev_byte *string1, size_t o1,
     if (i && j && *p == *(p - len2 - 1) + 1) {
       pos--;
       ops[pos].type = LEV_EDIT_REPLACE;
-      ops[pos].spos = --i + o1;
-      ops[pos].dpos = --j + o2;
+      ops[pos].spos = --i + off1;
+      ops[pos].dpos = --j + off2;
       p -= len2 + 1;
       dir = 0;
       continue;
@@ -4202,8 +5644,8 @@ editops_from_cost_matrix(size_t len1, const lev_byte *string1, size_t o1,
     if (dir == 0 && j && *p == *(p - 1) + 1) {
       pos--;
       ops[pos].type = LEV_EDIT_INSERT;
-      ops[pos].spos = i + o1;
-      ops[pos].dpos = --j + o2;
+      ops[pos].spos = i + off1;
+      ops[pos].dpos = --j + off2;
       p--;
       dir = -1;
       continue;
@@ -4211,8 +5653,8 @@ editops_from_cost_matrix(size_t len1, const lev_byte *string1, size_t o1,
     if (dir == 0 && i && *p == *(p - len2) + 1) {
       pos--;
       ops[pos].type = LEV_EDIT_DELETE;
-      ops[pos].spos = --i + o1;
-      ops[pos].dpos = j + o2;
+      ops[pos].spos = --i + off1;
+      ops[pos].dpos = j + off2;
       p -= len2;
       dir = 1;
       continue;
@@ -4225,10 +5667,24 @@ editops_from_cost_matrix(size_t len1, const lev_byte *string1, size_t o1,
   return ops;
 }
 
-/*
- * Find (some) edit sequence from string1 to string2.
- */
-LEV_STATIC_PY LevEditOp*
+/**
+ * lev_editops_find:
+ * @len1: The length of @string1.
+ * @string1: A string of length @len1, may contain NUL characters.
+ * @len2: The length of @string2.
+ * @string2: A string of length @len2, may contain NUL characters.
+ * @n: Where the number of edit operations should be stored.
+ *
+ * Find an optimal edit sequence from @string1 to @string2.
+ *
+ * When there's more than one optimal sequence, a one is arbitrarily (though
+ * deterministically) chosen.
+ *
+ * Returns: The optimal edit sequence, as a newly allocated array of
+ *          elementary edit operations, it length is stored in @n.
+ *          It is normalized, i.e., keep operations are not included.
+ **/
+_LEV_STATIC_PY LevEditOp*
 lev_editops_find(size_t len1, const lev_byte *string1,
                  size_t len2, const lev_byte *string2,
                  size_t *n)
@@ -4294,11 +5750,24 @@ lev_editops_find(size_t len1, const lev_byte *string1,
                                   matrix, n);
 }
 
-/*
- * Get the editops from the cost matrix. (Unicode)
+/**
+ * ueditops_from_cost_matrix:
+ * @len1: The length of @string1.
+ * @string1: A string of length @len1, may contain NUL characters.
+ * @o1: The offset where the matrix starts from the start of @string1.
+ * @len2: The length of @string2.
+ * @string2: A string of length @len2, may contain NUL characters.
+ * @o2: The offset where the matrix starts from the start of @string2.
+ * @matrix: The cost matrix.
+ * @n: Where the number of edit operations should be stored.
  *
- * Frees the matrix after use.
- */
+ * Reconstructs the optimal edit sequence from the cost matrix @matrix.
+ *
+ * The matrix is freed.
+ *
+ * Returns: The optimal edit sequence, as a newly allocated array of
+ *          elementary edit operations, it length is stored in @n.
+ **/
 static LevEditOp*
 ueditops_from_cost_matrix(size_t len1, const lev_wchar *string1, size_t o1,
                           size_t len2, const lev_wchar *string2, size_t o2,
@@ -4387,10 +5856,24 @@ ueditops_from_cost_matrix(size_t len1, const lev_wchar *string1, size_t o1,
   return ops;
 }
 
-/*
- * Find (some) edit sequence from string1 to string2. (Unicode)
- */
-LEV_STATIC_PY LevEditOp*
+/**
+ * lev_u_editops_find:
+ * @len1: The length of @string1.
+ * @string1: A string of length @len1, may contain NUL characters.
+ * @len2: The length of @string2.
+ * @string2: A string of length @len2, may contain NUL characters.
+ * @n: Where the number of edit operations should be stored.
+ *
+ * Find an optimal edit sequence from @string1 to @string2.
+ *
+ * When there's more than one optimal sequence, a one is arbitrarily (though
+ * deterministically) chosen.
+ *
+ * Returns: The optimal edit sequence, as a newly allocated array of
+ *          elementary edit operations, it length is stored in @n.
+ *          It is normalized, i.e., keep operations are not included.
+ **/
+_LEV_STATIC_PY LevEditOp*
 lev_u_editops_find(size_t len1, const lev_wchar *string1,
                    size_t len2, const lev_wchar *string2,
                    size_t *n)
@@ -4456,12 +5939,20 @@ lev_u_editops_find(size_t len1, const lev_wchar *string1,
                                    matrix, n);
 }
 
-/*
- * Convert an array of difflib-like block ops to atomic ops.
+/**
+ * lev_opcodes_to_editops:
+ * @nb: The length of @bops.
+ * @bops: An array of difflib block edit operation codes.
+ * @n: Where the number of edit operations should be stored.
+ * @keepkeep: If nonzero, keep operations will be included.  Otherwise the
+ *            result will be normalized, i.e. without any keep operations.
  *
- * Returns a newly allocated array.
- */
-LEV_STATIC_PY LevEditOp*
+ * Converts difflib block operation codes to elementary edit operations.
+ *
+ * Returns: The converted edit operatiosn, as a newly allocated array; its
+ *          size is stored in @n.
+ **/
+_LEV_STATIC_PY LevEditOp*
 lev_opcodes_to_editops(size_t nb, const LevOpCode *bops,
                        size_t *n, int keepkeep)
 {
@@ -4544,23 +6035,33 @@ lev_opcodes_to_editops(size_t nb, const LevOpCode *bops,
   return ops;
 }
 
-/*
- * Convert an array of atomic ops to difflib-like blocks.
+/**
+ * lev_editops_to_opcodes:
+ * @n: The size of @ops.
+ * @ops: An array of elementary edit operations.
+ * @nb: Where the number of difflib block operation codes should be stored.
+ * @len1: The length of the source string.
+ * @len2: The length of the destination string.
  *
- * Returns a newly allocated array.  len1, len2 are string lengths (needed for
- * the last KEEP block).
- */
-LEV_STATIC_PY LevOpCode*
-lev_editops_to_opcodes(size_t n, const LevEditOp *ops, size_t *nblocks,
+ * Converts elementary edit operations to difflib block operation codes.
+ *
+ * Note the string lengths are necessary since difflib doesn't allow omitting
+ * keep operations.
+ *
+ * Returns: The converted block operation codes, as a newly allocated array;
+ *          its length is stored in @nb.
+ **/
+_LEV_STATIC_PY LevOpCode*
+lev_editops_to_opcodes(size_t n, const LevEditOp *ops, size_t *nb,
                        size_t len1, size_t len2)
 {
-  size_t nb, i, spos, dpos;
+  size_t nbl, i, spos, dpos;
   const LevEditOp *o;
   LevOpCode *bops, *b;
   LevEditType type;
 
   /* compute the number of blocks */
-  nb = 0;
+  nbl = 0;
   o = ops;
   spos = dpos = 0;
   type = LEV_EDIT_KEEP;
@@ -4571,11 +6072,11 @@ lev_editops_to_opcodes(size_t n, const LevEditOp *ops, size_t *nblocks,
     if (!i)
       break;
     if (spos < o->spos || dpos < o->dpos) {
-      nb++;
+      nbl++;
       spos = o->spos;
       dpos = o->dpos;
     }
-    nb++;
+    nbl++;
     type = o->type;
     switch (type) {
       case LEV_EDIT_REPLACE:
@@ -4608,12 +6109,12 @@ lev_editops_to_opcodes(size_t n, const LevEditOp *ops, size_t *nblocks,
     }
   }
   if (spos < len1 || dpos < len2)
-    nb++;
+    nbl++;
 
   /* convert */
-  b = bops = (LevOpCode*)malloc(nb*sizeof(LevOpCode));
+  b = bops = (LevOpCode*)malloc(nbl*sizeof(LevOpCode));
   if (!bops) {
-    *nblocks = (size_t)(-1);
+    *nb = (size_t)(-1);
     return NULL;
   }
   o = ops;
@@ -4679,18 +6180,30 @@ lev_editops_to_opcodes(size_t n, const LevEditOp *ops, size_t *nblocks,
     b->dend = len2;
     b++;
   }
-  assert((size_t)(b - bops) == nb);
+  assert((size_t)(b - bops) == nbl);
 
-  *nblocks = nb;
+  *nb = nbl;
   return bops;
 }
 
-/*
- * Apply a sequence of block editing operations to a string.
+/**
+ * lev_opcodes_apply:
+ * @len1: The length of the source string.
+ * @string1: A string of length @len1, may contain NUL characters.
+ * @len2: The length of the destination string.
+ * @string2: A string of length @len2, may contain NUL characters.
+ * @nb: The length of @bops.
+ * @bops: An array of difflib block edit operation codes.
+ * @len: Where the size of the resulting string should be stored.
  *
- * Returns a newly allocated string.  bops is not checked!
- */
-LEV_STATIC_PY lev_byte*
+ * Applies a sequence of difflib block operations to a string.
+ *
+ * NB: @bops is not checked for applicability.
+ *
+ * Returns: The result of the edit as a newly allocated string, its length
+ *          is stored in @len.
+ **/
+_LEV_STATIC_PY lev_byte*
 lev_opcodes_apply(size_t len1, const lev_byte *string1,
                   size_t len2, const lev_byte *string2,
                   size_t nb, const LevOpCode *bops,
@@ -4733,12 +6246,24 @@ lev_opcodes_apply(size_t len1, const lev_byte *string1,
   return realloc(dst, *len*sizeof(lev_byte));
 }
 
-/*
- * Apply a sequence of block editing operations to a string. (Unicode)
+/**
+ * lev_u_opcodes_apply:
+ * @len1: The length of the source string.
+ * @string1: A string of length @len1, may contain NUL characters.
+ * @len2: The length of the destination string.
+ * @string2: A string of length @len2, may contain NUL characters.
+ * @nb: The length of @bops.
+ * @bops: An array of difflib block edit operation codes.
+ * @len: Where the size of the resulting string should be stored.
  *
- * Returns a newly allocated string.  bops is not checked!
- */
-LEV_STATIC_PY lev_wchar*
+ * Applies a sequence of difflib block operations to a string.
+ *
+ * NB: @bops is not checked for applicability.
+ *
+ * Returns: The result of the edit as a newly allocated string, its length
+ *          is stored in @len.
+ **/
+_LEV_STATIC_PY lev_wchar*
 lev_u_opcodes_apply(size_t len1, const lev_wchar *string1,
                     size_t len2, const lev_wchar *string2,
                     size_t nb, const LevOpCode *bops,
@@ -4781,17 +6306,22 @@ lev_u_opcodes_apply(size_t len1, const lev_wchar *string1,
   return realloc(dst, *len*sizeof(lev_wchar));
 }
 
-/*
- * Invert the sense of block ops (src <-> dest).
+/**
+ * lev_opcodes_invert:
+ * @nb: The length of @ops.
+ * @bops: An array of difflib block edit operation codes.
  *
- * Changed in place.
- */
-LEV_STATIC_PY void
-lev_opcodes_inverse(size_t n, LevOpCode *bops)
+ * Inverts the sense of @ops.  It is modified in place.
+ *
+ * In other words, @ops becomes a partial edit for the original source
+ * and destination strings with their roles exchanged.
+ **/
+_LEV_STATIC_PY void
+lev_opcodes_invert(size_t nb, LevOpCode *bops)
 {
   size_t i;
 
-  for (i = n; i; i--, bops++) {
+  for (i = nb; i; i--, bops++) {
     size_t z;
 
     z = bops->dbeg;
@@ -4805,12 +6335,20 @@ lev_opcodes_inverse(size_t n, LevOpCode *bops)
   }
 }
 
-/*
- * Find matching blocks.
+/**
+ * lev_editops_matching_blocks:
+ * @len1: The length of the source string.
+ * @len2: The length of the destination string.
+ * @n: The size of @ops.
+ * @ops: An array of elementary edit operations.
+ * @nmblocks: Where the number of matching block should be stored.
  *
- * Returns a newly allocated array.  len1, len2 are string lengths.
- */
-LEV_STATIC_PY LevMatchingBlock*
+ * Computes the matching block corresponding to an optimal edit @ops.
+ *
+ * Returns: The matching blocks as a newly allocated array, it length is
+ *          stored in @nmblocks.
+ **/
+_LEV_STATIC_PY LevMatchingBlock*
 lev_editops_matching_blocks(size_t len1,
                             size_t len2,
                             size_t n,
@@ -4939,12 +6477,20 @@ lev_editops_matching_blocks(size_t len1,
   return mblocks;
 }
 
-/*
- * Find matching blocks.
+/**
+ * lev_opcodes_matching_blocks:
+ * @len1: The length of the source string.
+ * @len2: The length of the destination string.
+ * @nb: The size of @bops.
+ * @bops: An array of difflib block edit operation codes.
+ * @nmblocks: Where the number of matching block should be stored.
  *
- * Returns a newly allocated array.  len1, len2 are string lengths.
- */
-LEV_STATIC_PY LevMatchingBlock*
+ * Computes the matching block corresponding to an optimal edit @bops.
+ *
+ * Returns: The matching blocks as a newly allocated array, it length is
+ *          stored in @nmblocks.
+ **/
+_LEV_STATIC_PY LevMatchingBlock*
 lev_opcodes_matching_blocks(size_t len1,
                             __attribute__((unused)) size_t len2,
                             size_t nb,
@@ -5001,3 +6547,220 @@ lev_opcodes_matching_blocks(size_t len1,
   *nmblocks = nmb;
   return mblocks;
 }
+
+/**
+ * lev_editops_total_cost:
+ * @n: Tne size of @ops.
+ * @ops: An array of elementary edit operations.
+ *
+ * Computes the total cost of operations in @ops.
+ *
+ * The costs of elementary operations are all 1.
+ *
+ * Returns: The total cost.
+ **/
+_LEV_STATIC_PY size_t
+lev_editops_total_cost(size_t n,
+                       const LevEditOp *ops)
+{
+  size_t i, sum = 0;
+
+  for (i = n; i; i--, ops++)
+    sum += !!ops->type;
+
+  return sum;
+}
+
+/**
+ * lev_editops_normalize:
+ * @n: The size of @ops.
+ * @ops: An array of elementary edit operations.
+ * @nnorm: Where to store then length of the normalized array.
+ *
+ * Normalizes a list of edit operations to contain no keep operations.
+ *
+ * Note it returns %NULL for an empty array.
+ *
+ * Returns: A newly allocated array of normalized edit operations, its length
+ *          is stored to @nnorm.
+ **/
+_LEV_STATIC_PY LevEditOp*
+lev_editops_normalize(size_t n,
+                      const LevEditOp *ops,
+                      size_t *nnorm)
+{
+  size_t nx, i;
+  const LevEditOp *o;
+  LevEditOp *opsnorm, *on;
+
+  if (!n || !ops) {
+    *nnorm = 0;
+    return NULL;
+  }
+
+  nx = 0;
+  o = ops;
+  for (i = n; i; i--, o++)
+    nx += (o->type == LEV_EDIT_KEEP);
+
+  *nnorm = n - nx;
+  if (!*nnorm)
+    return NULL;
+
+  opsnorm = on = (LevEditOp*)malloc((n - nx)*sizeof(LevEditOp));
+  o = ops;
+  for (i = n; i; i--, o++) {
+    if (o->type == LEV_EDIT_KEEP)
+      continue;
+    memcpy(on++, o, sizeof(LevEditOp));
+  }
+
+  return opsnorm;
+}
+
+/**
+ * lev_opcodes_total_cost:
+ * @nb: Tne size of @bops.
+ * @bops: An array of difflib block operation codes.
+ *
+ * Computes the total cost of operations in @bops.
+ *
+ * The costs of elementary operations are all 1.
+ *
+ * Returns: The total cost.
+ **/
+_LEV_STATIC_PY size_t
+lev_opcodes_total_cost(size_t nb,
+                       const LevOpCode *bops)
+{
+  size_t i, sum = 0;
+
+  for (i = nb; i; i--, bops++) {
+    switch (bops->type) {
+      case LEV_EDIT_REPLACE:
+      case LEV_EDIT_DELETE:
+      sum += (bops->send - bops->sbeg);
+      break;
+
+      case LEV_EDIT_INSERT:
+      sum += (bops->dend - bops->dbeg);
+      break;
+
+      default:
+      break;
+    }
+  }
+
+  return sum;
+}
+
+/**
+ * lev_editops_subtract:
+ * @n: The size of @ops.
+ * @ops: An array of elementary edit operations.
+ * @ns: The size of @sub.
+ * @sub: A subsequence (ordered subset) of @ops
+ * @nrem: Where to store then length of the remainder array.
+ *
+ * Subtracts a subsequence of elementary edit operations from a sequence.
+ *
+ * The remainder is a sequence that, applied to result of application of @sub,
+ * gives the same final result as application of @ops to original string.
+ *
+ * Returns: A newly allocated array of normalized edit operations, its length
+ *          is stored to @nrem.  It is always normalized, i.e, without any
+ *          keep operations.  On failure, %NULL is returned.
+ **/
+_LEV_STATIC_PY LevEditOp*
+lev_editops_subtract(size_t n,
+                     const LevEditOp *ops,
+                     size_t ns,
+                     const LevEditOp *sub,
+                     size_t *nrem)
+{
+    static const int shifts[] = { 0, 0, 1, -1 };
+    LevEditOp *rem;
+    size_t i, j, nr, nn;
+    int shift;
+
+    /* compute remainder size */
+    *nrem = -1;
+    nr = nn = 0;
+    for (i = 0; i < n; i++) {
+        if (ops[i].type != LEV_EDIT_KEEP)
+            nr++;
+    }
+    for (i = 0; i < ns; i++) {
+        if (sub[i].type != LEV_EDIT_KEEP)
+            nn++;
+    }
+    if (nn > nr)
+        return NULL;
+    nr -= nn;
+
+
+    /* subtract */
+    /* we could simply return NULL when nr == 0, but then it would be possible
+     * to subtract *any* sequence of the right length to get an empty sequence
+     * -- clrealy incorrectly; so we have to scan the list to check */
+    rem = nr ? (LevEditOp*)malloc(nr*sizeof(LevEditOp)) : NULL;
+    j = nn = shift = 0;
+    for (i = 0; i < ns; i++) {
+        while ((ops[j].spos != sub[i].spos
+                || ops[j].dpos != sub[i].dpos
+                || ops[j].type != sub[i].type)
+               && j < n) {
+            if (ops[j].type != LEV_EDIT_KEEP) {
+                rem[nn] = ops[j];
+                rem[nn].spos += shift;
+                nn++;
+            }
+            j++;
+        }
+        if (j == n) {
+            free(rem);
+            return NULL;
+        }
+
+        shift += shifts[sub[i].type];
+        j++;
+    }
+
+    while (j < n) {
+        if (ops[j].type != LEV_EDIT_KEEP) {
+            rem[nn] = ops[j];
+            rem[nn].spos += shift;
+            nn++;
+        }
+        j++;
+    }
+    assert(nn == nr);
+
+    *nrem = nr;
+    return rem;
+}
+/* }}} */
+
+/****************************************************************************
+ *
+ * Weighted mean strings
+ *
+ ****************************************************************************/
+
+/*
+_LEV_STATIC_PY lev_byte*
+lev_weighted_average(size_t len1,
+                     const lev_byte* string1,
+                     size_t len2,
+                     const lev_byte* string2,
+                     size_t n,
+                     const LevEditOp *ops,
+                     LevAveragingType avtype,
+                     size_t total_cost,
+                     double alpha,
+                     size_t *len)
+{
+  return NULL;
+}
+*/
+

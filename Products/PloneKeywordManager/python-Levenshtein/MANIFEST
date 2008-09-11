@@ -5,6 +5,6 @@ Levenshtein.c
 Levenshtein.h
 setup.cfg
 setup.py
-gendoc.py
+gendoc.sh
 StringMatcher.py
 MANIFEST

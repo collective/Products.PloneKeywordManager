@@ -1,6 +1,6 @@
 Metadata-Version: 1.0
 Name: python-Levenshtein
-Version: 0.8.1
+Version: 0.10.1
 Summary: Python extension computing string distances and similarities.
 Home-page: http://trific.ath.cx/python/levenshtein/
 Author: David Necas (Yeti)

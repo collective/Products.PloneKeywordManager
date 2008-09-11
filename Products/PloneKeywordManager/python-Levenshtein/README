@@ -12,6 +12,8 @@ It supports both normal and Unicode strings.
 Please see PKG-INFO for basic info, NEWS for news and the top of
 Levenshtein.c for TODO.
 
+Python 2.2 or newer is required.
+
 StringMatcher.py is an example SequenceMatcher-like class built on the top of
 Levenshtein.  It misses some SequenceMatcher's functionality, and has some
 extra OTOH.
@@ -25,9 +27,10 @@ are provided yet, RTFS.  But they are not interchangeable:
 - Unicode character type used with -DNO_PYTHON is wchar_t, Python extension
   uses Py_UNICODE, they may be the same but don't count on it
 
-gendoc.py generates HTML API documentation (the same as on my www pages),
-you probably won't a selfcontained instead of includable version, so run
-in `./gendoc.py selfcontained'.  It needs Levenshtein already installed.
+gendoc.sh generates HTML API documentation (the same as on my www pages),
+you probably want a selfcontained instead of includable version, so run
+in `./gendoc.sh --selfcontained'.  It needs Levenshtein already installed
+and genextdoc.py (http://trific.ath.cx/Ftp/python/genextdoc.py).
 
 Levenshtein can be copied and/or modified under the terms of GNU General
 Public License, see the file COPYING for full license text.
