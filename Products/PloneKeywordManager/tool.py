@@ -56,18 +56,26 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
 
     security.declarePrivate('getSetter')
     def getSetter(self,obj,field):
-        """Gets the setter function for the field.
+        """Gets the setter function for the field based on the index name.
         
         Returns None if it can't get the function
         """
-        if field.startswith("get"):
-            setter = field.replace("get","set",1)
+        fieldObj = obj.getField(field) or obj.getField(field.lower())
+        if fieldObj is not None:
+            return fieldObj.getMutator(obj)
+            
+        return None
+
+    security.declarePrivate('getSubjectList')
+    def getSubjectList(self,obj,field):
+        """Returns the current values for the given Lines field as a list.
+        """
+        fieldVal = getattr(obj,field,())
+        if callable(fieldVal):
+            return list(fieldVal())
         else:
-            setter = "set" + field.capitalize() #"Subject" => "setSubject"
-        
-        return getattr(obj,setter,None)
-        
-        
+            return list(fieldVal)
+       
     security.declarePublic('change')
     def change(self, old_keywords, new_keyword, context=None,field='Subject'):
         """Updates all objects using the old_keywords.
@@ -87,7 +95,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         for item in querySet:
             obj = item.getObject()
             ##MOD Dynamic field getting
-            subjectList = list(getattr(obj,field,'Subject')())      
+            subjectList = self.getSubjectList(obj,field)
 
             for element in old_keywords:
                 while (element in subjectList) and (element <> new_keyword):
@@ -105,6 +113,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         
         return len(querySet)
 
+
     security.declarePublic('delete')
     def delete(self, keywords, context=None, field='Subject'):
         """Removes the keywords from all objects using it.
@@ -121,7 +130,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         for item in querySet:
             obj = item.getObject()
             
-            subjectList = list(getattr(obj,field)())
+            subjectList = self.getSubjectList(obj,field)
 
             for element in keywords:
                 while element in subjectList:
