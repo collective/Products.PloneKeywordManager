@@ -11,7 +11,7 @@ from Products.CMFPlone import PloneMessageFactory as _
 
 from Products.CMFCore.utils import getToolByName
 pkm = getToolByName(context, "portal_keyword_manager")
-changed_objects = pkm.delete(keywords, context=context.aq_inner,field=field)
+changed_objects = pkm.delete(keywords, context=context.aq_inner,indexName=field)
 
 msg = _(u"Deleted %s for %d object(s).") % (','.join(keywords), changed_objects)
 

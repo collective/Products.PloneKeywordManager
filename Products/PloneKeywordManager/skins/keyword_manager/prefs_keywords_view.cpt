@@ -17,7 +17,7 @@
                  field  python:request.get('field','Subject');
 		 many_kws python: 20;
                  pkm    context/portal_keyword_manager;
-                 catalogSubjects python:pkm.getKeywords(context=context,field=field);
+                 catalogSubjects python:pkm.getKeywords(context=context,indexName=field);
 		 show_filters python: len(catalogSubjects) > many_kws;">
 
   <h1 i18n:translate="heading_keyword_manager">Keyword Manager</h1>

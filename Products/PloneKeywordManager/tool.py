@@ -53,31 +53,9 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         of difflib
         """
         return USE_LEVENSHTEIN
-
-    security.declarePrivate('getSetter')
-    def getSetter(self,obj,field):
-        """Gets the setter function for the field based on the index name.
-        
-        Returns None if it can't get the function
-        """
-        fieldObj = obj.getField(field) or obj.getField(field.lower())
-        if fieldObj is not None:
-            return fieldObj.getMutator(obj)
-            
-        return None
-
-    security.declarePrivate('getSubjectList')
-    def getSubjectList(self,obj,field):
-        """Returns the current values for the given Lines field as a list.
-        """
-        fieldVal = getattr(obj,field,())
-        if callable(fieldVal):
-            return list(fieldVal())
-        else:
-            return list(fieldVal)
-       
+    
     security.declarePublic('change')
-    def change(self, old_keywords, new_keyword, context=None,field='Subject'):
+    def change(self, old_keywords, new_keyword, context=None,indexName='Subject'):
         """Updates all objects using the old_keywords.
 
         Objects using the old_keywords will be using the new_keywords
@@ -87,7 +65,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         """
         self._checkPermission(context)
         ##MOD Dynamic field getting
-        query = {field: old_keywords}
+        query = {indexName: old_keywords}
         if context is not None:
             query['path'] = '/'.join(context.getPhysicalPath())
         querySet = self._query(**query)
@@ -95,7 +73,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         for item in querySet:
             obj = item.getObject()
             ##MOD Dynamic field getting
-            subjectList = self.getSubjectList(obj,field)
+            subjectList = self.getListFieldValues(obj,indexName)
 
             for element in old_keywords:
                 while (element in subjectList) and (element <> new_keyword):
@@ -105,24 +83,24 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
             subjectList = list(set(subjectList))
             
             ##MOD Dynamic field update
-            updateField = self.getSetter(obj,field)
+            updateField = self.getSetter(obj,indexName)
             if updateField is not None:
                 updateField(subjectList)
-                idxs=[field].extend([i for i in config.ALWAYS_REINDEX if i != field])
+                idxs=[indexName].extend([i for i in config.ALWAYS_REINDEX if i != indexName])
                 obj.reindexObject(idxs=idxs)
         
         return len(querySet)
 
 
     security.declarePublic('delete')
-    def delete(self, keywords, context=None, field='Subject'):
+    def delete(self, keywords, context=None, indexName='Subject'):
         """Removes the keywords from all objects using it.
         
         Returns the number of objects that have been updated.
         """
         self._checkPermission(context)
         ##Mod Dynamic field
-        query = {field: keywords}
+        query = {indexName: keywords}
         if context is not None:
             query['path'] = '/'.join(context.getPhysicalPath())
         querySet = self._query(**query)
@@ -130,38 +108,38 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         for item in querySet:
             obj = item.getObject()
             
-            subjectList = self.getSubjectList(obj,field)
+            subjectList = self.getListFieldValues(obj,indexName)
 
             for element in keywords:
                 while element in subjectList:
                     subjectList.remove(element)
             
-            updateField = self.getSetter(obj,field)
+            updateField = self.getSetter(obj,indexName)
             if updateField is not None:
                 updateField(subjectList)
-                idxs=[field].extend([i for i in config.ALWAYS_REINDEX if i != field])
+                idxs=[indexName].extend([i for i in config.ALWAYS_REINDEX if i != indexName])
                 obj.reindexObject(idxs=idxs)
 
         return len(querySet)
 
     security.declarePublic('getKeywords')
-    def getKeywords(self, context=None, field='Subject'):
+    def getKeywords(self, context=None, indexName='Subject'):
         self._checkPermission(context)
-        if field not in self.getKeywordIndexes():
-            raise ValueError, "%s is not a valid field" % field
+        if indexName not in self.getKeywordIndexes():
+            raise ValueError, "%s is not a valid field" % indexName
         
         catalog = getToolByName(self, 'portal_catalog')
         
         #why work hard if we don't have to?
         #if hasattr(catalog,'uniqueValuesFor'):
-        keywords = list(catalog.uniqueValuesFor(field))
+        keywords = list(catalog.uniqueValuesFor(indexName))
         #else:
         #    query = {}
         #    if context is not None:
         #        query['path'] = '/'.join(context.getPhysicalPath())
         #    keywords = {}
         #    for b in self._query(**query):
-        #        for keyword in getattr(b,field)():
+        #        for keyword in getattr(b,indexName)():
         #            keywords[keyword] = True
         #    keywords = keywords.keys()
         
@@ -219,5 +197,44 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
                 i.id not in config.IGNORE_INDEXES]
         idxs.sort()
         return idxs
+
+    security.declarePrivate('fieldNameForIndex')
+    def fieldNameForIndex(self, indexName):
+        """The name of the index may not be the same as the field on the object, and we need
+           the actual field name in order to find its mutator. 
+        """
+        catalog = getToolByName(self, 'portal_catalog')
+        indexObjs = [idx for idx in catalog.index_objects() if idx.getId() == indexName]
+        try:
+            fieldName = indexObjs[0].indexed_attrs[0]
+        except IndexError:
+            raise ValueError('Found no index named %s' % indexName)
+        
+        return fieldName
+    
+    security.declarePrivate('getSetter')
+    def getSetter(self,obj,indexName):
+        """Gets the setter function for the field based on the index name.
+        
+        Returns None if it can't get the function
+        """
+        fieldName = self.fieldNameForIndex(indexName)
+        fieldObj = obj.getField(fieldName) or obj.getField(fieldName.lower())
+        if fieldObj is not None:
+            return fieldObj.getMutator(obj)
+            
+        return None
+
+    security.declarePrivate('getListFieldValues')
+    def getListFieldValues(self,obj,indexName):
+        """Returns the current values for the given Lines field as a list.
+        """
+        fieldName = self.fieldNameForIndex(indexName)
+        fieldVal = getattr(obj,fieldName,())
+        if callable(fieldVal):
+            return list(fieldVal())
+        else:
+            return list(fieldVal)
+    
 
 Globals.InitializeClass(PloneKeywordManager)
