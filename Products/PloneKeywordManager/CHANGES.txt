@@ -1,8 +1,11 @@
 Plone Keyword Manager changes
 
-Changes in version 1.6 (SVN/Unreleased)
+Changes in version 1.6b2
 
-
+    *   No longer assumes that the index name is the same as the name of the
+        underlying schema field. 
+        [jessesnyder]
+        
 Changes in version 1.6b1
 
     *   Eggification. PKM is only supported under Plone 3 now. It may or may not
