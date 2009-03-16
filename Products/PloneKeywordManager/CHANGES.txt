@@ -1,7 +1,17 @@
 Plone Keyword Manager changes
 
 Changes in version 1.6 (SVN/Unreleased)
-
+    
+    *   fixed handling of non-ASCII Keywords in Controller Python Scripts
+        prefs_keywords_action_change.cpy and prefs_keywords_action_delete.cpy
+        [disko]
+    
+    *   added tests for the above mentioned bugfixes
+        [disko]
+    
+    *   added German translation
+        [disko]
+        
 Changes in version 1.6b2
 
     *   No longer assumes that the index name is the same as the name of the

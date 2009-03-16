@@ -18,11 +18,6 @@ msg = _(u"Deleted %s for %d object(s).") % (
     changed_objects
 )
 
-#msg = _(u"Deleted %s for %d object(s).") % (
-#    ','.join(keywords),
-#    changed_objects
-#)
-
 state.setNextAction('redirect_to:string:prefs_keywords_view?field=%s' % field)
 
 context.plone_utils.addPortalMessage(msg)

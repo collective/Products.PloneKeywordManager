@@ -21,12 +21,6 @@ msg =_(u"Changed %s to %s for %d object(s).") % (
     changed_objects
 )
 
-#msg =_(u"Changed %s to %s for %d object(s).") % (
-#    ','.join(keywords),
-#    changeto,
-#    changed_objects
-#)
-
 state.setNextAction('redirect_to:string:prefs_keywords_view?field=%s' % field)
 
 context.plone_utils.addPortalMessage(msg)
