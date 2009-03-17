@@ -17,7 +17,7 @@ changed_objects = pkm.change(keywords, changeto, context=context.aq_inner, index
 
 msg =_(u"Changed %s to %s for %d object(s).") % (
     ','.join(keywords).decode('utf-8'),
-    changeto,
+    changeto.decode('utf-8'),
     changed_objects
 )
 

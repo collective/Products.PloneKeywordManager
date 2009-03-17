@@ -24,6 +24,7 @@ class TestNonAsciiKeywords(PloneKeywordManagerTestCase):
                 u'Fr\\xfchst\\xfcck'.decode('utf-8'),
                 'Mitagessen',
                 'Abendessen',
+                u'Fr\\xfchessen'.decode('utf-8'),
             ]
         )
     
@@ -56,10 +57,17 @@ class TestNonAsciiKeywords(PloneKeywordManagerTestCase):
     #     self.assertRaises(UnicodeDecodeError, self._action_change, [u'Fr\\xfchst\\xfcck'.decode('utf-8'), 'Mittagessen', ], 'Abendessen', )
     #     self.assertRaises(UnicodeDecodeError, self._action_delete, [u'Fr\\xfchst\\xfcck'.decode('utf-8'), ])
     
-    def test_pref_keywords_action_change(self):
-        """ test the bugfix for prefs_keywords_action_change """
+    def test_pref_keywords_action_change_keywords(self):
+        """ test the bugfix for prefs_keywords_action_change when keywords contains at least one element with non ASCII characters """
         try:
             self._action_change([u'Fr\\xfchst\\xfcck'.decode('utf-8'), 'Mittagessen', ], 'Abendessen')
+        except UnicodeDecodeError:
+            self.fail()
+    
+    def test_pref_keywords_action_change_changeto(self):
+        """ test the bugfix for prefs_keywords_action_change when changeto contains non ASCII characters """
+        try:
+            self._action_change([u'Fr\\xfchst\\xfcck'.decode('utf-8'), 'Mittagessen', ], u'Fr\\xfchessen'.decode('utf-8'))
         except UnicodeDecodeError:
             self.fail()
     
