@@ -21,10 +21,10 @@ class TestNonAsciiKeywords(PloneKeywordManagerTestCase):
         )
         self.portal.setSubject(
             [
-                u'Fr\\xfchst\\xfcck'.decode('utf-8'),
+                u'Fr\\xfchst\\xfcck',
                 'Mitagessen',
                 'Abendessen',
-                u'Fr\\xfchessen'.decode('utf-8'),
+                u'Fr\\xfchessen',
             ]
         )
     
@@ -59,24 +59,15 @@ class TestNonAsciiKeywords(PloneKeywordManagerTestCase):
     
     def test_pref_keywords_action_change_keywords(self):
         """ test the bugfix for prefs_keywords_action_change when keywords contains at least one element with non ASCII characters """
-        try:
-            self._action_change([u'Fr\\xfchst\\xfcck'.decode('utf-8'), 'Mittagessen', ], 'Abendessen')
-        except UnicodeDecodeError:
-            self.fail()
+        self._action_change([u'Fr\\xfchst\\xfcck', 'Mittagessen', ], 'Abendessen')
     
     def test_pref_keywords_action_change_changeto(self):
         """ test the bugfix for prefs_keywords_action_change when changeto contains non ASCII characters """
-        try:
-            self._action_change([u'Fr\\xfchst\\xfcck'.decode('utf-8'), 'Mittagessen', ], u'Fr\\xfchessen'.decode('utf-8'))
-        except UnicodeDecodeError:
-            self.fail()
+        self._action_change([u'Fr\\xfchst\\xfcck', 'Mittagessen', ], u'Fr\\xfchessen')
     
     def test_pref_keywords_action_delete(self):
         """ test the bugfix for prefs_keywords_action_delete """
-        try:
-            self._action_delete([u'Fr\\xfchst\\xfcck'.decode('utf-8'), ])
-        except UnicodeDecodeError:
-            self.fail()
+        self._action_delete([u'Fr\\xfchst\\xfcck', ])
     
     # Keep adding methods here, or break it into multiple classes or multiple files as appropriate.
     # Having tests in multiple files makes it possible to run tests from just one package:
