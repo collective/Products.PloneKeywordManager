@@ -1,5 +1,8 @@
 Plone Keyword Manager changes
 
+Changes in version 1.7 (SVN/Unreleased)
+
+
 Changes in version 1.6 - 19/03/2009
     
     *   fixed handling of non-ASCII Keywords in Controller Python Scripts
