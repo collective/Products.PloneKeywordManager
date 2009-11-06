@@ -1,0 +1,103 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PloneKeywordManager\n"
+"POT-Creation-Date: 2009-11-06 11:34+0200\n"
+"PO-Revision-Date: 2009-11-06 11:34+0200\n"
+"Last-Translator: Dimitri Boone <Dimitri.Boone@UGent.be>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Language-Code: nl\n"
+"Language-Name: Dutch\n"
+"Preferred-Encodings: latin1\n"
+"X-Is-Fallback-For: nl-be nl-nl\n"
+"Domain: plone\n"
+
+#. <input class="context" i18n:attributes="value" type="submit" value="Search"/>
+#: PloneKeywordManager/skins/keyword_manager/prefs_keywords_view.pt
+msgid "Search"
+msgstr "Zoeken"
+
+#. <input class="standalone" i18n:attributes="value" type="submit" value="View keywords"/>
+msgid "View keywords"
+msgstr "Toon trefwoorden"
+
+# PloneKeywordManager/skins/keyword_manager/prefs_keywords_view.pt
+# Note: It appears that this installation of the Keyword Manager is not using 
+# the "Levenshtein" Python module for detecting similar keywords.  This does not affect
+# the end result of the Keyword Manager, but can make this page render up to 10 times more
+# quickly.  If you notice that this page is slow to load, ask your site admin to
+# install the Levenshtein Python module; a copy is included with PloneKeywordManager
+# and installation instructions are in the README.
+msgid "description_levenshtein"
+msgstr "Opgelet: de \"Levenshtein\" Python module werd niet gevonden. "
+"De Keyword Manager gebruikt die module voor het sneller terugvinden "
+"van gelijkaardige trefwoorden. Als u merkt dat deze pagina traag "
+"laadt, vraag dan aan uw websitebeheerder om de \"Levenshtein\" "
+"Python module te installeren. Meer info is terug te vinden in het "
+"README-bestand in de PloneKeywordManager package."
+
+#. <div class="documentDescription" i18n:translate="description_keyword_manager">
+#: PloneKeywordManager/skins/keyword_manager/prefs_keywords_view.pt
+msgid "description_keyword_manager"
+msgstr "Met de Keyword Manager kan je trefwoorden wijzigen, verwijderen "
+"en samenvoegen."
+
+#. <h1 i18n:translate="heading_keyword_manager">
+#: PloneKeywordManager/skins/keyword_manager/prefs_keywords_view.pt
+msgid "heading_keyword_manager"
+msgstr "Keyword Manager"
+
+#. <label for="select_keyword_list" i18n:translate="label_keyword">
+#: PloneKeywordManager/skins/keyword_manager/prefs_keywords_view.pt
+msgid "label_keyword"
+msgstr "Trefwoord"
+
+#. <legend i18n:translate="label_keyword_assignments">
+#: PloneKeywordManager/skins/keyword_manager/prefs_keywords_view.pt
+msgid "label_keyword_assignments"
+msgstr "Gevonden trefwoorden"
+
+#. <legend i18n:translate="label_list_alphabetically">
+#: PloneKeywordManager/skins/keyword_manager/prefs_keywords_view.pt
+msgid "label_list_alphabetically"
+msgstr "Alfabetische lijst"
+
+#. <legend i18n:translate="label_search_by_keyword">
+#: PloneKeywordManager/skins/keyword_manager/prefs_keywords_view.pt
+msgid "label_search_by_keyword"
+msgstr "Zoeken op trefwoord"
+
+#. <label for="select_alphabet_list" i18n:translate="label_view_range">
+#: PloneKeywordManager/skins/keyword_manager/prefs_keywords_view.pt
+msgid "label_view_range"
+msgstr "Toon reeks"
+
+#. <input class="destructive"
+#.        value="Merge" />
+#: PloneKeywordManager/skins/keyword_manager/prefs_keywords_view.pt
+msgid "Merge"
+msgstr "Samenvoegen"
+
+#. <input class="destructive"
+#.        i18n:attributes="value"
+#: PloneKeywordManager/skins/keyword_manager/prefs_keywords_view.pt
+msgid "Delete"
+msgstr "Verwijderen"
+
+# No content in this site has any keywords assigned yet, so there's nothing
+# to manage at this time.  (To assign keywords to a piece of content, use
+# the item's "Properties" tab.)
+#: PloneKeywordManager/skins/keyword_manager/prefs_keywords_view.pt
+msgid "description_no_keywords"
+msgstr "Er werden geen trefwoorden gevonden in deze site. "
+"Gebruik de \"Categorisatie\" tab (onder \"Bewerken\") om "
+"trefwoorden te zetten op inhoudsitems."
+
+
+# ### Manuel added strings ####
+
+msgid "Keyword Manager"
+msgstr "Keyword Manager"
+
