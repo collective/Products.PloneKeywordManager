@@ -1,52 +1,56 @@
 Plone Keyword Manager changes
 
-Changes in version 1.7 (SVN/Unreleased)
+1.7 (SVN/Unreleased)
+--------------------
 
+- Restify the CHANGES.txt file [toutpt]
+- Add keywords import throw genericsetup [toutpt]
 
-Changes in version 1.6 - 19/03/2009
+1.6 - 19/03/2009
+----------------
+
+- fixed handling of non-ASCII Keywords in Controller Python Scripts
+prefs_keywords_action_change.cpy and prefs_keywords_action_delete.cpy [disko]
     
-    *   fixed handling of non-ASCII Keywords in Controller Python Scripts
-        prefs_keywords_action_change.cpy and prefs_keywords_action_delete.cpy
-        [disko]
-    
-    *   added tests for the above mentioned bugfixes
-        [disko]
-    
-    *   added German translation
-        [disko]
+- added tests for the above mentioned bugfixes [disko]
+
+- added German translation [disko]
+
+1.6b2
+-----
+
+- No longer assumes that the index name is the same as the name of the 
+underlying schema field. [jessesnyder]
         
-Changes in version 1.6b2
+1.6b1
+-----
 
-    *   No longer assumes that the index name is the same as the name of the
-        underlying schema field. 
-        [jessesnyder]
-        
-Changes in version 1.6b1
-
-    *   Eggification. PKM is only supported under Plone 3 now. It may or may not
-        work in Plone 2.5.
-        [dunlapm]
+- Eggification. PKM is only supported under Plone 3 now. It may or may not
+work in Plone 2.5. [dunlapm]
     
-    *   Added support for multiple keyword indexes. If you have more than one
-        keyword field on your content type(s) then you will still be able to
-        manage all of your keywords. If you only use the single default field
-        then you will get the normal interface.
+- Added support for multiple keyword indexes. If you have more than one
+keyword field on your content type(s) then you will still be able to
+manage all of your keywords. If you only use the single default field
+then you will get the normal interface.
 
-Changes in version 0.4-plone3compat branch
+0.4-plone3compat branch
+-----------------------
 
-    *   Plone 2.5 and Plone 3 compatibility (glenfant)
+- Plone 2.5 and Plone 3 compatibility (glenfant)
 
-Changes in Version 0.4
+0.4
+---
 
-    *   Added Brazilian Portuguese i18n support
-        by Rafahela Bazzanella - rafabazzanella@yahoo.com.br
+- Added Brazilian Portuguese i18n support
+by Rafahela Bazzanella - rafabazzanella@yahoo.com.br
 
-Changes in Version 0.3
+0.3
+---
 
-    *   Refactored code to run from a portal tool
+- Refactored code to run from a portal tool
 
-    *   Minor clean ups
+- Minor clean ups
 
-    *   Introduced the permission "Manage Keywords" to have better control
-        about who can manage keywords
+- Introduced the permission "Manage Keywords" to have better control
+about who can manage keywords
 

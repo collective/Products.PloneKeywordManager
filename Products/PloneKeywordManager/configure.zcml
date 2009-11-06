@@ -1,0 +1,13 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:five="http://namespaces.zope.org/five"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    i18n_domain="nmd.policy">
+  <genericsetup:importStep
+        name="keywords"
+        title="Create or update keywords"
+        description="Create all keywords"
+        handler=".setuphandlers.importKeywords">
+  </genericsetup:importStep>
+<!-- Place the exportstep here -->
+</configure>
