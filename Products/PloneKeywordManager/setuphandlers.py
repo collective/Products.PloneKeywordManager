@@ -11,7 +11,7 @@ def importKeywords(context):
     if doc is None:
         site.invokeFactory('Document', id, title='Keywords')
         doc = getattr(site, id)
-    doc.setSubject([i for i in keywords.split() if i])
+    doc.setSubject([i for i in keywords.split('\n') if i])
     doc.setExcludeFromNav(True)
     doc.reindexObject()
     doc.unmarkCreationFlag()

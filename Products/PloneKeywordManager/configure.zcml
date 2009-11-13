@@ -9,5 +9,13 @@
         description="Create all keywords"
         handler=".setuphandlers.importKeywords">
   </genericsetup:importStep>
+
+  <genericsetup:registerProfile
+     name="default"
+     title="Products.PloneKeywordManager default"
+     directory="profiles/default"
+     description="Keyword manager"
+     provides="Products.GenericSetup.interfaces.EXTENSION"
+     />
 <!-- Place the exportstep here -->
 </configure>
