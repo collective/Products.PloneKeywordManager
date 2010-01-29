@@ -29,6 +29,7 @@ except ImportError, e:
 # Sibling imports
 from Products.PloneKeywordManager.interfaces import IPloneKeywordManager
 from Products.PloneKeywordManager import config
+from zope import interface
 
 class PloneKeywordManager(UniqueObject, SimpleItem):
     """A portal wide tool for managing keywords within Plone."""
@@ -39,7 +40,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
     meta_type = "Plone Keyword Manager Tool"
     security = ClassSecurityInfo()
     
-    __implements__ = (IPloneKeywordManager,)
+    interface.implements(IPloneKeywordManager)
 
     manage_options = ({'label' : 'Overview', 'action' : 'manage_overview'},)
 

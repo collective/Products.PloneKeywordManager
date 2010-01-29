@@ -3,8 +3,7 @@
 # See also LICENSE.txt
 # $Id$
 
-from Interface import Interface
-
+from zope.interface import Interface
 
 class IPloneKeywordManager(Interface):
     """A portal tool for managing keywords"""

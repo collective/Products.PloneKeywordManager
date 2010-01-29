@@ -6,6 +6,7 @@ Plone Keyword Manager changes
 - Restify the CHANGES.txt file [toutpt]
 - Add keywords import throw genericsetup [toutpt]
 - Add a default profile based on Extensions/Install.py [toutpt]
+- remove zope2 interface [toutpt]
 
 1.6 - 19/03/2009
 ----------------
