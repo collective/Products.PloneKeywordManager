@@ -13,14 +13,14 @@ except ImportError:
 # Zope imports
 import Globals
 from OFS.SimpleItem import SimpleItem
-from AccessControl import ClassSecurityInfo 
+from AccessControl import ClassSecurityInfo
 from AccessControl import getSecurityManager
 from AccessControl import Unauthorized
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 
 # CMF imports
 from Products.CMFCore.utils import UniqueObject, getToolByName
-from Products.CMFCore.Expression import Expression
+#from Products.CMFCore.Expression import Expression
 try:
     from Products.CMFCore import CMFCorePermissions
 except ImportError, e:
@@ -31,6 +31,7 @@ from Products.PloneKeywordManager.interfaces import IPloneKeywordManager
 from Products.PloneKeywordManager import config
 from zope import interface
 
+
 class PloneKeywordManager(UniqueObject, SimpleItem):
     """A portal wide tool for managing keywords within Plone."""
 
@@ -39,13 +40,13 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
     id = "portal_keyword_manager"
     meta_type = "Plone Keyword Manager Tool"
     security = ClassSecurityInfo()
-    
+
     interface.implements(IPloneKeywordManager)
 
-    manage_options = ({'label' : 'Overview', 'action' : 'manage_overview'},)
+    manage_options = ({'label': 'Overview', 'action': 'manage_overview'}, )
 
     security.declareProtected(CMFCorePermissions.ManagePortal, 'manage_overview')
-    manage_overview = PageTemplateFile('www/explainTool', globals(), 
+    manage_overview = PageTemplateFile('www/explainTool', globals(),
             __name__='manage_overview')
 
     security.declarePublic('usingLevenshtein')
@@ -54,9 +55,9 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         of difflib
         """
         return USE_LEVENSHTEIN
-    
+
     security.declarePublic('change')
-    def change(self, old_keywords, new_keyword, context=None,indexName='Subject'):
+    def change(self, old_keywords, new_keyword, context=None, indexName='Subject'):
         """Updates all objects using the old_keywords.
 
         Objects using the old_keywords will be using the new_keywords
@@ -74,7 +75,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         for item in querySet:
             obj = item.getObject()
             ##MOD Dynamic field getting
-            subjectList = self.getListFieldValues(obj,indexName)
+            subjectList = self.getListFieldValues(obj, indexName)
 
             for element in old_keywords:
                 while (element in subjectList) and (element <> new_keyword):
@@ -82,21 +83,21 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
 
             # dedupe new Keyword list (an issue when combining multiple keywords)
             subjectList = list(set(subjectList))
-            
+
             ##MOD Dynamic field update
-            updateField = self.getSetter(obj,indexName)
+            updateField = self.getSetter(obj, indexName)
             if updateField is not None:
                 updateField(subjectList)
                 idxs=[indexName].extend([i for i in config.ALWAYS_REINDEX if i != indexName])
                 obj.reindexObject(idxs=idxs)
-        
+
         return len(querySet)
 
 
     security.declarePublic('delete')
     def delete(self, keywords, context=None, indexName='Subject'):
         """Removes the keywords from all objects using it.
-        
+
         Returns the number of objects that have been updated.
         """
         self._checkPermission(context)
@@ -108,14 +109,14 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
 
         for item in querySet:
             obj = item.getObject()
-            
-            subjectList = self.getListFieldValues(obj,indexName)
+
+            subjectList = self.getListFieldValues(obj, indexName)
 
             for element in keywords:
                 while element in subjectList:
                     subjectList.remove(element)
-            
-            updateField = self.getSetter(obj,indexName)
+
+            updateField = self.getSetter(obj, indexName)
             if updateField is not None:
                 updateField(subjectList)
                 idxs=[indexName].extend([i for i in config.ALWAYS_REINDEX if i != indexName])
@@ -128,9 +129,9 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         self._checkPermission(context)
         if indexName not in self.getKeywordIndexes():
             raise ValueError, "%s is not a valid field" % indexName
-        
+
         catalog = getToolByName(self, 'portal_catalog')
-        
+
         #why work hard if we don't have to?
         #if hasattr(catalog,'uniqueValuesFor'):
         keywords = list(catalog.uniqueValuesFor(indexName))
@@ -143,7 +144,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         #        for keyword in getattr(b,indexName)():
         #            keywords[keyword] = True
         #    keywords = keywords.keys()
-        
+
         keywords.sort()
         return keywords
 
@@ -157,18 +158,18 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         if not USE_LEVENSHTEIN:
             # No levenshtein module around. Fall back to difflib
             return difflib.get_close_matches(word, possibilities, num, score)
-        
+
         # Levenshtein is around, so let's use it.
         res = []
-        
+
         # Search for all similar terms in possibilities
         for item in possibilities:
             lscore = Levenshtein.ratio(word, item)
             if lscore > score:
-                res.append((item,lscore))
+                res.append((item, lscore))
 
         # Sort by score (high scores on top of list)
-        res.sort(lambda x,y: -cmp(x[1],y[1]))
+        res.sort(lambda x, y: -cmp(x[1], y[1]))
 
         # Return first n terms without scores
         return [item[0] for item in res[:num]]
@@ -185,7 +186,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         if not getSecurityManager().checkPermission(
             config.MANAGE_KEYWORDS_PERMISSION, context):
             raise Unauthorized("You don't have the necessary permissions to "
-                               "access %r." % (context,))
+                               "access %r." % context)
 
     def getKeywordIndexes(self):
         """Gets a list of indexes from the catalog. Uses config.py to choose the
@@ -202,7 +203,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
     security.declarePrivate('fieldNameForIndex')
     def fieldNameForIndex(self, indexName):
         """The name of the index may not be the same as the field on the object, and we need
-           the actual field name in order to find its mutator. 
+           the actual field name in order to find its mutator.
         """
         catalog = getToolByName(self, 'portal_catalog')
         indexObjs = [idx for idx in catalog.index_objects() if idx.getId() == indexName]
@@ -210,32 +211,32 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
             fieldName = indexObjs[0].indexed_attrs[0]
         except IndexError:
             raise ValueError('Found no index named %s' % indexName)
-        
+
         return fieldName
-    
+
     security.declarePrivate('getSetter')
-    def getSetter(self,obj,indexName):
+    def getSetter(self, obj, indexName):
         """Gets the setter function for the field based on the index name.
-        
+
         Returns None if it can't get the function
         """
         fieldName = self.fieldNameForIndex(indexName)
         fieldObj = obj.getField(fieldName) or obj.getField(fieldName.lower())
         if fieldObj is not None:
             return fieldObj.getMutator(obj)
-            
+
         return None
 
     security.declarePrivate('getListFieldValues')
-    def getListFieldValues(self,obj,indexName):
+    def getListFieldValues(self, obj, indexName):
         """Returns the current values for the given Lines field as a list.
         """
         fieldName = self.fieldNameForIndex(indexName)
-        fieldVal = getattr(obj,fieldName,())
+        fieldVal = getattr(obj, fieldName, ())
         if callable(fieldVal):
             return list(fieldVal())
         else:
             return list(fieldVal)
-    
+
 
 Globals.InitializeClass(PloneKeywordManager)
