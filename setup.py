@@ -13,8 +13,8 @@ setup(name='Products.PloneKeywordManager',
           Keywords can be cleaned up from time to time by a site manager to \
           create a consistent vocabulary.",
 
-      long_description=open(os.path.join(_os_path, "README.txt")).read() + "\n" +
-                       open(os.path.join(_os_path, "CHANGES.txt")).read(),
+      long_description=open("README.txt").read() + "\n" +
+                       open("CHANGES.txt").read(),
       # Get more strings from http://www.python.org/pypi?%3Aaction=list_classifiers
       classifiers=[
         "Framework :: Plone",
