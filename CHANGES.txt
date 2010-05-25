@@ -3,10 +3,22 @@ Plone Keyword Manager changes
 1.7 (SVN/Unreleased)
 --------------------
 
-- Restify the CHANGES.txt file [toutpt]
-- Add keywords import throw genericsetup [toutpt]
-- Add a default profile based on Extensions/Install.py [toutpt]
-- remove zope2 interface [toutpt]
+- Added ability to mix unicode and non-unicode keywords and changes. 
+  Fixes a bug with collective.dancing (and plone.z3cform) upgrading
+  form inputs to unicode automagically.
+  [dunlapm]
+
+- Restify the CHANGES.txt file
+  [toutpt]
+
+- Add keywords import through genericsetup
+  [toutpt]
+
+- Add a default profile based on Extensions/Install.py
+  [toutpt]
+
+- remove zope2 interface
+  [toutpt]
 
 1.6 - 19/03/2009
 ----------------

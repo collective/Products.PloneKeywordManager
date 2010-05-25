@@ -163,8 +163,18 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         res = []
 
         # Search for all similar terms in possibilities
+        if isinstance(word, str):
+            oword = unicode(word, 'utf-8')
+        else:
+            oword = word.encode('utf-8')
+        
         for item in possibilities:
-            lscore = Levenshtein.ratio(word, item)
+            if isinstance(item, type(word)):
+                lscore = Levenshtein.ratio(word, item)
+            elif isinstance(item, type(oword)):
+                lscore = Levenshtein.ratio(oword, item)
+            else:
+                raise ValueError, "%s is not a normal, or unicode string" % item
             if lscore > score:
                 res.append((item, lscore))
 

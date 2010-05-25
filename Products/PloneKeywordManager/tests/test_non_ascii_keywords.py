@@ -68,6 +68,9 @@ class TestNonAsciiKeywords(PloneKeywordManagerTestCase):
     def test_pref_keywords_action_delete(self):
         """ test the bugfix for prefs_keywords_action_delete """
         self._action_delete([u'Fr\\xfchst\\xfcck', ])
+        
+    def test_getscoredmatches(self):
+      self.pkm.getScoredMatches(u'foo', ['foo', u'bar', 'baz'], 7, 0.6)
     
     # Keep adding methods here, or break it into multiple classes or multiple files as appropriate.
     # Having tests in multiple files makes it possible to run tests from just one package:
