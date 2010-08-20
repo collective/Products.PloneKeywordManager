@@ -16,12 +16,7 @@ authors' interpretation of existing keywords.
 Installation
 ============
 
-Plone Keyword Manager can be easily installed and removed with the
-built-in install mechanism in Plone 2 and up. Place it in your Products
-directory and use the Add/Remove Products panel to activate.
-
-If you want to install in a CMF site or a Plone 1 site,
-it installs like any other CMF Product.
+To install this package. please see docs/INSTALL.txt.
 
 Plone Keyword Manager uses Python's difflib for the similarity search per
 default, but if you want to speed up the PloneKeywordManager, you should
