@@ -1,5 +1,8 @@
 Plone Keyword Manager changes
 
+1.8 - Unreleased
+----------------
+
 1.7 - 20/08/2010
 ----------------
 
