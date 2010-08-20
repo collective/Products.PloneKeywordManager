@@ -1,9 +1,22 @@
 import os
 from setuptools import setup, find_packages
 
-_os_path = os.path.join("Products", "PloneKeywordManager")
 
-version = open(os.path.join(_os_path, "version.txt")).read().strip()
+def read(*rnames):
+    return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
+
+version = '1.8dev'
+
+long_description = (
+    read('README.txt')
+    + '\n' +
+    read('CHANGES.txt')
+    #+ '\n' +
+    #read('Products', 'PloneKeywordManager', 'README.txt')
+    #+ '\n' +
+    #read('CONTRIBUTORS.txt')
+    )
+
 
 setup(name='Products.PloneKeywordManager',
       version=version,
@@ -12,9 +25,7 @@ setup(name='Products.PloneKeywordManager',
           It uses a similiarity search to support you in identifying similar keywords.\
           Keywords can be cleaned up from time to time by a site manager to \
           create a consistent vocabulary.",
-
-      long_description=open("README.txt").read() + "\n" +
-                       open("CHANGES.txt").read(),
+      long_description=long_description,
       # Get more strings from http://www.python.org/pypi?%3Aaction=list_classifiers
       classifiers=[
         "Framework :: Plone",
@@ -32,9 +43,13 @@ setup(name='Products.PloneKeywordManager',
       zip_safe=False,
       install_requires=[
           'setuptools',
+          #'python-Levenshtein',   # broken pypi-download
           # -*- Extra requirements: -*-
       ],
       entry_points="""
       # -*- Entry points: -*-
+
+      [z3c.autoinclude.plugin]
+      target = plone
       """,
       )

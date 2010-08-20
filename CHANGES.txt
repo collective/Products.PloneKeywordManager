@@ -1,9 +1,20 @@
-Plone Keyword Manager changes
+Changelog
+=========
 
-1.8 - Unreleased
+
+1.8 (unreleased)
 ----------------
 
-1.7 - 20/08/2010
+- Added the z3c.autoinclude entry point so this package is automatically loaded
+  on Plone 3.3 and above. [WouterVH]
+
+- Remove the old-style refresh.txt and version.txt. Version is now specified in
+  setup.py [WouterVH]
+
+- Cleanup install-instructions. [WouterVH]
+
+
+1.7 (20/08/2010)
 ----------------
 
 - Added ability to mix unicode and non-unicode keywords and changes. 
@@ -11,63 +22,68 @@ Plone Keyword Manager changes
   form inputs to unicode automagically.
   [dunlapm]
 
-- Restify the CHANGES.txt file
+- Restify the CHANGES.txt file.
   [toutpt]
 
-- Add keywords import through genericsetup
+- Add keywords import through genericsetup.
   [toutpt]
 
-- Add a default profile based on Extensions/Install.py
+- Add a default profile based on Extensions/Install.py.
   [toutpt]
 
-- remove zope2 interface
+- remove zope2 interface.
   [toutpt]
 
-1.6 - 19/03/2009
+
+1.6 (19/03/2009)
 ----------------
 
-- fixed handling of non-ASCII Keywords in Controller Python Scripts
-prefs_keywords_action_change.cpy and prefs_keywords_action_delete.cpy [disko]
+- Fixed handling of non-ASCII Keywords in Controller Python Scripts
+  prefs_keywords_action_change.cpy and prefs_keywords_action_delete.cpy [disko]
 
-- added tests for the above mentioned bugfixes [disko]
+- Added tests for the above mentioned bugfixes. [disko]
 
-- added German translation [disko]
+- Added German translation. [disko]
 
-1.6b2
------
+
+1.6b2 (15-11-2008)
+------------------
 
 - No longer assumes that the index name is the same as the name of the
-underlying schema field. [jessesnyder]
+  underlying schema field. [jessesnyder]
 
-1.6b1
------
 
-- Eggification. PKM is only supported under Plone 3 now. It may or may not
-work in Plone 2.5. [dunlapm]
+1.6b1 (09-09-2008)
+------------------
 
-- Added support for multiple keyword indexes. If you have more than one
-keyword field on your content type(s) then you will still be able to
-manage all of your keywords. If you only use the single default field
-then you will get the normal interface.
+- Eggification from PloneKeywordManager into Products.PloneKeywordManager. This
+  package is only supported for Plone 3 now. It may or may not work in Plone 2.5. [dunlapm]
 
-0.4-plone3compat branch
+- Added support for multiple keyword indexes. If you have more than one keyword
+  field on your content type(s) then you will still be able to manage all of your
+  keywords. If you only use the single default field then you will get the normal
+  interface.
+
+
+1.5-alpha1 (28-11-2007)
 -----------------------
 
-- Plone 2.5 and Plone 3 compatibility (glenfant)
+- Plone 2.5 and Plone 3 compatibility for product PloneKeywordManager. [glenfant]
 
-0.4
----
 
-- Added Brazilian Portuguese i18n support
-by Rafahela Bazzanella - rafabazzanella@yahoo.com.br
+0.4 (unknown)
+-------------
 
-0.3
----
+- Added Brazilian Portuguese i18n support.
+  [Rafahela Bazzanella <rafabazzanella@yahoo.com.br>]
 
-- Refactored code to run from a portal tool
 
-- Minor clean ups
+0.3 (05-04-2005)
+-----------------
 
-- Introduced the permission "Manage Keywords" to have better control
-about who can manage keywords
+- Refactored code to run from a portal tool.
 
+- Minor clean ups.
+
+- Introduced the permission "Manage Keywords" to have better control about who
+  can manage keywords.
