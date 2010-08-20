@@ -1,5 +1,5 @@
 Products.PloneKeywordManager Installation
-==========================
+=========================================
 
 To install Products.PloneKeywordManager into the global Python environment (or a workingenv),
 using a traditional Zope 2 instance, you can do this:
