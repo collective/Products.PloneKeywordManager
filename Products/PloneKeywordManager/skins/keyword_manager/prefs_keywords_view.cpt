@@ -32,48 +32,49 @@
 	<div class="portalMessage"
 	 	 tal:condition="not:pkm/usingLevenshtein"
 		 i18n:translate="description_levenshtein">
-		Note: It appears that this installation of the Keyword Manager is not using 
+		Note: It appears that this installation of the Keyword Manager is not using
 		the "Levenshtein" Python module for detecting similar keywords.  This does not affect
 		the end result of the Keyword Manager, but can make this page render up to 10 times more
 		quickly.  If you notice that this page is slow to load, ask your site admin to
 		install the Levenshtein Python module; a copy is included with PloneKeywordManager
 		and installation instructions are in the README.
 	</div>
-	
+
     <div class="documentDescription"
          i18n:translate="description_keyword_manager">
     The Keyword Manager allows you to delete and merge keywords in your portal.
     </div>
-    
+
       <tal:kw_fields tal:define="kwfields pkm/getKeywordIndexes"
                      tal:condition="python:len(kwfields)>1">
         <form action="prefs_keywords_view" method="get"
               tal:attributes="action string:${context/absolute_url}/${template/id}">
             <fieldset>
-                <legend>
-                 Chose Keyword Field/Index
+                <legend i18n:translate="label_choose_keyword_field">
+                 Choose Keyword Field/Index
                 </legend>
-            
+
             <div class="field">
-                <label for="kwfield">
+                <label for="kwfield" i18n:translate="label_keyword_field">
                     Keyword Field
                 </label>
-                
+
                 <select id="kwfield" name="field">
                     <option tal:repeat="fld kwfields"
                             tal:attributes="value fld;
                                             selected python:fld==field;"
+                            i18n:translate=""
                             tal:content="python:fld.replace('get','',1)" />
                 </select>
             </div>
-        
+
             <div class="formControls">
               <input class="standalone"
                      type="submit"
                      value="Select Field"
                      i18n:attributes="value" />
             </div>
-            
+
             </fieldset>
         </form>
       </tal:kw_fields>
@@ -171,14 +172,14 @@
                                tal:content="err" i18n:translate="">
                             Error message goes here
                           </div>
-			  <dl tal:repeat="subject python:test(search, [search], catalogSubjects)">    
+			  <dl tal:repeat="subject python:test(search, [search], catalogSubjects)">
 			   <tal:block tal:condition="python:not show_filters or search or limit=='a-z' or (subject and limit==subject.lower()[0])">
 			   <dt>
-			    <input type="checkbox" name="keywords:list" 
+			    <input type="checkbox" name="keywords:list"
 			           tal:attributes="value subject;
                                                    onclick string:document.forms['keyword_edit_form'].changeto.value='${subject}';; return true;;" />
 			    <div tal:replace="subject">Subject</div>
-			   </dt>     
+			   </dt>
 			   <dd>
 			     <span tal:repeat="item python:pkm.getScoredMatches(subject, catalogSubjects, num, score, context=context)" style="white-space: nowrap;">
 			       <span tal:condition="python:subject!=item">
@@ -203,7 +204,7 @@
                             </div>
 			 <label for="input_change_to" i18n:translate="label_keyword">Keyword</label>
 			 <input id="input_change_to" type="text" name="changeto" />
-			</div> 
+			</div>
 
 			<div class="formControls">
 			    <input class="destructive"
@@ -222,9 +223,9 @@
 			</div>
 
 			</fieldset>
-		</form>                                                     
+		</form>
 	</tal:site_has_keywords>
-	
+
 	<tal:no_keywords_yet condition="not:catalogSubjects">
 		<div i18n:translate="description_no_keywords">
 			No content in this site has any keywords assigned yet, so there's nothing
@@ -232,7 +233,7 @@
 			the item's "Categorization" tab while editing.)
 		</div>
 	</tal:no_keywords_yet>
-	
+
 </div>
 </body>
 </html>

@@ -106,3 +106,35 @@ msgstr "Supprimer"
 
 msgid "Keyword Manager"
 msgstr "Gestionnaire de mots-clés"
+
+#: PloneKeywordManager/skins/keyword_manager/prefs_keywords_view.pt
+# No content in this site has any keywords assigned yet, so there's nothing
+# to manage at this time.  (To assign keywords to a piece of content, use
+# the item's "Properties" tab.)
+msgid "description_no_keywords"
+msgstr ""
+"Aucun contenu de ce site n'a encore de mot clé associé pour ce champ. "
+"Pour utiliser cette fonctionnalité, "
+"assignez tout d'abord des mots-clés sur des contenus via l'onglet 'Catégorisation'."
+
+
+#. Default: "Changed ${from} to ${to} for ${num} object(s)."
+msgid "msg_changed_keywords"
+msgstr "Changement de ${from} en ${to} sur ${num} objet(s)."
+
+#. Default: "Choose Keyword Field/Index"
+msgid "label_choose_keyword_field"
+msgstr "Choisir le champ de mots-clés"
+
+#. Default: "Keyword Field"
+msgid "label_keyword_field"
+msgstr "Champ de mots-clés"
+
+msgid "Select Field"
+msgstr "Choisir ce champ"
+
+msgid "Please provide a new term"
+msgstr "Veuillez indiquer le nouveau terme"
+
+msgid "Please select at least one keyword"
+msgstr "Veuillez sélectionner au moins un mot-clé"

@@ -5,6 +5,12 @@ Changelog
 1.8 (unreleased)
 ----------------
 
+- French translation.
+  [thomasdesvenain]
+
+- Internationalization fixes.
+  [thomasdesvenain]
+
 - Added the z3c.autoinclude entry point so this package is automatically loaded
   on Plone 3.3 and above. [WouterVH]
 
@@ -17,7 +23,7 @@ Changelog
 1.7 (20/08/2010)
 ----------------
 
-- Added ability to mix unicode and non-unicode keywords and changes. 
+- Added ability to mix unicode and non-unicode keywords and changes.
   Fixes a bug with collective.dancing (and plone.z3cform) upgrading
   form inputs to unicode automagically.
   [dunlapm]
