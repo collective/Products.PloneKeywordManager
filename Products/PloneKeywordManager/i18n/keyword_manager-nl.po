@@ -23,21 +23,6 @@ msgstr "Zoeken"
 msgid "View keywords"
 msgstr "Toon trefwoorden"
 
-# PloneKeywordManager/skins/keyword_manager/prefs_keywords_view.pt
-# Note: It appears that this installation of the Keyword Manager is not using 
-# the "Levenshtein" Python module for detecting similar keywords.  This does not affect
-# the end result of the Keyword Manager, but can make this page render up to 10 times more
-# quickly.  If you notice that this page is slow to load, ask your site admin to
-# install the Levenshtein Python module; a copy is included with PloneKeywordManager
-# and installation instructions are in the README.
-msgid "description_levenshtein"
-msgstr "Opgelet: de \"Levenshtein\" Python module werd niet gevonden. "
-"De Keyword Manager gebruikt die module voor het sneller terugvinden "
-"van gelijkaardige trefwoorden. Als u merkt dat deze pagina traag "
-"laadt, vraag dan aan uw websitebeheerder om de \"Levenshtein\" "
-"Python module te installeren. Meer info is terug te vinden in het "
-"README-bestand in de PloneKeywordManager package."
-
 #. <div class="documentDescription" i18n:translate="description_keyword_manager">
 #: PloneKeywordManager/skins/keyword_manager/prefs_keywords_view.pt
 msgid "description_keyword_manager"

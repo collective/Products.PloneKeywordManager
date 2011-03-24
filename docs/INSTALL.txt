@@ -4,12 +4,12 @@ Products.PloneKeywordManager Installation
 To install Products.PloneKeywordManager into the global Python environment (or a workingenv),
 using a traditional Zope 2 instance, you can do this:
 
- * When you're reading this you have probably already run 
+ * When you're reading this you have probably already run
    ``easy_install Products.PloneKeywordManager``. Find out how to install setuptools
    (and EasyInstall) here:
    http://peak.telecommunity.com/DevCenter/EasyInstall
 
- * If you are using Zope 2.9 (not 2.10), get `pythonproducts`_ and install it 
+ * If you are using Zope 2.9 (not 2.10), get `pythonproducts`_ and install it
    via::
 
        python setup.py install --home /path/to/instance
@@ -28,26 +28,38 @@ using a traditional Zope 2 instance, you can do this:
 Alternatively, if you are using zc.buildout and the plone.recipe.zope2instance
 recipe to manage your project, you can do this:
 
- * Add ``Products.PloneKeywordManager`` to the list of eggs to install, e.g.:
- 
+  * Add ``Products.PloneKeywordManager`` to the list of eggs to install, e.g.:
+
     [buildout]
     ...
     eggs =
         ...
-        Products.PloneKeywordManager
-        
+        Products.PloneKeywordManager [Levenshtein]
+
+  * If you want Products.PloneKeywordManager to be a dependency of a module,
+    update the setup.py of this module, e.g.:
+
+    install_requires=[
+          ...
+          'Products.PloneKeywordManager[Levenshtein]',
+          ...
+      ],
+
+  * If you get troubles with python-Levenshtein install, you may remove the
+    [Levenshtein] extra.
+
   * Tell the plone.recipe.zope2instance recipe to install a ZCML slug:
-  
+
     [instance]
     recipe = plone.recipe.zope2instance
     ...
     zcml =
         Products.PloneKeywordManager
-        
+
   * Re-run buildout, e.g. with:
-  
+
     $ ./bin/buildout
-        
+
 You can skip the ZCML slug if you are going to explicitly include the package
 from another package's configure.zcml file.
 

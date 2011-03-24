@@ -18,16 +18,6 @@ Installation
 
 To install this package. please see docs/INSTALL.txt.
 
-Plone Keyword Manager uses Python's difflib for the similarity search per
-default, but if you want to speed up the PloneKeywordManager, you should
-install the
-"Python-Levenshtein-Module":http://trific.ath.cx/resources/python/levenshtein
-(written in C) which will makes things faster up to 10 times. A copy of
-the Levensthein-Module is provided in the package (to install it on linux do
-something like "cd python-Levenshtein; python setup.py install").
-Plone Keyword Manager will use the faster Levensthein-search automatically
-if it can be imported by your Zope-Server.
-
 Usage
 =====
 

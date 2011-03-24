@@ -49,13 +49,6 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
     manage_overview = PageTemplateFile('www/explainTool', globals(),
             __name__='manage_overview')
 
-    security.declarePublic('usingLevenshtein')
-    def usingLevenshtein(self):
-        """ Returns True iff Levenshtein is installed and will be used instead
-        of difflib
-        """
-        return USE_LEVENSHTEIN
-
     security.declarePublic('change')
     def change(self, old_keywords, new_keyword, context=None, indexName='Subject'):
         """Updates all objects using the old_keywords.
@@ -167,7 +160,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
             oword = unicode(word, 'utf-8')
         else:
             oword = word.encode('utf-8')
-        
+
         for item in possibilities:
             if isinstance(item, type(word)):
                 lscore = Levenshtein.ratio(word, item)

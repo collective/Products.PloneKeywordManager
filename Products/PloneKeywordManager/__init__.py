@@ -10,9 +10,8 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #
 #
-# Uses Levenshtein-C-Wrapper for Python if installed,
-# if not, use python-difflib. Levenshtein is recommended,
-# because it will speed things up ~ 10 times.
+# Uses Levenshtein-C-Wrapper for Python
+# because it will speed things up ~ 10 times than python-difflib.
 #
 # More info about Levenshtein on:
 # http://trific.ath.cx/resources/python/levenshtein/
@@ -29,7 +28,7 @@ from Products.CMFCore.utils import ToolInit
 # Sibling imports
 from Products.PloneKeywordManager import config
 from Products.PloneKeywordManager import tool
-    
+
 global cmf_keyword_manager_globals
 cmf_keyword_manager_globals=globals()
 

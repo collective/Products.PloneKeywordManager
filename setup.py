@@ -43,7 +43,6 @@ setup(name='Products.PloneKeywordManager',
       zip_safe=False,
       install_requires=[
           'setuptools',
-          #'python-Levenshtein',   # broken pypi-download
           # -*- Extra requirements: -*-
       ],
       entry_points="""
@@ -52,4 +51,9 @@ setup(name='Products.PloneKeywordManager',
       [z3c.autoinclude.plugin]
       target = plone
       """,
+      extras_require = {
+          'Levenshtein': [
+              'python-Levenshtein',
+          ]
+      }
       )
