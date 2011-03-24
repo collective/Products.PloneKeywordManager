@@ -48,14 +48,6 @@ recipe to manage your project, you can do this:
   * If you get troubles with python-Levenshtein install, you may remove the
     [Levenshtein] extra.
 
-  * Tell the plone.recipe.zope2instance recipe to install a ZCML slug:
-
-    [instance]
-    recipe = plone.recipe.zope2instance
-    ...
-    zcml =
-        Products.PloneKeywordManager
-
   * Re-run buildout, e.g. with:
 
     $ ./bin/buildout
