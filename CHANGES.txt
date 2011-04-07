@@ -5,6 +5,9 @@ Changelog
 1.8 (unreleased)
 ----------------
 
+- Upgrade imports for Zope 2.13. Remove deprecation warnings.
+  [thomasdesvenain]
+
 - Manage python-Levenshtein dependency as a setuptools extras_require.
   [thomasdesvenain]
 

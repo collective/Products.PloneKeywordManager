@@ -11,7 +11,11 @@ except ImportError:
     USE_LEVENSHTEIN = False
 
 # Zope imports
-import Globals
+try:
+    from AccessControl.class_init import InitializeClass
+except ImportError: # < Zope 2.13
+    from Globals import InitializeClass
+
 from OFS.SimpleItem import SimpleItem
 from AccessControl import ClassSecurityInfo
 from AccessControl import getSecurityManager
@@ -242,4 +246,4 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
             return list(fieldVal)
 
 
-Globals.InitializeClass(PloneKeywordManager)
+InitializeClass(PloneKeywordManager)
