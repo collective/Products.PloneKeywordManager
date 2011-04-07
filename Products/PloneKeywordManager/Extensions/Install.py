@@ -26,7 +26,7 @@ configlets = (
 
 
 def install_subskin(self, out, skin_name, globals):
-    skinstool=getToolByName(self, 'portal_skins')
+    skinstool = getToolByName(self, 'portal_skins')
     if skin_name not in skinstool.objectIds():
         addDirectoryViews(skinstool, 'skins', globals)
 
@@ -35,7 +35,7 @@ def install_subskin(self, out, skin_name, globals):
         path = [i.strip() for i in path.split(',')]
         try:
             if skin_name not in path:
-                path.insert(path.index('custom')+1, skin_name)
+                path.insert(path.index('custom') + 1, skin_name)
         except ValueError:
             if skin_name not in path:
                 path.append(skin_name)
