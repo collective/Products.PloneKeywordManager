@@ -5,6 +5,8 @@ Changelog
 1.8 (unreleased)
 ----------------
 
+- Add uninstall-profile. [WouterVH]
+
 - Fix marker-file for setuphandlers.py. [WouterVH]
 
 - Add MANIFEST.in to include docs in release. [WouterVH]

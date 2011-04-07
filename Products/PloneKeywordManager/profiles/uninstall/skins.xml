@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+
+<object name="portal_skins">
+
+  <object
+    name="keyword_manager"
+    meta_type="Filesystem Directory View"
+    directory="Products.PloneKeywordManager:skins/keyword_manager"
+    remove="True" />
+
+  <skin-path name="*">
+    <layer name="keyword_manager" remove="True" />
+  </skin-path>
+
+</object>
