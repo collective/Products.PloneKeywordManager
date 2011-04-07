@@ -5,6 +5,8 @@ Changelog
 1.8 (unreleased)
 ----------------
 
+- Add MANIFEST.in to include docs in release. [WouterVH]
+
 - Upgrade imports for Zope 2.13. Remove deprecation warnings.
   [thomasdesvenain]
 
