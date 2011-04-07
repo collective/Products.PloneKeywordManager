@@ -14,7 +14,7 @@ from Products.CMFCore.utils import getToolByName
 pkm = getToolByName(context, 'portal_keyword_manager')
 changed_objects = pkm.change(keywords, changeto, context=context.aq_inner, indexName=field)
 
-msg =_('msg_changed_keywords', default=u"Changed ${from} to ${to} for ${num} object(s).",
+msg = _('msg_changed_keywords', default=u"Changed ${from} to ${to} for ${num} object(s).",
        mapping={'from': ','.join(keywords).decode('utf-8'),
                 'to': changeto.decode('utf-8'),
                 'num': changed_objects})

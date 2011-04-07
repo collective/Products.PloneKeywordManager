@@ -21,9 +21,11 @@ from AccessControl import ClassSecurityInfo
 from AccessControl import getSecurityManager
 from AccessControl import Unauthorized
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
+from zope import interface
 
 # CMF imports
-from Products.CMFCore.utils import UniqueObject, getToolByName
+from Products.CMFCore.utils import getToolByName
+from Products.CMFCore.utils import UniqueObject
 #from Products.CMFCore.Expression import Expression
 try:
     from Products.CMFCore import CMFCorePermissions
@@ -33,7 +35,6 @@ except ImportError, e:
 # Sibling imports
 from Products.PloneKeywordManager.interfaces import IPloneKeywordManager
 from Products.PloneKeywordManager import config
-from zope import interface
 
 
 class PloneKeywordManager(UniqueObject, SimpleItem):
