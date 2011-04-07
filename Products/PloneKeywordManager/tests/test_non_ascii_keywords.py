@@ -15,11 +15,7 @@ class TestNonAsciiKeywords(PloneKeywordManagerTestCase):
         Setup that is specific to a particular test should be done in that test method.
         """
         self.pkm = getToolByName(self.portal, 'portal_keyword_manager')
-        self.setRoles(
-            (
-                'Manager',
-            )
-        )
+        self.setRoles(('Manager', ))
         self.portal.setSubject(
             [u'Fr\\xfchst\\xfcck',
               'Mitagessen',
