@@ -3,7 +3,7 @@
 
 def importKeywords(context):
     """Create a document with an empty body to setup all keywords"""
-    keywords = context.readDataFile('plonekeywordmanager-various.txt')
+    keywords = context.readDataFile('keywords.txt')
     if keywords is None:
         return
 
