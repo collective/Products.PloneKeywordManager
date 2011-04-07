@@ -5,6 +5,10 @@ Changelog
 1.8 (unreleased)
 ----------------
 
+- Add tests related to skins-directories. [WouterVH]
+
+- remove old-style Install.py. [WouterVH]
+
 - Add uninstall-profile. [WouterVH]
 
 - Fix marker-file for setuphandlers.py. [WouterVH]
