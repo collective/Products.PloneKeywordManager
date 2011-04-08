@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.8 (unreleased)
+1.8 (2011-04-08)
 ----------------
 
 - Add tests related to skins-directories. [WouterVH]
