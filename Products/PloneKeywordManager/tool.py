@@ -12,7 +12,7 @@ except ImportError:
 
 # Zope imports
 try:
-    from AccessControl.class_init import InitializeClass
+    from App.class_init import InitializeClass
 except ImportError: # < Zope 2.13
     from Globals import InitializeClass
 
