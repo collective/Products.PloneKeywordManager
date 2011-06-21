@@ -86,7 +86,8 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
             updateField = self.getSetter(obj, indexName)
             if updateField is not None:
                 updateField(subjectList)
-                idxs=[indexName].extend([i for i in config.ALWAYS_REINDEX if i != indexName])
+                idxs=[indexName]
+                idxs.extend([i for i in config.ALWAYS_REINDEX if i != indexName])
                 obj.reindexObject(idxs=idxs)
 
         return len(querySet)

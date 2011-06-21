@@ -5,6 +5,9 @@ Changelog
 1.9 (unreleased)
 ----------------
 
+- Fixed critical error at index update.
+  [thomasdesvenain]
+
 - Upgrade imports for Zope 2.13. Remove deprecation warnings.
   [toutpt]
 
