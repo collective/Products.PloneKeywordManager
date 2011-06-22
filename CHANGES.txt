@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.9 (unreleased)
+1.9 (2011-06-22)
 ----------------
 
 - Fixed critical error at index update.
