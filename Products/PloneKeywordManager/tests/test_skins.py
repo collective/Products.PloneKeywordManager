@@ -1,16 +1,26 @@
-import unittest
-from Products.PloneKeywordManager.tests.base import PloneKeywordManagerTestCase
+# -*- coding: utf-8 -*-
+
+import unittest2 as unittest
+
+from plone.app.testing import TEST_USER_ID
+from plone.app.testing import setRoles
+
+from Products.PloneKeywordManager.testing import INTEGRATION_TESTING
 
 SKINSDIRS = ['keyword_manager', ]
 
 
-class TestSetup(PloneKeywordManagerTestCase):
+# TODO: move to test_setup.py
+class TestSetup(unittest.TestCase):
     """Test the installation of this package
     Important: the name of all test-methods should start with test_
     """
 
-    def afterSetUp(self):
-        self.loginAsPortalOwner()
+    layer = INTEGRATION_TESTING
+
+    def setUp(self):
+        self.portal = self.layer['portal']
+        setRoles(self.portal, TEST_USER_ID, ['Manager'])
 
     def test_skinsdir_presence(self):
         #check the presence of the skins-directory in portal_skins
@@ -34,9 +44,3 @@ class TestSetup(PloneKeywordManagerTestCase):
                 '%s filesystem directory view not found in portal_skins' % skinsdir)
             skin_objects = directory_view.objectItems()
             self.failUnless(skin_objects, '%s-skinsdir seems to empty' % skinsdir)
-
-
-def test_suite():
-    suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(TestSetup))
-    return suite

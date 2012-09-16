@@ -1,3 +1,5 @@
+PROJECTNAME = 'PloneKeywordManager'
+
 MANAGE_KEYWORDS_PERMISSION = "Manage Keywords"
 
 TOOL_NAME = "Plone Keyword Manager Tool"

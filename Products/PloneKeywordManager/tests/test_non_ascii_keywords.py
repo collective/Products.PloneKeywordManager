@@ -1,38 +1,30 @@
-import unittest
-from Products.PloneKeywordManager.tests.base import PloneKeywordManagerTestCase
+# -*- coding: utf-8 -*-
+
+import unittest2 as unittest
+
+from plone.app.testing import TEST_USER_ID
+from plone.app.testing import setRoles
+
+from Products.PloneKeywordManager.testing import INTEGRATION_TESTING
 
 from Products.CMFCore.utils import getToolByName
 
 
-class TestNonAsciiKeywords(PloneKeywordManagerTestCase):
-    """The name of the class should be meaningful. This may be a class that
-    tests the installation of a particular product.
-    """
+class NonAsciiKeywordsTestCase(unittest.TestCase):
 
-    def afterSetUp(self):
-        """
-        This method is called before each single test. It can be used to set up common state.
-        Setup that is specific to a particular test should be done in that test method.
-        """
+    layer = INTEGRATION_TESTING
+
+    def setUp(self):
+        self.portal = self.layer['portal']
+        setRoles(self.portal, TEST_USER_ID, ['Manager'])
+
         self.pkm = getToolByName(self.portal, 'portal_keyword_manager')
-        self.setRoles(('Manager', ))
         self.portal.setSubject(
             [u'Fr\\xfchst\\xfcck',
               'Mitagessen',
               'Abendessen',
              u'Fr\\xfchessen',
             ])
-
-    def beforeTearDown(self):
-        """
-        This method is called after each single test. It can be used for cleanup, if you need it.
-        Note that the test framework will roll back the Zope transaction at the end of each test,
-        so tests are generally independent of one another.
-        However, if you are modifying external resources (say a database) or globals
-        (such as registering a new adapter in the Component Architecture during a test),
-        you may want to tear things down here.
-        """
-        self.setRoles(())
 
     def _action_change(self, keywords, changeto, field='Subject'):
         """ calls prefs_keywords_action_change.py """
@@ -66,13 +58,3 @@ class TestNonAsciiKeywords(PloneKeywordManagerTestCase):
 
     def test_getscoredmatches(self):
         self.pkm.getScoredMatches(u'foo', ['foo', u'bar', 'baz'], 7, 0.6)
-
-
-def test_suite():
-    """
-        This sets up a test suite that actually runs the tests
-        in the class above.
-    """
-    suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(TestNonAsciiKeywords))
-    return suite

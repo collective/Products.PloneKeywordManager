@@ -56,6 +56,7 @@ setup(name='Products.PloneKeywordManager',
         ],
       extras_require={
         'Levenshtein': ['python-Levenshtein'],
+        'test': ['plone.app.testing'],
         },
       entry_points="""
       [z3c.autoinclude.plugin]
