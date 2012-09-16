@@ -26,10 +26,20 @@ setup(name='Products.PloneKeywordManager',
           Keywords can be cleaned up from time to time by a site manager to \
           create a consistent vocabulary.",
       long_description=long_description,
-      # Get more strings from http://www.python.org/pypi?%3Aaction=list_classifiers
       classifiers=[
+        "Development Status :: 6 - Mature",
+        "Environment :: Web Environment",
         "Framework :: Plone",
+        "Framework :: Plone :: 4.0",
+        "Framework :: Plone :: 4.1",
+        "Framework :: Plone :: 4.2",
+        "Intended Audience :: End Users/Desktop",
+        "Intended Audience :: System Administrators",
+        "License :: OSI Approved :: GNU General Public License (GPL)",
+        "Operating System :: OS Independent",
         "Programming Language :: Python",
+        "Programming Language :: Python :: 2.6",
+        "Programming Language :: Python :: 2.7",
         "Topic :: Software Development :: Libraries :: Python Modules",
         ],
       keywords='Plone Keywords',
@@ -42,18 +52,13 @@ setup(name='Products.PloneKeywordManager',
       include_package_data=True,
       zip_safe=False,
       install_requires=[
-          'setuptools',
-          # -*- Extra requirements: -*-
-      ],
+        'setuptools',
+        ],
+      extras_require={
+        'Levenshtein': ['python-Levenshtein'],
+        },
       entry_points="""
-      # -*- Entry points: -*-
-
       [z3c.autoinclude.plugin]
       target = plone
       """,
-      extras_require = {
-          'Levenshtein': [
-              'python-Levenshtein',
-          ]
-      }
       )
