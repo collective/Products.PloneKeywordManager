@@ -1,10 +1,10 @@
 import unittest
-from Products.PlonekeywordManager.tests.base import TestCase
+from Products.PloneKeywordManager.tests.base import PloneKeywordManagerTestCase
 
 SKINSDIRS = ['keyword_manager', ]
 
 
-class TestSetup(TestCase):
+class TestSetup(PloneKeywordManagerTestCase):
     """Test the installation of this package
     Important: the name of all test-methods should start with test_
     """
