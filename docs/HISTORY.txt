@@ -1,11 +1,12 @@
 Changelog
 =========
 
-
 1.10 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Tests use now plone.app.testing; test coverage improved. [hvelarde]
+
+- Fix package distribution. [hvelarde]
 
 
 1.9 (2011-06-22)

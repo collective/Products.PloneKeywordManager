@@ -1,21 +1,10 @@
 import os
 from setuptools import setup, find_packages
 
-
-def read(*rnames):
-    return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
-
 version = '1.10dev'
 
-long_description = (
-    read('README.txt')
-    + '\n' +
-    read('CHANGES.txt')
-    #+ '\n' +
-    #read('Products', 'PloneKeywordManager', 'README.txt')
-    #+ '\n' +
-    #read('CONTRIBUTORS.txt')
-    )
+long_description = open("README.txt").read() + "\n" + \
+                   open(os.path.join("docs", "HISTORY.txt")).read()
 
 
 setup(name='Products.PloneKeywordManager',
