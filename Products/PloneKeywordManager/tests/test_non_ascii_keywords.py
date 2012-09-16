@@ -67,11 +67,6 @@ class TestNonAsciiKeywords(PloneKeywordManagerTestCase):
     def test_getscoredmatches(self):
         self.pkm.getScoredMatches(u'foo', ['foo', u'bar', 'baz'], 7, 0.6)
 
-    # Keep adding methods here, or break it into multiple classes or multiple files as appropriate.
-    # Having tests in multiple files makes it possible to run tests from just one package:
-    #
-    #   ./bin/instance test -s Products.PloneKeywordManager -t test_non_ascii_keywords
-
 
 def test_suite():
     """

@@ -35,11 +35,6 @@ class TestSetup(PloneKeywordManagerTestCase):
             skin_objects = directory_view.objectItems()
             self.failUnless(skin_objects, '%s-skinsdir seems to empty' % skinsdir)
 
-    def testFail(self):
-        #always passing dummy tests
-        self.failIf(False)
-        self.failUnless(True)
-
 
 def test_suite():
     suite = unittest.TestSuite()
