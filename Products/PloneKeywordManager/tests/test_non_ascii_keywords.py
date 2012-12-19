@@ -6,7 +6,8 @@ class NonAsciiKeywordsTestCase(IntegrationTestCase):
 
     def setUp(self):
         super(NonAsciiKeywordsTestCase, self).setUp()
-        self.portal.setSubject(
+        self.document = self.portal['keywords']
+        self.document.edit(subject=
             [u'Fr\\xfchst\\xfcck',
               'Mitagessen',
               'Abendessen',
@@ -34,6 +35,30 @@ class NonAsciiKeywordsTestCase(IntegrationTestCase):
     def test_pref_keywords_action_delete(self):
         """ test the bugfix for prefs_keywords_action_delete """
         self._action_delete([u'Fr\\xfchst\\xfcck', ])
+
+    def test_only_one_index_is_updated(self):
+        def search(**kw):
+            return [r.getObject() for r in self.portal.portal_catalog(**kw)]
+        self.document.edit(title='Foo')
+        self.assertEqual(self.document.Title(), 'Foo')
+        # setting the attribute directly...
+        self.document.title = 'Bar'
+        self.assertEqual(self.document.Title(), 'Bar')
+        # ...should not cause the field to be reindexed.
+        self.assertEqual(search(Title='Foo'), [self.document])
+        self.assertEqual(search(Title='Bar'), [])
+        # and remapping Keywords should reindex 'Subject'...
+        self.assertEqual(search(Subject=u'Fr\\xfchst\\xfcck'), [self.document])
+        self.assertEqual(search(Subject=u'Fr\\xfchessen'), [self.document])
+        self._action_delete([u'Fr\\xfchst\\xfcck',])
+        self._action_change([u'Fr\\xfchessen'], u'Zen')
+        self.assertEqual(search(Subject=u'Fr\\xfchst\\xfcck'), [])
+        self.assertEqual(search(Subject=u'Zen'), [self.document])
+        # ...but not 'Title'...
+        self.assertEqual(search(Title='Bar'), [])
+        # ...until the content is completely reindexed
+        self.document.reindexObject()
+        self.assertEqual(search(Title='Bar'), [self.document])
 
     def test_getscoredmatches(self):
         self.pkm.getScoredMatches(u'foo', ['foo', u'bar', 'baz'], 7, 0.6)

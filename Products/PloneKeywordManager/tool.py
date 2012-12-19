@@ -55,6 +55,11 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
             __name__='manage_overview')
 
     security.declarePublic('change')
+
+    def _getFullIndexList(self, indexName):
+        idxs = set([indexName]).union(config.ALWAYS_REINDEX)
+        return list(idxs)
+
     def change(self, old_keywords, new_keyword, context=None, indexName='Subject'):
         """Updates all objects using the old_keywords.
 
@@ -86,8 +91,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
             updateField = self.getSetter(obj, indexName)
             if updateField is not None:
                 updateField(subjectList)
-                idxs=[indexName]
-                idxs.extend([i for i in config.ALWAYS_REINDEX if i != indexName])
+                idxs = self._getFullIndexList(indexName)
                 obj.reindexObject(idxs=idxs)
 
         return len(querySet)
@@ -118,7 +122,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
             updateField = self.getSetter(obj, indexName)
             if updateField is not None:
                 updateField(subjectList)
-                idxs=[indexName].extend([i for i in config.ALWAYS_REINDEX if i != indexName])
+                idxs = self._getFullIndexList(indexName)
                 obj.reindexObject(idxs=idxs)
 
         return len(querySet)
