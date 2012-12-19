@@ -1,38 +1,17 @@
 # -*- coding: utf-8 -*-
 
-import unittest2 as unittest
+from Products.PloneKeywordManager.tests.base import IntegrationTestCase
 
-from plone.app.testing import TEST_USER_ID
-from plone.app.testing import setRoles
-
-from Products.PloneKeywordManager.testing import INTEGRATION_TESTING
-
-from Products.CMFCore.utils import getToolByName
-
-
-class NonAsciiKeywordsTestCase(unittest.TestCase):
-
-    layer = INTEGRATION_TESTING
+class NonAsciiKeywordsTestCase(IntegrationTestCase):
 
     def setUp(self):
-        self.portal = self.layer['portal']
-        setRoles(self.portal, TEST_USER_ID, ['Manager'])
-
-        self.pkm = getToolByName(self.portal, 'portal_keyword_manager')
+        super(NonAsciiKeywordsTestCase, self).setUp()
         self.portal.setSubject(
             [u'Fr\\xfchst\\xfcck',
               'Mitagessen',
               'Abendessen',
              u'Fr\\xfchessen',
             ])
-
-    def _action_change(self, keywords, changeto, field='Subject'):
-        """ calls prefs_keywords_action_change.py """
-        self.portal.prefs_keywords_action_change(keywords, changeto, field)
-
-    def _action_delete(self, keywords, field='Subject'):
-        """ calls prefs_keywords_action_delete.cpy """
-        self.portal.prefs_keywords_action_delete(keywords, field)
 
     # def test_show_non_ascii_bugs(self):
     #     """
