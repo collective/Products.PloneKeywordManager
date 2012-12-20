@@ -15,6 +15,8 @@ class Fixture(PloneSandboxLayer):
     def setUpZope(self, app, configurationContext):
         # Load ZCML
         import Products.PloneKeywordManager
+        import plone.app.dexterity
+        self.loadZCML(package=plone.app.dexterity)
         self.loadZCML(package=Products.PloneKeywordManager)
 
         # Install product and call its initialize() function
@@ -23,6 +25,7 @@ class Fixture(PloneSandboxLayer):
     def setUpPloneSite(self, portal):
         # Install into Plone site using portal_setup
         self.applyProfile(portal, 'Products.PloneKeywordManager:default')
+        self.applyProfile(portal, 'plone.app.dexterity:default')
 
 
 FIXTURE = Fixture()

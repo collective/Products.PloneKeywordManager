@@ -16,6 +16,11 @@ try:
 except ImportError: # < Zope 2.13
     from Globals import InitializeClass
 
+#try:
+from Acquisition import aq_base
+#except:
+#    aq_base = lambda content: content
+
 from OFS.SimpleItem import SimpleItem
 from AccessControl import ClassSecurityInfo
 from AccessControl import getSecurityManager
@@ -55,6 +60,11 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
             __name__='manage_overview')
 
     security.declarePublic('change')
+
+    def _getFullIndexList(self, indexName):
+        idxs = set([indexName]).union(config.ALWAYS_REINDEX)
+        return list(idxs)
+
     def change(self, old_keywords, new_keyword, context=None, indexName='Subject'):
         """Updates all objects using the old_keywords.
 
@@ -86,8 +96,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
             updateField = self.getSetter(obj, indexName)
             if updateField is not None:
                 updateField(subjectList)
-                idxs=[indexName]
-                idxs.extend([i for i in config.ALWAYS_REINDEX if i != indexName])
+                idxs = self._getFullIndexList(indexName)
                 obj.reindexObject(idxs=idxs)
 
         return len(querySet)
@@ -118,7 +127,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
             updateField = self.getSetter(obj, indexName)
             if updateField is not None:
                 updateField(subjectList)
-                idxs=[indexName].extend([i for i in config.ALWAYS_REINDEX if i != indexName])
+                idxs = self._getFullIndexList(indexName)
                 obj.reindexObject(idxs=idxs)
 
         return len(querySet)
@@ -229,10 +238,17 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
 
         Returns None if it can't get the function
         """
-        fieldName = self.fieldNameForIndex(indexName)
-        fieldObj = obj.getField(fieldName) or obj.getField(fieldName.lower())
-        if fieldObj is not None:
-            return fieldObj.getMutator(obj)
+        # Archetypes:
+        if getattr(aq_base(obj), 'getField', None) is not None:
+            fieldName = self.fieldNameForIndex(indexName)
+            fieldObj = obj.getField(fieldName) or obj.getField(fieldName.lower())
+            if fieldObj is not None:
+                return fieldObj.getMutator(obj)
+            return None
+        # DefaultDublinCoreImpl:
+        setterName = 'set' + indexName
+        if getattr(aq_base(obj), setterName, None) is not None:
+            return getattr(obj, setterName)
 
         return None
 
