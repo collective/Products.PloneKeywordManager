@@ -4,6 +4,10 @@ Changelog
 1.10 (unreleased)
 -----------------
 
+- Fix index update on keyword delete not to reindex all attributes. [leorochael]
+
+- Add support for dexterity (and generic DublinCoreImpl subclasses). [leorochael]
+
 - Tests use now plone.app.testing; test coverage improved. [hvelarde]
 
 - Fix package distribution. [hvelarde]
