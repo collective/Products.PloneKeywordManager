@@ -7,6 +7,10 @@ def importKeywords(context):
     if keywords is None:
         return
 
+    keywordlist = [i for i in keywords.split('\n') if i]
+    if len(keywordlist) < 1:
+        return
+    
     site = context.getSite()
     id = 'keywords'
     doc = getattr(site, id, None)
@@ -15,7 +19,7 @@ def importKeywords(context):
         site.invokeFactory('Document', id, title='Keywords')
         doc = getattr(site, id)
 
-    doc.setSubject([i for i in keywords.split('\n') if i])
+    doc.setSubject(keywordlist)
     doc.setExcludeFromNav(True)
     doc.reindexObject()
     doc.unmarkCreationFlag()

@@ -12,6 +12,9 @@ Changelog
 
 - Fix package distribution. [hvelarde]
 
+- Do not create a `keywords` Document in the plone-site in case the ``keywords.txt``
+  file is empty. (useful for sites not having Document globally allowed)
+  [fRiSi]
 
 1.9 (2011-06-22)
 ----------------
