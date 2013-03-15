@@ -16,6 +16,9 @@ Changelog
   file is empty. (useful for sites not having Document globally allowed)
   [fRiSi]
 
+- Allow `Site Administrators` too access the keyword managment
+  [fRiSi]
+  
 1.9 (2011-06-22)
 ----------------
 

@@ -2,7 +2,7 @@
 title=Changing keywords
 
 [security]
-View=0:Manager
+View=0:Manager,Site Administrator
 
 [actions]
 #action.success = redirect_to:string:prefs_keywords_view

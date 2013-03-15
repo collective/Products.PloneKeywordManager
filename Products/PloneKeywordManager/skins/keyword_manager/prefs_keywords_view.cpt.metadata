@@ -2,7 +2,7 @@
 title=Keyword Manager
 
 [security]
-View=0:Manager
+View=0:Manager,Site Administrator
 
 [validators]
 validators...Merge = validate_prefs_keywords

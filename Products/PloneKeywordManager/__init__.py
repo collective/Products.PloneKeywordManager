@@ -33,7 +33,7 @@ global cmf_keyword_manager_globals
 cmf_keyword_manager_globals=globals()
 
 registerPermissions([(config.MANAGE_KEYWORDS_PERMISSION,[])],
-    ('Manager',))
+    ('Manager', 'Site Administrator'))
 
 def initialize(context):
     registerDirectory('skins', cmf_keyword_manager_globals)
