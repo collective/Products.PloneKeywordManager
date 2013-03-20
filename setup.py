@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 version = '1.10dev'
 
-long_description = open("README.txt").read() + "\n" + \
+long_description = open("README.rst").read() + "\n" + \
                    open(os.path.join("docs", "HISTORY.txt")).read()
 
 
