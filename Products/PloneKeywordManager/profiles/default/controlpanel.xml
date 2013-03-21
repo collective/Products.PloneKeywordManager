@@ -8,7 +8,7 @@
     appId="PloneKeywordManager"
     category="Products"
     condition_expr=""
-    icon_expr="string:${portal_url}/book_icon.gif"
+    icon_expr="string:${portal_url}/book_icon.png"
     url_expr="string:${portal_url}/prefs_keywords_view"
     i18n:attributes="title"
     visible="True">
