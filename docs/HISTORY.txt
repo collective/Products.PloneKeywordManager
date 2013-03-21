@@ -4,6 +4,9 @@ Changelog
 1.10 (unreleased)
 -----------------
 
+- Use png icon as gif icon has been removed.
+  [thomasdesvenain]
+
 - Fix index update on keyword delete not to reindex all attributes. [leorochael]
 
 - Add support for dexterity (and generic DublinCoreImpl subclasses). [leorochael]
