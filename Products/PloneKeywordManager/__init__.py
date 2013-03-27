@@ -30,10 +30,23 @@ from Products.PloneKeywordManager import config
 from Products.PloneKeywordManager import tool
 
 global cmf_keyword_manager_globals
-cmf_keyword_manager_globals=globals()
+
+import pkg_resources
+
+try:
+    pkg_resources.get_distribution('plone.dexterity')
+except pkg_resources.DistributionNotFound:
+    HAS_DEXTERITY = False
+else:
+    HAS_DEXTERITY = True
+
+
+cmf_keyword_manager_globals = globals()
+
 
 registerPermissions([(config.MANAGE_KEYWORDS_PERMISSION,[])],
     ('Manager', 'Site Administrator'))
+
 
 def initialize(context):
     registerDirectory('skins', cmf_keyword_manager_globals)

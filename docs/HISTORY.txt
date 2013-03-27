@@ -21,6 +21,8 @@ Changelog
 
 - Allow `Site Administrators` too access the keyword managment
   [fRiSi]
+
+- Make installation possible for dexterity-based Documents [pysailor]
   
 1.9 (2011-06-22)
 ----------------

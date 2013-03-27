@@ -1,4 +1,10 @@
 #from Products.CMFCore.utils import getToolByName
+from Products.PloneKeywordManager import HAS_DEXTERITY
+if HAS_DEXTERITY:
+    from plone.dexterity.interfaces import IDexterityContent
+else:
+    class IDexterityContent(object):
+        pass
 
 
 def importKeywords(context):
@@ -10,7 +16,7 @@ def importKeywords(context):
     keywordlist = [i for i in keywords.split('\n') if i]
     if len(keywordlist) < 1:
         return
-    
+
     site = context.getSite()
     id = 'keywords'
     doc = getattr(site, id, None)
@@ -20,6 +26,9 @@ def importKeywords(context):
         doc = getattr(site, id)
 
     doc.setSubject(keywordlist)
-    doc.setExcludeFromNav(True)
+    if IDexterityContent.providedBy(doc):
+        doc.exclude_from_nav = True
+    else:
+        doc.setExcludeFromNav(True)
     doc.reindexObject()
     doc.unmarkCreationFlag()
