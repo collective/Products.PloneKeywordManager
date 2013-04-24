@@ -2,6 +2,8 @@
 # See also LICENSE.txt
 # $Id: tool.py 47645 2007-08-20 14:59:10Z glenfant $
 
+import pkg_resources
+
 # Python imports
 try:
     import Levenshtein
@@ -10,17 +12,20 @@ except ImportError:
     import difflib
     USE_LEVENSHTEIN = False
 
+# multiligual detection
+try:
+    pkg_resources.get_distribution('plone.app.multilingual')
+    MULTILINGUAL = True
+except pkg_resources.DistributionNotFound:
+    MULTILINGUAL = False
+
 # Zope imports
 try:
     from App.class_init import InitializeClass
-except ImportError: # < Zope 2.13
+except ImportError:  # < Zope 2.13
     from Globals import InitializeClass
 
-#try:
 from Acquisition import aq_base
-#except:
-#    aq_base = lambda content: content
-
 from OFS.SimpleItem import SimpleItem
 from AccessControl import ClassSecurityInfo
 from AccessControl import getSecurityManager
@@ -31,11 +36,9 @@ from zope import interface
 # CMF imports
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.utils import UniqueObject
-#from Products.CMFCore.Expression import Expression
-try:
-    from Products.CMFCore import CMFCorePermissions
-except ImportError, e:
-    from Products.CMFCore import permissions as CMFCorePermissions
+from Products.CMFCore import permissions as CMFCorePermissions
+
+
 
 # Sibling imports
 from Products.PloneKeywordManager.interfaces import IPloneKeywordManager
@@ -53,7 +56,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
 
     interface.implements(IPloneKeywordManager)
 
-    manage_options = ({'label': 'Overview', 'action': 'manage_overview'}, )
+    manage_options = ({'label': 'Overview', 'action': 'manage_overview'},)
 
     security.declareProtected(CMFCorePermissions.ManagePortal, 'manage_overview')
     manage_overview = PageTemplateFile('www/explainTool', globals(),
@@ -74,15 +77,17 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         Returns the number of objects that have been updated.
         """
         self._checkPermission(context)
-        ##MOD Dynamic field getting
+        # #MOD Dynamic field getting
         query = {indexName: old_keywords}
         if context is not None:
             query['path'] = '/'.join(context.getPhysicalPath())
+        if MULTILINGUAL:
+            query['Language'] = 'all'
         querySet = self._query(**query)
 
         for item in querySet:
             obj = item.getObject()
-            ##MOD Dynamic field getting
+            # #MOD Dynamic field getting
             subjectList = self.getListFieldValues(obj, indexName)
 
             for element in old_keywords:
@@ -92,7 +97,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
             # dedupe new Keyword list (an issue when combining multiple keywords)
             subjectList = list(set(subjectList))
 
-            ##MOD Dynamic field update
+            # #MOD Dynamic field update
             updateField = self.getSetter(obj, indexName)
             if updateField is not None:
                 updateField(subjectList)
@@ -109,7 +114,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         Returns the number of objects that have been updated.
         """
         self._checkPermission(context)
-        ##Mod Dynamic field
+        # #Mod Dynamic field
         query = {indexName: keywords}
         if context is not None:
             query['path'] = '/'.join(context.getPhysicalPath())
@@ -140,10 +145,10 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
 
         catalog = getToolByName(self, 'portal_catalog')
 
-        #why work hard if we don't have to?
-        #if hasattr(catalog,'uniqueValuesFor'):
+        # why work hard if we don't have to?
+        # if hasattr(catalog,'uniqueValuesFor'):
         keywords = list(catalog.uniqueValuesFor(indexName))
-        #else:
+        # else:
         #    query = {}
         #    if context is not None:
         #        query['path'] = '/'.join(context.getPhysicalPath())
@@ -187,7 +192,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
                 res.append((item, lscore))
 
         # Sort by score (high scores on top of list)
-        res.sort(lambda x, y: -cmp(x[1], y[1]))
+        res.sort(lambda x, y:-cmp(x[1], y[1]))
 
         # Return first n terms without scores
         return [item[0] for item in res[:num]]
@@ -213,7 +218,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         """
         catalog = getToolByName(self, 'portal_catalog')
         idxs = catalog.index_objects()
-        idxs = [i.id for i in idxs if i.meta_type==config.META_TYPE and
+        idxs = [i.id for i in idxs if i.meta_type == config.META_TYPE and
                 i.id not in config.IGNORE_INDEXES]
         idxs.sort()
         return idxs
