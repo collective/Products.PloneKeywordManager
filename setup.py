@@ -1,7 +1,7 @@
 import os
 from setuptools import setup, find_packages
 
-version = '1.10dev'
+version = '2.0'
 
 long_description = open("README.rst").read() + "\n" + \
                    open(os.path.join("docs", "HISTORY.txt")).read()
@@ -19,10 +19,8 @@ setup(name='Products.PloneKeywordManager',
         "Development Status :: 6 - Mature",
         "Environment :: Web Environment",
         "Framework :: Plone",
-        "Framework :: Plone :: 4.0",
-        "Framework :: Plone :: 4.1",
         "Framework :: Plone :: 4.2",
-#        "Framework :: Plone :: 4.3",
+        "Framework :: Plone :: 4.3",
         "Intended Audience :: End Users/Desktop",
         "Intended Audience :: System Administrators",
         "License :: OSI Approved :: GNU General Public License (GPL)",

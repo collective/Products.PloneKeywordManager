@@ -1,8 +1,8 @@
-Plone Keyword Manager
-=====================
-
 .. image:: https://travis-ci.org/collective/Products.PloneKeywordManager.png?branch=master
     :target: https://travis-ci.org/collective/Products.PloneKeywordManager
+
+Plone Keyword Manager
+=====================
 
 Plone Keyword Manager allows you to change, merge and delete
 keywords (aka tags or subjects) in Plone and updates all corresponding objects 
@@ -52,11 +52,16 @@ add a ``keywords.txt`` in your profile with one keyword per line. This step add 
 update a Document with an id to 'keywords'. Let it in private state so only
 the administrator will be able to manage it.
 
+Source Code
+===========
+
 Source code of this project is in the 
 `Plone Collective <http://github.com/colective/PloneKeywordManager>`_
 
 For instructions how to contribute please read the
 `Collective Information Page <http://collective.github.com/>`_
+
+Further development focuses on Plone 4.2 and higher.
 
 Credits
 =======
@@ -77,3 +82,4 @@ for updating the template to Plone 2.0 format.
 We would also like to thank Maik for letting us put this code in the
 `Collective <http://collective.github.com/>`_ - so it can be improved and
 expanded by the Collective developers.
+
