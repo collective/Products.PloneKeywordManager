@@ -6,7 +6,8 @@ class NonAsciiKeywordsTestCase(IntegrationTestCase):
 
     def setUp(self):
         super(NonAsciiKeywordsTestCase, self).setUp()
-        self.document = self.portal['keywords']
+        self.portal.invokeFactory('Document', 'keyword_doc')
+        self.document = self.portal['keyword_doc']
         self.document.edit(subject=
             [u'Fr\\xfchst\\xfcck',
               'Mitagessen',
