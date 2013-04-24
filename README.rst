@@ -1,6 +1,9 @@
 Plone Keyword Manager
 =====================
 
+.. image:: https://travis-ci.org/collective/Products.PloneKeywordManager.png?branch=master
+    :target: https://travis-ci.org/collective/Products.PloneKeywordManager
+
 Plone Keyword Manager allows you to change, merge and delete
 keywords (aka tags or subjects) in Plone and updates all corresponding objects 
 automatically. It uses a similiarity search to support you in identifying 
