@@ -1,8 +1,8 @@
 Changelog
 =========
 
-2.0 (unreleased)
------------------
+2.0 (2013-04-24)
+----------------
 
 - Use png icon as gif icon has been removed.
   [thomasdesvenain]
