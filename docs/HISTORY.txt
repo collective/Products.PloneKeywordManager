@@ -4,6 +4,9 @@ Changelog
 2.0 (2013-04-24)
 ----------------
 
+- take plone.app.multilingual into acount and set Language=all on change.
+  [jensens]
+
 - Use png icon as gif icon has been removed.
   [thomasdesvenain]
 
