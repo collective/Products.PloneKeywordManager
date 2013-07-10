@@ -47,10 +47,19 @@ textbox. Try it yourself, you'll get the idea behind it...
 For developer and integrator
 ============================
 
-You can also use KeywordManager to import your keywords with genericsetup. Just
-add a ``keywords.txt`` in your profile with one keyword per line. This step add or
-update a Document with an id to 'keywords'. Let it in private state so only
-the administrator will be able to manage it.
+You can also use KeywordManager to import your keywords with GenericSetup.  You must have access to the file system to do this.  
+
+* Add a file ``keywords.txt`` to the directory ``Products/PloneKeywordManager/profiles/default``, with one keyword per line. 
+
+* In the ZMI, go to portal_setup, Import tab. Locate the step called ``Create or update keywords``. Check the box next to it, then click the button ``Import Selected Steps``. 
+
+This will add or update a Document titled ``Keywords`` (with ID ``keyword``) in the root of the Plone site; this document will have all the listed keywords assigned to it. 
+
+Leave this document in the private state so only an administrator will be able to see and edit it.
+
+Each time you run this import step, the ``Keywords`` document's keywords will be completely replaced with the contents of the ``keywords.txt`` file.
+
+
 
 Source Code
 ===========
