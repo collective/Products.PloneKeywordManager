@@ -56,10 +56,10 @@ Source Code
 ===========
 
 Source code of this project is in the 
-`Plone Collective <http://github.com/colective/PloneKeywordManager>`_
+`Plone Collective <https://github.com/collective/Products.PloneKeywordManager>`_
 
 For instructions how to contribute please read the
-`Collective Information Page <http://collective.github.com/>`_
+`Collective Information Page <http://collective.github.io//>`_
 
 Further development focuses on Plone 4.2 and higher.
 
