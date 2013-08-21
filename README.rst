@@ -1,6 +1,9 @@
 .. image:: https://travis-ci.org/collective/Products.PloneKeywordManager.png?branch=master
     :target: https://travis-ci.org/collective/Products.PloneKeywordManager
 
+.. image:: https://coveralls.io/repos/collective/Products.PloneKeywordManager/badge.png?branch=master
+    :target: https://coveralls.io/r/collective/Products.PloneKeywordManager
+
 Plone Keyword Manager
 =====================
 
