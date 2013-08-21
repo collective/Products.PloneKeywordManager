@@ -4,8 +4,7 @@ Changelog
 2.1 (unreleased)
 ----------------
 
-- Nothing changed yet.
-
+- Fixed getSetter and getListFieldValues method in tool to handle also non-default field names [cekk]
 
 2.0 (2013-04-24)
 ----------------
