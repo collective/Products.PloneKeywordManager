@@ -38,8 +38,6 @@ from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.utils import UniqueObject
 from Products.CMFCore import permissions as CMFCorePermissions
 
-
-
 # Sibling imports
 from Products.PloneKeywordManager.interfaces import IPloneKeywordManager
 from Products.PloneKeywordManager import config
@@ -59,8 +57,8 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
     manage_options = ({'label': 'Overview', 'action': 'manage_overview'},)
 
     security.declareProtected(CMFCorePermissions.ManagePortal, 'manage_overview')
-    manage_overview = PageTemplateFile('www/explainTool', globals(),
-            __name__='manage_overview')
+    manage_overview = PageTemplateFile(
+        'www/explainTool', globals(), __name__='manage_overview')
 
     security.declarePublic('change')
 
@@ -90,7 +88,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
             subjectList = self.getListFieldValues(obj, indexName)
 
             for element in old_keywords:
-                while (element in subjectList) and (element <> new_keyword):
+                while (element in subjectList) and (element != new_keyword):
                     subjectList[subjectList.index(element)] = new_keyword
 
             # dedupe new Keyword list (an issue when combining multiple keywords)
@@ -104,7 +102,6 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
                 obj.reindexObject(idxs=idxs)
 
         return len(querySet)
-
 
     security.declarePublic('delete')
     def delete(self, keywords, context=None, indexName='Subject'):
@@ -191,7 +188,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
                 res.append((item, lscore))
 
         # Sort by score (high scores on top of list)
-        res.sort(lambda x, y:-cmp(x[1], y[1]))
+        res.sort(lambda x, y: -cmp(x[1], y[1]))
 
         # Return first n terms without scores
         return [item[0] for item in res[:num]]
@@ -206,7 +203,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         else:
             context = self
         if not getSecurityManager().checkPermission(
-            config.MANAGE_KEYWORDS_PERMISSION, context):
+                config.MANAGE_KEYWORDS_PERMISSION, context):
             raise Unauthorized("You don't have the necessary permissions to "
                                "access %r." % context)
 

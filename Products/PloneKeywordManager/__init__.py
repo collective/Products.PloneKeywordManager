@@ -48,13 +48,13 @@ import logging
 logger = logging.getLogger("Products.PloneKeywordManager")
 
 
-registerPermissions([(config.MANAGE_KEYWORDS_PERMISSION, [])],
+registerPermissions(
+    [(config.MANAGE_KEYWORDS_PERMISSION, [])],
     ('Manager', 'Site Administrator'))
 
 
 def initialize(context):
 
-    new_tool = ToolInit(config.TOOL_NAME,
-                    tools=(tool.PloneKeywordManager, ),
-                    icon='tool.gif')
+    new_tool = ToolInit(
+        config.TOOL_NAME, tools=(tool.PloneKeywordManager, ), icon='tool.gif')
     new_tool.initialize(context)

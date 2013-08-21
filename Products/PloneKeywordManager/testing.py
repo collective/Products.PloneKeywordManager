@@ -27,13 +27,12 @@ class Fixture(PloneSandboxLayer):
         self.applyProfile(portal, 'Products.PloneKeywordManager:default')
         self.applyProfile(portal, 'plone.app.dexterity:default')
 
-
 FIXTURE = Fixture()
 INTEGRATION_TESTING = IntegrationTesting(
     bases=(FIXTURE,),
     name='Products.PloneKeywordManager:Integration',
-    )
+)
 FUNCTIONAL_TESTING = FunctionalTesting(
     bases=(FIXTURE,),
     name='Products.PloneKeywordManager:Functional',
-    )
+)

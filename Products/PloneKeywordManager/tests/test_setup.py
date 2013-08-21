@@ -10,7 +10,6 @@ from Products.PloneKeywordManager.testing import INTEGRATION_TESTING
 from zope.component import getMultiAdapter
 from Products.PloneKeywordManager.browser.interfaces import IPloneKeywordManagerLayer
 from zope import interface
-from zope.component.interfaces import ComponentLookupError
 
 
 class InstallTestCase(unittest.TestCase):

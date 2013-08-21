@@ -9,12 +9,12 @@ class NonAsciiKeywordsTestCase(IntegrationTestCase):
         super(NonAsciiKeywordsTestCase, self).setUp()
         self.portal.invokeFactory('Document', 'keyword_doc')
         self.document = self.portal['keyword_doc']
-        self.document.edit(subject=
-            [u'Fr\\xfchst\\xfcck',
-              'Mitagessen',
-              'Abendessen',
-             u'Fr\\xfchessen',
-            ])
+        self.document.edit(
+            subject=[
+                u'Fr\\xfchst\\xfcck',
+                'Mitagessen',
+                'Abendessen',
+                u'Fr\\xfchessen'])
 
     # def test_show_non_ascii_bugs(self):
     #     """
@@ -52,7 +52,7 @@ class NonAsciiKeywordsTestCase(IntegrationTestCase):
         # and remapping Keywords should reindex 'Subject'...
         self.assertEqual(search(Subject=u'Fr\\xfchst\\xfcck'), [self.document])
         self.assertEqual(search(Subject=u'Fr\\xfchessen'), [self.document])
-        self._action_delete([u'Fr\\xfchst\\xfcck',])
+        self._action_delete([u'Fr\\xfchst\\xfcck'])
         self._action_change([u'Fr\\xfchessen'], u'Zen')
         self.assertEqual(search(Subject=u'Fr\\xfchst\\xfcck'), [])
         self.assertEqual(search(Subject=u'Zen'), [self.document])

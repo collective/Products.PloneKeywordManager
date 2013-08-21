@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 
 from plone.dexterity.fti import DexterityFTI
-
 from Products.PloneKeywordManager.tests.base import IntegrationTestCase
+
 
 class DexterityContentTestCase(IntegrationTestCase):
     """Test the keyword manager with Dexterity content types"""
 
     def setUp(self):
         super(DexterityContentTestCase, self).setUp()
-        self.portal.portal_types._setObject('test_type',
-                                       DexterityFTI('test_type'))
+        self.portal.portal_types._setObject(
+            'test_type', DexterityFTI('test_type'))
         test_type = self.portal.portal_types.test_type
         test_type.klass = 'plone.dexterity.content.Item'
         test_type.behaviors = (
