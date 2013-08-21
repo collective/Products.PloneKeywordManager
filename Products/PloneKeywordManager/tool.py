@@ -84,7 +84,6 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         if MULTILINGUAL:
             query['Language'] = 'all'
         querySet = self._query(**query)
-
         for item in querySet:
             obj = item.getObject()
             # #MOD Dynamic field getting
@@ -247,6 +246,10 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         if getattr(aq_base(obj), 'getField', None) is not None:
             fieldName = self.fieldNameForIndex(indexName)
             fieldObj = obj.getField(fieldName) or obj.getField(fieldName.lower())
+            if not fieldObj and fieldName.startswith('get'):
+                fieldName = fieldName.lstrip('get')
+                fieldName = fieldName[0].lower() + fieldName[1:]
+                fieldObj = obj.getField(fieldName)
             if fieldObj is not None:
                 return fieldObj.getMutator(obj)
             return None
@@ -263,6 +266,10 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         """
         fieldName = self.fieldNameForIndex(indexName)
         fieldVal = getattr(obj, fieldName, ())
+        if not fieldVal and fieldName.startswith('get'):
+            fieldName = fieldName.lstrip('get')
+            fieldName = fieldName[0].lower() + fieldName[1:]
+            fieldVal = getattr(obj, fieldName, ())
         if callable(fieldVal):
             return list(fieldVal())
         else:

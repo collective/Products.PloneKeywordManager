@@ -1,0 +1,19 @@
+<configure
+   xmlns="http://namespaces.zope.org/zope"
+   xmlns:browser="http://namespaces.zope.org/browser"
+   i18n_domain="Products.PloneKeywordManager">
+
+    <permission
+        id="plone_keyword_manager.UsePloneKeywordManager"
+        title="PloneKeywordManager: Use PloneKeywordManager"
+    />
+    <browser:page
+      for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+      name="prefs_keywords_view"
+  	  template="prefs_keywords_view.pt"
+      class=".prefs_keywords_view.PrefsKeywordsView"
+      permission="plone_keyword_manager.UsePloneKeywordManager"
+      layer=".interfaces.IPloneKeywordManagerLayer"
+      />
+
+</configure>
