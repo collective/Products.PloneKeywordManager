@@ -3,19 +3,28 @@
   xmlns:cmf="http://namespaces.zope.org/cmf"
   xmlns:five="http://namespaces.zope.org/five"
   xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+  xmlns:i18n="http://namespaces.zope.org/i18n"
   i18n_domain="Products.PloneKeywordManager">
 
   <!-- Include configuration for dependencies listed in setup.py -->
   <includeDependencies package="." />
 
-  <!-- register all skins-folders all at once -->
-  <cmf:registerDirectory name="skins" directory="skins" recursive="True" />
-
+  <include package=".browser" />
+  <include file="upgrades.zcml" />
+  <i18n:registerTranslations directory="locales" />
 
   <genericsetup:registerProfile
     name="default"
     title="Plone Keyword Manager"
     directory="profiles/default"
+    description="Keyword manager"
+    provides="Products.GenericSetup.interfaces.EXTENSION"
+    />
+
+  <genericsetup:registerProfile
+    name="uninstall"
+    title="Plone Keyword Manager"
+    directory="profiles/uninstall"
     description="Keyword manager"
     provides="Products.GenericSetup.interfaces.EXTENSION"
     />
