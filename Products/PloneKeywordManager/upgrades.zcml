@@ -2,7 +2,7 @@
     xmlns="http://namespaces.zope.org/zope"
     xmlns:gs="http://namespaces.zope.org/genericsetup"
     i18n_domain="Products.PloneKeywordManager">
-       
+
   <!-- Upgrade steps -->
   <gs:upgradeStep
         title="Upgrade Products.PloneKeywordManager 3"

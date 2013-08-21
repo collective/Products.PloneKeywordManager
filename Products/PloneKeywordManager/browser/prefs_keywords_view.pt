@@ -15,10 +15,10 @@
                  score  python:request.get('score',  0.6);
                  num    python:request.get('num',7);
                  field  python:request.get('field','Subject');
-		 many_kws python: 20;
+                 many_kws python: 20;
                  pkm    context/portal_keyword_manager;
                  catalogSubjects python:pkm.getKeywords(context=context,indexName=field);
-		 show_filters python: len(catalogSubjects) > many_kws;">
+                 show_filters python: len(catalogSubjects) > many_kws;">
 
   <h1 i18n:translate="heading_keyword_manager">Keyword Manager</h1>
 
@@ -69,153 +69,153 @@
         </form>
       </tal:kw_fields>
 
-	<tal:site_has_keywords condition="python:len(catalogSubjects) > 0">
-		<form action="prefs_keywords_view" method="get"
-                      tal:attributes="action string:${context/absolute_url}/prefs_keywords_view"
-                      tal:condition="show_filters">
-                    <input type="hidden" name="field" tal:attributes="value field" />
-		    <fieldset>
-				<legend i18n:translate="label_list_alphabetically">
-				      List alphabetically
-				</legend>
+  <tal:site_has_keywords condition="python:len(catalogSubjects) > 0">
+    <form action="prefs_keywords_view" method="get"
+          tal:attributes="action string:${context/absolute_url}/prefs_keywords_view"
+          tal:condition="show_filters">
+        <input type="hidden" name="field" tal:attributes="value field" />
+        <fieldset>
+        <legend i18n:translate="label_list_alphabetically">
+              List alphabetically
+        </legend>
 
-				<div class="field">
-				    <label for="select_alphabet_list"
-				           i18n:translate="label_view_range">
-				          View range
-				    </label>
+        <div class="field">
+            <label for="select_alphabet_list"
+                   i18n:translate="label_view_range">
+                  View range
+            </label>
 
-				    <select id="select_alphabet_list"
-				            name="limit" tabindex="1">
+            <select id="select_alphabet_list"
+                    name="limit" tabindex="1">
 
-				        <option value="a-z">a - z</option>
+                <option value="a-z">a - z</option>
 
-				        <tal:block tal:repeat="item python:range(ord('a'),ord('z')+1)">
-				            <option value="a" tal:attributes="value python:chr(item);" tal:content="python:chr(item)">a</option>
-				        </tal:block>
+                <tal:block tal:repeat="item python:range(ord('a'),ord('z')+1)">
+                    <option value="a" tal:attributes="value python:chr(item);" tal:content="python:chr(item)">a</option>
+                </tal:block>
 
-				    </select>
-				</div>
+            </select>
+        </div>
 
-				<div class="formControls">
-				    <input class="standalone"
-				           type="submit"
-				           value="View keywords"
-				           i18n:attributes="value" />
-				</div>
+        <div class="formControls">
+            <input class="standalone"
+                   type="submit"
+                   value="View keywords"
+                   i18n:attributes="value" />
+        </div>
 
-			</fieldset>
-		</form>
+      </fieldset>
+    </form>
 
-		<form action="prefs_keywords_view"
-                      tal:attributes="action string:${context/absolute_url}/prefs_keywords_view"
-                      tal:condition="show_filters">
-                        <input type="hidden" name="field" tal:attributes="value field" />
-			<fieldset>
-				<legend i18n:translate="label_search_by_keyword">
-				    Search by keyword
-				</legend>
+    <form action="prefs_keywords_view"
+          tal:attributes="action string:${context/absolute_url}/prefs_keywords_view"
+          tal:condition="show_filters">
+      <input type="hidden" name="field" tal:attributes="value field" />
+      <fieldset>
+        <legend i18n:translate="label_search_by_keyword">
+            Search by keyword
+        </legend>
 
-				<div class="field">
+        <div class="field">
 
-					<label for="select_keyword_list"
-					       i18n:translate="label_keyword">
-					    Keyword
-					</label>
+          <label for="select_keyword_list"
+                 i18n:translate="label_keyword">
+              Keyword
+          </label>
 
-					<select id="select_keyword_list" name="search">
-					  <option value="" i18n:translate="label_select">Select...</option>
-					 <tal:block tal:repeat="subject catalogSubjects">
-					  <option tal:content="subject">Subject</option>
-					 </tal:block>
-					</select>
+          <select id="select_keyword_list" name="search">
+            <option value="" i18n:translate="label_select">Select...</option>
+           <tal:block tal:repeat="subject catalogSubjects">
+            <option tal:content="subject">Subject</option>
+           </tal:block>
+          </select>
 
-				</div>
+        </div>
 
-				<div class="formControls">
+        <div class="formControls">
 
-					<input class="context"
-					       type="submit"
-					       value="Search"
-					       i18n:attributes="value" />
+          <input class="context"
+                 type="submit"
+                 value="Search"
+                 i18n:attributes="value" />
 
-				</div>
+        </div>
 
-			</fieldset>
-		</form>
+      </fieldset>
+    </form>
 
-		<form name="keyword_edit_form" action="." method="post"
-                      tal:condition="python:not show_filters or search or limit"
-		      tal:attributes="action string:${context/absolute_url}/prefs_keywords_view"
-		      >
+    <form name="keyword_edit_form" action="." method="post"
+          tal:condition="python:not show_filters or search or limit"
+          tal:attributes="action string:${context/absolute_url}/prefs_keywords_view"
+          >
                         <input type="hidden" name="form.submitted" value="1" />
                         <input type="hidden" name="limit" tal:attributes="value limit" />
                         <input type="hidden" name="field" tal:attributes="value field" />
-			<fieldset>
-			  <legend i18n:translate="label_keyword_assignments">
-			    Keyword assignments
-			  </legend>
-			  <dl tal:repeat="subject python:search and [search] or catalogSubjects">
-			   <tal:block tal:condition="python:not show_filters or search or limit=='a-z' or (subject and limit==subject.lower()[0])">
-			   <dt>
-			    <input type="checkbox" name="keywords:list"
-			           tal:attributes="value subject;
-                                                   onclick string:document.forms['keyword_edit_form'].changeto.value='${subject}';; return true;;" />
-			    <div tal:replace="subject">Subject</div>
-			   </dt>
-			   <dd>
-			     <span tal:repeat="item python:pkm.getScoredMatches(subject, catalogSubjects, num, score, context=context)" style="white-space: nowrap;">
-			       <span tal:condition="python:subject!=item">
-			         <input type="checkbox" name="keywords:list"
-			                tal:attributes="value item;
-			                onclick string: document.forms['keyword_edit_form'].changeto.value='${item}';; return true;;" />
-			         <tal:block tal:content="item">Subject</tal:block>
-			       </span>
-			     </span>
-			   </dd>
+      <fieldset>
+        <legend i18n:translate="label_keyword_assignments">
+          Keyword assignments
+        </legend>
+        <dl tal:repeat="subject python:search and [search] or catalogSubjects">
+         <tal:block tal:condition="python:not show_filters or search or limit=='a-z' or (subject and limit==subject.lower()[0])">
+         <dt>
+          <input type="checkbox" name="keywords:list"
+                 tal:attributes="value subject;
+                                 onclick string:document.forms['keyword_edit_form'].changeto.value='${subject}';; return true;;" />
+          <div tal:replace="subject">Subject</div>
+         </dt>
+         <dd>
+           <span tal:repeat="item python:pkm.getScoredMatches(subject, catalogSubjects, num, score, context=context)" style="white-space: nowrap;">
+             <span tal:condition="python:subject!=item">
+               <input type="checkbox" name="keywords:list"
+                      tal:attributes="value item;
+                                      onclick string: document.forms['keyword_edit_form'].changeto.value='${item}';; return true;;" />
+               <tal:block tal:content="item">Subject</tal:block>
+             </span>
+           </span>
+         </dd>
 
-			   </tal:block>
+         </tal:block>
 
-			  </dl>
+        </dl>
 
-			<div class="field">
-                            <div class="error"
-                                 tal:define="err errors/changeto|nothing"
-                		 tal:condition="err"
-                                 tal:content="err" i18n:translate="">
-                              Error message goes here
-                            </div>
-			 <label for="input_change_to" i18n:translate="label_keyword">Keyword</label>
-			 <input id="input_change_to" type="text" name="changeto" />
-			</div>
+      <div class="field">
+                <div class="error"
+                     tal:define="err errors/changeto|nothing"
+                     tal:condition="err"
+                     tal:content="err" i18n:translate="">
+                    Error message goes here
+                </div>
+       <label for="input_change_to" i18n:translate="label_keyword">Keyword</label>
+       <input id="input_change_to" type="text" name="changeto" />
+      </div>
 
-			<div class="formControls">
-			    <input class="destructive"
-			           type="submit"
-			           name="form.button.Merge"
-			           i18n:attributes="value"
-			           value="Merge" />
+      <div class="formControls">
+          <input class="destructive"
+                 type="submit"
+                 name="form.button.Merge"
+                 i18n:attributes="value"
+                 value="Merge" />
 
-			    <input class="destructive"
-			           id="input_delete_keyword"
-			           type="submit"
-			           name="form.button.Delete"
-			           i18n:attributes="value"
-			           value="Delete" />
+          <input class="destructive"
+                 id="input_delete_keyword"
+                 type="submit"
+                 name="form.button.Delete"
+                 i18n:attributes="value"
+                 value="Delete" />
 
-			</div>
+      </div>
 
-			</fieldset>
-		</form>
-	</tal:site_has_keywords>
+      </fieldset>
+    </form>
+  </tal:site_has_keywords>
 
-	<tal:no_keywords_yet condition="not:catalogSubjects">
-		<div i18n:translate="description_no_keywords">
-			No content in this site has any keywords assigned yet, so there's nothing
-			to manage at this time.  (To assign keywords to a piece of content, use
-			the item's "Categorization" tab while editing.)
-		</div>
-	</tal:no_keywords_yet>
+  <tal:no_keywords_yet condition="not:catalogSubjects">
+    <div i18n:translate="description_no_keywords">
+      No content in this site has any keywords assigned yet, so there's nothing
+      to manage at this time.  (To assign keywords to a piece of content, use
+      the item's "Categorization" tab while editing.)
+    </div>
+  </tal:no_keywords_yet>
 
 </div>
 </body>
