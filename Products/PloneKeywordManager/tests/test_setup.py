@@ -32,7 +32,7 @@ class InstallTestCase(unittest.TestCase):
         """
         view = getMultiAdapter((self.portal, self.request), name="prefs_keywords_view")
         view = view.__of__(self.portal)
-        self.failUnless(view())
+        self.assertTrue(view())
 
     def test_prefs_keywords_view_protected(self):
         """
