@@ -2,6 +2,7 @@
 
 from Products.PloneKeywordManager.tests.base import IntegrationTestCase
 
+
 class NonAsciiKeywordsTestCase(IntegrationTestCase):
 
     def setUp(self):

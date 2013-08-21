@@ -1,7 +1,0 @@
-<?xml version="1.0"?>
-
-<action-icons  i18n:domain="plone">
-
-  <action-icon category="controlpanel" action_id="keywordmanager" remove="True" />
-
-</action-icons>

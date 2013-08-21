@@ -22,7 +22,6 @@
 from AccessControl.Permission import registerPermissions
 
 # CMF imports
-from Products.CMFCore.DirectoryView import registerDirectory
 from Products.CMFCore.utils import ToolInit
 
 # Sibling imports
@@ -43,13 +42,17 @@ else:
 
 cmf_keyword_manager_globals = globals()
 
+from zope.i18nmessageid import MessageFactory
+keywordmanagerMessageFactory = MessageFactory('Products.PloneKeywordManager')
+import logging
+logger = logging.getLogger("Products.PloneKeywordManager")
 
-registerPermissions([(config.MANAGE_KEYWORDS_PERMISSION,[])],
+
+registerPermissions([(config.MANAGE_KEYWORDS_PERMISSION, [])],
     ('Manager', 'Site Administrator'))
 
 
 def initialize(context):
-    registerDirectory('skins', cmf_keyword_manager_globals)
 
     new_tool = ToolInit(config.TOOL_NAME,
                     tools=(tool.PloneKeywordManager, ),
