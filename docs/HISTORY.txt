@@ -4,10 +4,17 @@ Changelog
 2.1 (unreleased)
 ----------------
 
-- Fixed getSetter and getListFieldValues method in tool to handle also non-default field names [cekk]
+- check for plone.app.multilingual and Products.LinguaPlone [pbauer]
+
+- Fixed getSetter and getListFieldValues method in tool to handle also
+  non-default field names [cekk]
+
 - Removed skins and moved control panel to a browser view [cekk]
+
 - Added custom permission to access the view [cekk]
+
 - Fixed uninstall profile [cekk]
+
 - Moved translations from i18n to locales [cekk]
 
 2.0 (2013-04-24)
@@ -35,7 +42,7 @@ Changelog
   [fRiSi]
 
 - Make installation possible for dexterity-based Documents [pysailor]
-  
+
 1.9 (2011-06-22)
 ----------------
 
