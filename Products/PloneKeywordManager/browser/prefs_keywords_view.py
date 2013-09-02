@@ -2,7 +2,9 @@ from Products.Five import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from Products.PloneKeywordManager import keywordmanagerMessageFactory as _
 from Products.CMFCore.utils import getToolByName
+import logging
 
+logger = logging.getLogger("Products.PloneKeywordManager")
 
 class PrefsKeywordsView(BrowserView):
     """
@@ -49,7 +51,6 @@ class PrefsKeywordsView(BrowserView):
                 mapping={'from': ','.join(keywords).decode('utf-8'),
                          'to': changeto.decode('utf-8'),
                          'num': changed_objects})
-
         if changed_objects:
             msg_type = 'info'
         else:
@@ -79,5 +80,6 @@ class PrefsKeywordsView(BrowserView):
         if message and type:
             pu = getToolByName(self.context, "plone_utils")
             pu.addPortalMessage(message, type=type)
+        logger.info(self.context.translate(message))
         portal_url = self.context.portal_url()
         self.request.RESPONSE.redirect("%s/prefs_keywords_view" % portal_url)

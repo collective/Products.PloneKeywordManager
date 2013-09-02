@@ -17,7 +17,11 @@ try:
     pkg_resources.get_distribution('plone.app.multilingual')
     MULTILINGUAL = True
 except pkg_resources.DistributionNotFound:
-    MULTILINGUAL = False
+    try:
+        pkg_resources.get_distribution('Products.LinguaPlone')
+        MULTILINGUAL = True
+    except pkg_resources.DistributionNotFound:
+        MULTILINGUAL = False
 
 # Zope imports
 try:
@@ -114,6 +118,8 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         query = {indexName: keywords}
         if context is not None:
             query['path'] = '/'.join(context.getPhysicalPath())
+        if MULTILINGUAL:
+            query['Language'] = 'all'
         querySet = self._query(**query)
 
         for item in querySet:
