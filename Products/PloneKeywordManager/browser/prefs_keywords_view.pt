@@ -129,7 +129,8 @@
           <select id="select_keyword_list" name="search">
             <option value="" i18n:translate="label_select">Select...</option>
            <tal:block tal:repeat="subject catalogSubjects">
-            <option tal:content="subject">Subject</option>
+            <option tal:content="subject"
+                    tal:attributes="selected python:subject==search">Subject</option>
            </tal:block>
           </select>
 
@@ -158,7 +159,9 @@
         <legend i18n:translate="label_keyword_assignments">
           Keyword assignments
         </legend>
-
+		<p class="discreet" i18n:translate="help_keyword_assignments">
+		Select one or more keywords, then set a replacement keyword and click on 'Merge / Replace' to replace all selected value by this one. Click on Delete to remove selected values.
+		</p>
         <div class="field">
         <dl tal:repeat="subject python:search and [search] or catalogSubjects">
          <tal:block
@@ -196,7 +199,7 @@
                      tal:content="err" i18n:translate="">
                     Error message goes here
                 </div>
-       <label for="input_change_to" i18n:translate="label_keyword">Keyword</label>
+       <label for="input_change_to" i18n:translate="">Keyword to apply</label>
        <input id="input_change_to" type="text" name="changeto" />
       </div>
 

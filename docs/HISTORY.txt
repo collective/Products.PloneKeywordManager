@@ -7,6 +7,10 @@ Changelog
 - Works when the field related to KeywordIndex is monovalued [thomasdesvenain]
 
 - UI and labels improvements [thomasdesvenain]
+	- selected values are kept after form submission
+	- change in selection lists automatically submit the form
+	- keywords are clickable labels
+	- added some helpers and tooltips, and improved labels
 
 - check for plone.app.multilingual and Products.LinguaPlone [pbauer]
 
