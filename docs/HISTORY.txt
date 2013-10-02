@@ -4,6 +4,8 @@ Changelog
 2.1 (unreleased)
 ----------------
 
+- Works when the field related to KeywordIndex is monovalued [thomasdesvenain]
+
 - UI and labels improvements [thomasdesvenain]
 
 - check for plone.app.multilingual and Products.LinguaPlone [pbauer]

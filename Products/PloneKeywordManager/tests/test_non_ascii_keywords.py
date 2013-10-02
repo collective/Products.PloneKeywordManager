@@ -64,3 +64,10 @@ class NonAsciiKeywordsTestCase(IntegrationTestCase):
 
     def test_getscoredmatches(self):
         self.pkm.getScoredMatches(u'foo', ['foo', u'bar', 'baz'], 7, 0.6)
+
+    def test_monovalued_keyword(self):
+        # i use language only because it is the only monovalued field available by default
+        self.portal.portal_catalog.addIndex('Language', 'KeywordIndex')
+        self.document.edit(Language='en')
+        self._action_change('en', 'en-US', field='Language')
+        self.assertEqual(self.document.Language(), 'en-US')

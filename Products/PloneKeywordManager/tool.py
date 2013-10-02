@@ -83,25 +83,34 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         query = {indexName: old_keywords}
         if context is not None:
             query['path'] = '/'.join(context.getPhysicalPath())
+
         if MULTILINGUAL:
             query['Language'] = 'all'
+
         querySet = self._query(**query)
         for item in querySet:
             obj = item.getObject()
             # #MOD Dynamic field getting
-            subjectList = self.getListFieldValues(obj, indexName)
 
-            for element in old_keywords:
-                while (element in subjectList) and (element != new_keyword):
-                    subjectList[subjectList.index(element)] = new_keyword
+            value = self.getFieldValue(obj, indexName)
+            if type(value) in (list, tuple):
+                #MULTIVALUED FIELD
+                value = list(value)
+                for element in old_keywords:
+                    while (element in value) and (element != new_keyword):
+                        value[value.index(element)] = new_keyword
 
-            # dedupe new Keyword list (an issue when combining multiple keywords)
-            subjectList = list(set(subjectList))
+                # dedupe new Keyword list (an issue when combining multiple keywords)
+                value = list(set(value))
+            else:
+                #MONOVALUED FIELD
+                value = new_keyword
 
-            # #MOD Dynamic field update
+                # #MOD Dynamic field update
+
             updateField = self.getSetter(obj, indexName)
             if updateField is not None:
-                updateField(subjectList)
+                updateField(value)
                 idxs = self._getFullIndexList(indexName)
                 obj.reindexObject(idxs=idxs)
 
@@ -124,16 +133,20 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
 
         for item in querySet:
             obj = item.getObject()
-
-            subjectList = self.getListFieldValues(obj, indexName)
-
-            for element in keywords:
-                while element in subjectList:
-                    subjectList.remove(element)
+            value = self.getFieldValue(obj, indexName)
+            if type(value) in (list, tuple):
+                # MULTIVALUED
+                value = list(value)
+                for element in keywords:
+                    while element in value:
+                        value.remove(element)
+            else:
+                # MONOVALUED
+                value = None
 
             updateField = self.getSetter(obj, indexName)
             if updateField is not None:
-                updateField(subjectList)
+                updateField(value)
                 idxs = self._getFullIndexList(indexName)
                 obj.reindexObject(idxs=idxs)
 
@@ -263,20 +276,17 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
 
         return None
 
-    security.declarePrivate('getListFieldValues')
-    def getListFieldValues(self, obj, indexName):
-        """Returns the current values for the given Lines field as a list.
-        """
+    def getFieldValue(self, obj, indexName):
         fieldName = self.fieldNameForIndex(indexName)
         fieldVal = getattr(obj, fieldName, ())
         if not fieldVal and fieldName.startswith('get'):
             fieldName = fieldName.lstrip('get')
             fieldName = fieldName[0].lower() + fieldName[1:]
             fieldVal = getattr(obj, fieldName, ())
-        if callable(fieldVal):
-            return list(fieldVal())
-        else:
-            return list(fieldVal)
 
+        if callable(fieldVal):
+            return fieldVal()
+        else:
+            return fieldVal
 
 InitializeClass(PloneKeywordManager)
