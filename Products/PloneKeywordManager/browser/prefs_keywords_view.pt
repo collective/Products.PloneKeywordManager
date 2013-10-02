@@ -88,12 +88,14 @@
             </label>
 
             <select id="select_alphabet_list"
-                    name="limit" tabindex="1">
+                    name="limit" tabindex="1"
+                    onchange="javascript:this.form.submit()">
 
                 <option value="a-z">a - z</option>
 
                 <tal:block tal:repeat="item python:range(ord('a'),ord('z')+1)">
-                    <option value="a" tal:attributes="value python:chr(item);"
+                    <option value="a" tal:attributes="value python:chr(item);
+                                                      selected python:limit==chr(item) and True or None"
                             tal:content="python:chr(item)">a</option>
                 </tal:block>
 
@@ -126,7 +128,8 @@
               Keyword
           </label>
 
-          <select id="select_keyword_list" name="search">
+          <select id="select_keyword_list" name="search"
+                  onchange="javascript:this.form.submit()">
             <option value="" i18n:translate="label_select">Select...</option>
            <tal:block tal:repeat="subject catalogSubjects">
             <option tal:content="subject">Subject</option>
@@ -175,7 +178,7 @@
          <dd>
            <span tal:repeat="item python:pkm.getScoredMatches(subject, catalogSubjects, num, score, context=context)" style="white-space: nowrap;">
              <span tal:condition="python:subject!=item"
-                   tal:define="item_id python:context.plone_utils.normalizeString(subject)">
+                   tal:define="item_id python:context.plone_utils.normalizeString(item)">
                <input type="checkbox" name="keywords:list"
                       tal:attributes="value item;
                                       id string:item-${item_id};
