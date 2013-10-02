@@ -4,6 +4,8 @@ Changelog
 2.1 (unreleased)
 ----------------
 
+- UI and labels improvements [thomasdesvenain]
+
 - check for plone.app.multilingual and Products.LinguaPlone [pbauer]
 
 - Fixed getSetter and getListFieldValues method in tool to handle also

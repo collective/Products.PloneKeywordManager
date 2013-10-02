@@ -49,11 +49,13 @@
                     Keyword Field
                 </label>
 
-                <select id="kwfield" name="field">
+                <select id="kwfield" name="field"
+                        onchange="javascript:this.form.submit()">
                     <option tal:repeat="fld kwfields"
                             tal:attributes="value fld;
                                             selected python:fld==field;"
                             i18n:translate=""
+                            i18n:domain="plone"
                             tal:content="python:fld.replace('get','',1)" />
                 </select>
             </div>
@@ -91,7 +93,8 @@
                 <option value="a-z">a - z</option>
 
                 <tal:block tal:repeat="item python:range(ord('a'),ord('z')+1)">
-                    <option value="a" tal:attributes="value python:chr(item);" tal:content="python:chr(item)">a</option>
+                    <option value="a" tal:attributes="value python:chr(item);"
+                            tal:content="python:chr(item)">a</option>
                 </tal:block>
 
             </select>
@@ -155,21 +158,29 @@
         <legend i18n:translate="label_keyword_assignments">
           Keyword assignments
         </legend>
+
+        <div class="field">
         <dl tal:repeat="subject python:search and [search] or catalogSubjects">
-         <tal:block tal:condition="python:not show_filters or search or limit=='a-z' or (subject and limit==subject.lower()[0])">
+         <tal:block
+            condition="python:not show_filters or search or limit=='a-z' or (subject and limit==subject.lower()[0])"
+            define="subject_id python:context.plone_utils.normalizeString(subject)">
          <dt>
           <input type="checkbox" name="keywords:list"
                  tal:attributes="value subject;
+                                 id string:subject-${subject_id};
                                  onclick string:document.forms['keyword_edit_form'].changeto.value='${subject}';; return true;;" />
-          <div tal:replace="subject">Subject</div>
+               <label tal:content="subject" tal:attributes="for string:subject-${subject_id};">
+                 Subject</label>
          </dt>
          <dd>
            <span tal:repeat="item python:pkm.getScoredMatches(subject, catalogSubjects, num, score, context=context)" style="white-space: nowrap;">
-             <span tal:condition="python:subject!=item">
+             <span tal:condition="python:subject!=item"
+                   tal:define="item_id python:context.plone_utils.normalizeString(subject)">
                <input type="checkbox" name="keywords:list"
                       tal:attributes="value item;
+                                      id string:item-${item_id};
                                       onclick string: document.forms['keyword_edit_form'].changeto.value='${item}';; return true;;" />
-               <tal:block tal:content="item">Subject</tal:block>
+               <label tal:content="item" tal:attributes="for string:item-${item_id};">Subject</label>
              </span>
            </span>
          </dd>
@@ -177,7 +188,7 @@
          </tal:block>
 
         </dl>
-
+	  </div>
       <div class="field">
                 <div class="error"
                      tal:define="err errors/changeto|nothing"
@@ -193,14 +204,16 @@
           <input class="destructive"
                  type="submit"
                  name="form.button.Merge"
-                 i18n:attributes="value"
-                 value="Merge" />
+                 title="Merge all selected keywords and/or replace them by filled value"
+                 i18n:attributes="value; title"
+                 value="Merge / Replace" />
 
           <input class="destructive"
                  id="input_delete_keyword"
                  type="submit"
                  name="form.button.Delete"
-                 i18n:attributes="value"
+                 i18n:attributes="value; title"
+                 title="Remove all selected keywords"
                  value="Delete" />
 
       </div>

@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2013-08-21 14:57+0000\n"
+"POT-Creation-Date: 2013-10-02 08:53+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Preferred-Encodings: utf-8 latin1\n"
 "Domain: Products.PloneKeywordManager\n"
 
-#: ./browser/prefs_keywords_view.pt:199
+#: ./browser/prefs_keywords_view.pt:211
 msgid "Delete"
 msgstr ""
 
@@ -25,31 +25,39 @@ msgstr ""
 msgid "Keyword Manager"
 msgstr ""
 
-#: ./browser/prefs_keywords_view.pt:193
-msgid "Merge"
+#: ./browser/prefs_keywords_view.pt:204
+msgid "Merge / Replace"
 msgstr ""
 
-#: ./browser/prefs_keywords_view.py:34
+#: ./browser/prefs_keywords_view.pt:204
+msgid "Merge all selected keywords and/or replace them by filled value"
+msgstr ""
+
+#: ./browser/prefs_keywords_view.py:36
 msgid "Please provide a new term"
 msgstr ""
 
-#: ./browser/prefs_keywords_view.py:27
+#: ./browser/prefs_keywords_view.py:29
 msgid "Please select a valid keyword field"
 msgstr ""
 
-#: ./browser/prefs_keywords_view.py:23
+#: ./browser/prefs_keywords_view.py:25
 msgid "Please select at least one keyword"
 msgstr ""
 
-#: ./browser/prefs_keywords_view.pt:137
+#: ./browser/prefs_keywords_view.pt:211
+msgid "Remove all selected keywords"
+msgstr ""
+
+#: ./browser/prefs_keywords_view.pt:140
 msgid "Search"
 msgstr ""
 
-#: ./browser/prefs_keywords_view.pt:62
+#: ./browser/prefs_keywords_view.pt:64
 msgid "Select Field"
 msgstr ""
 
-#: ./browser/prefs_keywords_view.pt:101
+#: ./browser/prefs_keywords_view.pt:104
 msgid "View keywords"
 msgstr ""
 
@@ -59,7 +67,7 @@ msgid "description_keyword_manager"
 msgstr ""
 
 #. Default: "No content in this site has any keywords assigned yet, so there's nothing to manage at this time. (To assign keywords to a piece of content, use the item's \"Categorization\" tab while editing.)"
-#: ./browser/prefs_keywords_view.pt:213
+#: ./browser/prefs_keywords_view.pt:226
 msgid "description_no_keywords"
 msgstr ""
 
@@ -74,12 +82,12 @@ msgid "label_choose_keyword_field"
 msgstr ""
 
 #. Default: "Keyword"
-#: ./browser/prefs_keywords_view.pt:121
+#: ./browser/prefs_keywords_view.pt:124
 msgid "label_keyword"
 msgstr ""
 
 #. Default: "Keyword assignments"
-#: ./browser/prefs_keywords_view.pt:155
+#: ./browser/prefs_keywords_view.pt:158
 msgid "label_keyword_assignments"
 msgstr ""
 
@@ -89,32 +97,32 @@ msgid "label_keyword_field"
 msgstr ""
 
 #. Default: "List alphabetically"
-#: ./browser/prefs_keywords_view.pt:78
+#: ./browser/prefs_keywords_view.pt:80
 msgid "label_list_alphabetically"
 msgstr ""
 
 #. Default: "Search by keyword"
-#: ./browser/prefs_keywords_view.pt:115
+#: ./browser/prefs_keywords_view.pt:118
 msgid "label_search_by_keyword"
 msgstr ""
 
 #. Default: "Select..."
-#: ./browser/prefs_keywords_view.pt:127
+#: ./browser/prefs_keywords_view.pt:130
 msgid "label_select"
 msgstr ""
 
 #. Default: "View range"
-#: ./browser/prefs_keywords_view.pt:83
+#: ./browser/prefs_keywords_view.pt:85
 msgid "label_view_range"
 msgstr ""
 
 #. Default: "Changed ${from} to ${to} for ${num} object(s)."
-#: ./browser/prefs_keywords_view.py:48
+#: ./browser/prefs_keywords_view.py:50
 msgid "msg_changed_keywords"
 msgstr ""
 
 #. Default: "Deleted ${keywords} for ${num} object(s)."
-#: ./browser/prefs_keywords_view.py:64
+#: ./browser/prefs_keywords_view.py:65
 msgid "msg_deleted_keywords"
 msgstr ""
 
