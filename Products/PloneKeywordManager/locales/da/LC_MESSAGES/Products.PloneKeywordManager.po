@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2013-10-02 08:53+0000\n"
+"POT-Creation-Date: 2013-10-02 19:36+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -14,7 +14,7 @@ msgstr ""
 "Preferred-Encodings: utf-8 latin1\n"
 "Domain: Products.PloneKeywordManager\n"
 
-#: ./browser/prefs_keywords_view.pt:211
+#: ./browser/prefs_keywords_view.pt:214
 msgid "Delete"
 msgstr "Slet"
 
@@ -22,11 +22,15 @@ msgstr "Slet"
 msgid "Keyword Manager"
 msgstr "Emneordsrenser"
 
-#: ./browser/prefs_keywords_view.pt:204
+#: ./browser/prefs_keywords_view.pt:202
+msgid "Keyword to apply"
+msgstr ""
+
+#: ./browser/prefs_keywords_view.pt:207
 msgid "Merge / Replace"
 msgstr ""
 
-#: ./browser/prefs_keywords_view.pt:204
+#: ./browser/prefs_keywords_view.pt:207
 msgid "Merge all selected keywords and/or replace them by filled value"
 msgstr ""
 
@@ -42,11 +46,11 @@ msgstr ""
 msgid "Please select at least one keyword"
 msgstr ""
 
-#: ./browser/prefs_keywords_view.pt:211
+#: ./browser/prefs_keywords_view.pt:214
 msgid "Remove all selected keywords"
 msgstr ""
 
-#: ./browser/prefs_keywords_view.pt:140
+#: ./browser/prefs_keywords_view.pt:141
 msgid "Search"
 msgstr "Vis"
 
@@ -64,7 +68,7 @@ msgid "description_keyword_manager"
 msgstr "Emneordsrenseren hjælper dig med at rydde op i dine emneord. Du kan enten slette udvalgte emneord eller slå de emneord sammen, som minder meget om hinanden."
 
 #. Default: "No content in this site has any keywords assigned yet, so there's nothing to manage at this time. (To assign keywords to a piece of content, use the item's \"Categorization\" tab while editing.)"
-#: ./browser/prefs_keywords_view.pt:226
+#: ./browser/prefs_keywords_view.pt:229
 msgid "description_no_keywords"
 msgstr ""
 
@@ -72,6 +76,11 @@ msgstr ""
 #: ./browser/prefs_keywords_view.pt:23
 msgid "heading_keyword_manager"
 msgstr "Emneordsrenser"
+
+#. Default: "Select one or more keywords, then set a replacement keyword and click on 'Merge / Replace' to replace all selected value by this one. Click on Delete to remove selected values."
+#: ./browser/prefs_keywords_view.pt:162
+msgid "help_keyword_assignments"
+msgstr ""
 
 #. Default: "Choose Keyword Field/Index"
 #: ./browser/prefs_keywords_view.pt:43
@@ -84,7 +93,7 @@ msgid "label_keyword"
 msgstr "Emneord"
 
 #. Default: "Keyword assignments"
-#: ./browser/prefs_keywords_view.pt:158
+#: ./browser/prefs_keywords_view.pt:159
 msgid "label_keyword_assignments"
 msgstr "Disse emneord blev fundet"
 
