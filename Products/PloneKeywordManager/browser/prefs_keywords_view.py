@@ -23,18 +23,18 @@ class PrefsKeywordsView(BrowserView):
 
         if not keywords:
             message = _(u'Please select at least one keyword')
-            return self.doReturn(message, 'error')
+            return self.doReturn(message, 'error', field=field)
 
         if not field or field not in pkm.getKeywordIndexes():
             message = _(u'Please select a valid keyword field')
-            return self.doReturn(message, 'error')
+            return self.doReturn(message, 'error', field=field)
 
         if 'form.button.Merge' in self.request.form:
             # We should assume there is a 'changeto' filled
             changeto = self.request.get('changeto', None)
             if not changeto:
                 message = _(u'Please provide a new term')
-                return self.doReturn(message, 'error')
+                return self.doReturn(message, 'error', field=field)
 
             return self.changeKeywords(keywords, changeto, field)
 
@@ -56,7 +56,7 @@ class PrefsKeywordsView(BrowserView):
         else:
             msg_type = 'warning'
 
-        return self.doReturn(msg, msg_type)
+        return self.doReturn(msg, msg_type, field=field)
 
     def deleteKeywords(self, keywords, field):
         pkm = getToolByName(self.context, "portal_keyword_manager")
@@ -71,15 +71,20 @@ class PrefsKeywordsView(BrowserView):
         else:
             msg_type = 'warning'
 
-        return self.doReturn(msg, msg_type)
+        return self.doReturn(msg, msg_type, field=field)
 
-    def doReturn(self, message='', type=''):
+    def doReturn(self, message='', type='', field=''):
         """
         set the message and return
         """
         if message and type:
             pu = getToolByName(self.context, "plone_utils")
             pu.addPortalMessage(message, type=type)
+
         logger.info(self.context.translate(message))
         portal_url = self.context.portal_url()
-        self.request.RESPONSE.redirect("%s/prefs_keywords_view" % portal_url)
+        url = "%s/prefs_keywords_view" % portal_url
+        if field:
+            url = "%s?field=%s" % (url, field)
+
+        self.request.RESPONSE.redirect(url)
