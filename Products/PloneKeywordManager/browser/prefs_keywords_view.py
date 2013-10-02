@@ -73,13 +73,13 @@ class PrefsKeywordsView(BrowserView):
 
         return self.doReturn(msg, msg_type, field=field)
 
-    def doReturn(self, message='', type='', field=''):
+    def doReturn(self, message='', msg_type='', field=''):
         """
         set the message and return
         """
-        if message and type:
+        if message and msg_type:
             pu = getToolByName(self.context, "plone_utils")
-            pu.addPortalMessage(message, type=type)
+            pu.addPortalMessage(message, type=msg_type)
 
         logger.info(self.context.translate(message))
         portal_url = self.context.portal_url()
