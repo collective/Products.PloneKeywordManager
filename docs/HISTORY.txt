@@ -4,6 +4,12 @@ Changelog
 2.1 (unreleased)
 ----------------
 
+- Decode values so they work with Dexterity. [davisagli]
+
+- Handle sets as field values. [davisagli]
+
+- Update Dexterity content even if it has no explicit setter. [davisagli]
+
 - Works when the field related to KeywordIndex is monovalued [thomasdesvenain]
 
 - UI and labels improvements [thomasdesvenain]

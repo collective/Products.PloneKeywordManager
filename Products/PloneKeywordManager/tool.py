@@ -46,6 +46,12 @@ from Products.CMFCore import permissions as CMFCorePermissions
 from Products.PloneKeywordManager.interfaces import IPloneKeywordManager
 from Products.PloneKeywordManager import config
 
+try:
+    from plone.dexterity.interfaces import IDexterityContent
+except ImportError:
+    class IDexterityContent(interface.Interface):
+        pass
+
 
 class PloneKeywordManager(UniqueObject, SimpleItem):
     """A portal wide tool for managing keywords within Plone."""
@@ -87,6 +93,9 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         if MULTILINGUAL:
             query['Language'] = 'all'
 
+        old_keywords = [k.decode('utf8') if isinstance(k, str) else k for k in old_keywords]
+        new_keyword = new_keyword.decode('utf8') if isinstance(new_keyword, str) else new_keyword
+
         querySet = self._query(**query)
         for item in querySet:
             obj = item.getObject()
@@ -102,6 +111,9 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
 
                 # dedupe new Keyword list (an issue when combining multiple keywords)
                 value = list(set(value))
+            elif type(value) is set:
+                value = value - set(old_keywords)
+                value.add(new_keyword)
             else:
                 #MONOVALUED FIELD
                 value = new_keyword
@@ -140,6 +152,8 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
                 for element in keywords:
                     while element in value:
                         value.remove(element)
+            elif type(value) is set:
+                value = value - set(keywords)
             else:
                 # MONOVALUED
                 value = None
@@ -245,17 +259,23 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
 
         Returns None if it can't get the function
         """
+        fieldName = self.fieldNameForIndex(indexName)
         # Archetypes:
         if getattr(aq_base(obj), 'getField', None) is not None:
-            fieldName = self.fieldNameForIndex(indexName)
             fieldObj = obj.getField(fieldName) or obj.getField(fieldName.lower())
             if not fieldObj and fieldName.startswith('get'):
-                fieldName = fieldName.lstrip('get')
+                fieldName = fieldName.lstrip('get_')
                 fieldName = fieldName[0].lower() + fieldName[1:]
                 fieldObj = obj.getField(fieldName)
             if fieldObj is not None:
                 return fieldObj.getMutator(obj)
             return None
+        # Dexterity
+        if IDexterityContent.providedBy(obj):
+            if fieldName.startswith('get'):
+                fieldName = fieldName.lstrip('get_')
+                fieldName = fieldName[0].lower() + fieldName[1:]
+            return lambda value: setattr(obj, fieldName, value)
         # DefaultDublinCoreImpl:
         setterName = 'set' + indexName
         if getattr(aq_base(obj), setterName, None) is not None:
@@ -267,7 +287,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         fieldName = self.fieldNameForIndex(indexName)
         fieldVal = getattr(obj, fieldName, ())
         if not fieldVal and fieldName.startswith('get'):
-            fieldName = fieldName.lstrip('get')
+            fieldName = fieldName.lstrip('get_')
             fieldName = fieldName[0].lower() + fieldName[1:]
             fieldVal = getattr(obj, fieldName, ())
 
