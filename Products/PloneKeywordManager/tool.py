@@ -270,16 +270,16 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
             if fieldObj is not None:
                 return fieldObj.getMutator(obj)
             return None
+        # DefaultDublinCoreImpl:
+        setterName = 'set' + indexName
+        if getattr(aq_base(obj), setterName, None) is not None:
+            return getattr(obj, setterName)
         # Dexterity
         if IDexterityContent.providedBy(obj):
             if fieldName.startswith('get'):
                 fieldName = fieldName.lstrip('get_')
                 fieldName = fieldName[0].lower() + fieldName[1:]
             return lambda value: setattr(obj, fieldName, value)
-        # DefaultDublinCoreImpl:
-        setterName = 'set' + indexName
-        if getattr(aq_base(obj), setterName, None) is not None:
-            return getattr(obj, setterName)
 
         return None
 
