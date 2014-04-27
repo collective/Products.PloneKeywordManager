@@ -8,11 +8,11 @@ Plone Keyword Manager
 =====================
 
 Plone Keyword Manager allows you to change, merge and delete
-keywords (aka tags or subjects) in Plone and updates all corresponding objects 
-automatically. It uses a similiarity search to support you in identifying 
-similar keywords. PloneKeywordManager helps you to build an inductive 
-vocabulary with several people working on the same Plone site. Keywords can be 
-cleaned up from time to time by a site-manager to create a consistent 
+keywords (aka tags or subjects) in Plone and updates all corresponding objects
+automatically. It uses a similiarity search to support you in identifying
+similar keywords. PloneKeywordManager helps you to build an inductive
+vocabulary with several people working on the same Plone site. Keywords can be
+cleaned up from time to time by a site-manager to create a consistent
 vocabulary.
 
 Plone Keyword Manager is a quite simple solution to a major problem in the real
@@ -23,14 +23,17 @@ authors' interpretation of existing keywords.
 Installation
 ============
 
-In your buildout add ``Products.PloneKeywordManager`` to your instances eggs 
-section. Run buildout. Activate it at Site Setups Add Ons page.
+In your buildout add ``Products.PloneKeywordManager`` to your instances eggs
+section or policy packages ``setup.py``.  If you want similiarity search add
+``Products.PloneKeywordManager`[Levenshtein]`` instead.
+
+Run buildout. Activate it at Site Setups Add Ons page.
 
 Usage
 =====
 
-After installing, you will find an entry in Site Setup a section called 
-Keyword Manager. Inside, you will see an alphabetical listing and a selection 
+After installing, you will find an entry in Site Setup a section called
+Keyword Manager. Inside, you will see an alphabetical listing and a selection
 for all keywords existing in your site.
 
 Use the last one to see similar terms for a single keyword.
@@ -50,13 +53,13 @@ textbox. Try it yourself, you'll get the idea behind it...
 For developer and integrator
 ============================
 
-You can also use KeywordManager to import your keywords with GenericSetup.  You must have access to the file system to do this.  
+You can also use KeywordManager to import your keywords with GenericSetup.  You must have access to the file system to do this.
 
-* Add a file ``keywords.txt`` to the directory ``Products/PloneKeywordManager/profiles/default``, with one keyword per line. 
+* Add a file ``keywords.txt`` to the directory ``Products/PloneKeywordManager/profiles/default``, with one keyword per line.
 
-* In the ZMI, go to portal_setup, Import tab. Locate the step called ``Create or update keywords``. Check the box next to it, then click the button ``Import Selected Steps``. 
+* In the ZMI, go to portal_setup, Import tab. Locate the step called ``Create or update keywords``. Check the box next to it, then click the button ``Import Selected Steps``.
 
-This will add or update a Document titled ``Keywords`` (with ID ``keyword``) in the root of the Plone site; this document will have all the listed keywords assigned to it. 
+This will add or update a Document titled ``Keywords`` (with ID ``keyword``) in the root of the Plone site; this document will have all the listed keywords assigned to it.
 
 Leave this document in the private state so only an administrator will be able to see and edit it.
 
@@ -67,7 +70,7 @@ Each time you run this import step, the ``Keywords`` document's keywords will be
 Source Code
 ===========
 
-Source code of this project is in the 
+Source code of this project is in the
 `Plone Collective <https://github.com/collective/Products.PloneKeywordManager>`_
 
 For instructions how to contribute please read the
