@@ -1,8 +1,10 @@
 Changelog
 =========
 
-2.1 (unreleased)
+2.1 (2014-04-27)
 ----------------
+
+- Enable search for values (search icon behind value). [jensens]
 
 - Decode values so they work with Dexterity. [davisagli]
 
