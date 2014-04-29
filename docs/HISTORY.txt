@@ -1,6 +1,11 @@
 Changelog
 =========
 
+2.2 (unreleased)
+----------------
+
+- Fix ``getSetter`` method in tool.py to handle also discussion items. [cekk]
+
 2.1 (2014-04-27)
 ----------------
 
