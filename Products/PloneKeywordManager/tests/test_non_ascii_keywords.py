@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
-
+from plone.app.discussion.interfaces import IDiscussionSettings
 from Products.PloneKeywordManager.tests.base import IntegrationTestCase
+from plone.registry.interfaces import IRegistry
+from zope.component import createObject, queryUtility
+from plone.app.discussion.interfaces import IConversation
+from plone.app.discussion.interfaces import IComment
 
 
 class NonAsciiKeywordsTestCase(IntegrationTestCase):
@@ -71,3 +75,16 @@ class NonAsciiKeywordsTestCase(IntegrationTestCase):
         self.document.edit(Language='en')
         self._action_change('en', 'en-US', field='Language')
         self.assertEqual(self.document.Language(), 'en-US')
+
+    def test_discussion_indexes_updated(self):
+        # Allow discussion
+        registry = queryUtility(IRegistry)
+        discussion_settings = registry.forInterface(IDiscussionSettings)
+        discussion_settings.globally_enabled = True
+        self.document.allow_discussion = True
+        conversation = IConversation(self.document)
+        comment = createObject('plone.Comment')
+        comment.text = 'Comment text'
+        conversation.addComment(comment)
+        self._action_delete([u'Fr\\xfchst\\xfcck', ])
+        self.assertFalse(u'Fr\\xfchst\\xfcck' in self.pkm.getKeywords())
