@@ -24,7 +24,9 @@ install:
 before_script:
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
-script: bin/code-analysis && bin/test
+script:
+  - test $QA && bin/code-analysis || true
+  - bin/test
 after_success: test $QA && bin/coverage.sh && pip install -q coveralls && coveralls || true
 notifications:
   irc: irc.freenode.org#plone-testing
