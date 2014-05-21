@@ -1,8 +1,14 @@
 .. image:: https://travis-ci.org/collective/Products.PloneKeywordManager.png?branch=master
+    :alt: Travis CI badge
     :target: https://travis-ci.org/collective/Products.PloneKeywordManager
 
 .. image:: https://coveralls.io/repos/collective/Products.PloneKeywordManager/badge.png?branch=master
+    :alt: Coveralls badge
     :target: https://coveralls.io/r/collective/Products.PloneKeywordManager
+
+.. image:: https://pypip.in/d/Products.PloneKeywordManager/badge.png
+    :target: https://pypi.python.org/pypi/Products.PloneKeywordManager/
+    :alt: Downloads
 
 Plone Keyword Manager
 =====================
