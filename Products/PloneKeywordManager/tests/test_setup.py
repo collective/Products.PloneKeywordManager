@@ -61,14 +61,3 @@ class UninstallTestCase(unittest.TestCase):
 
     def test_uninstalled(self):
         self.assertFalse(self.qi.isProductInstalled(PROJECTNAME))
-
-    def markRequestWithLayer(self):
-        # to be removed when p.a.testing will fix https://dev.plone.org/ticket/11673
-        request = self.layer['request']
-        interface.alsoProvides(request, IPloneKeywordManagerLayer)
-
-    def test_prefs_keywords_view_unregistered(self):
-        """
-        test if the view is not registered
-        """
-        self.assertRaises(AttributeError, self.portal.restrictedTraverse, '@@prefs_keywords_view')
