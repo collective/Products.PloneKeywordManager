@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 from plone.app.discussion.interfaces import IDiscussionSettings
-from Products.PloneKeywordManager.tests.base import IntegrationTestCase
+from Products.PloneKeywordManager.tests.base import PKMTestCase
 from plone.registry.interfaces import IRegistry
 from zope.component import createObject, queryUtility
 from plone.app.discussion.interfaces import IConversation
-from plone.app.discussion.interfaces import IComment
 
 
-class NonAsciiKeywordsTestCase(IntegrationTestCase):
+class NonAsciiKeywordsTestCase(PKMTestCase):
 
     def setUp(self):
         super(NonAsciiKeywordsTestCase, self).setUp()

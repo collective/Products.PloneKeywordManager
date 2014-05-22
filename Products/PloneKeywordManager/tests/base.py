@@ -11,7 +11,7 @@ from zope import interface
 from zope.component import getMultiAdapter
 
 
-class IntegrationTestCase(unittest.TestCase):
+class BaseIntegrationTestCase(unittest.TestCase):
 
     layer = INTEGRATION_TESTING
 
@@ -20,8 +20,15 @@ class IntegrationTestCase(unittest.TestCase):
         self.request = self.layer['request']
         self.markRequestWithLayer()
         setRoles(self.portal, TEST_USER_ID, ['Manager'])
-
         self.pkm = getToolByName(self.portal, 'portal_keyword_manager')
+
+    def markRequestWithLayer(self):
+        # to be removed when p.a.testing will fix https://dev.plone.org/ticket/11673
+        request = self.layer['request']
+        interface.alsoProvides(request, IPloneKeywordManagerLayer)
+
+
+class PKMTestCase(BaseIntegrationTestCase):
 
     def _action_change(self, keywords, changeto, field='Subject'):
         """ calls changeKeywords method from  prefs_keywords_view """
@@ -32,8 +39,3 @@ class IntegrationTestCase(unittest.TestCase):
         """ calls deleteKeywords method from  prefs_keywords_view """
         view = getMultiAdapter((self.portal, self.request), name="prefs_keywords_view")
         view.deleteKeywords(keywords, field)
-
-    def markRequestWithLayer(self):
-        # to be removed when p.a.testing will fix https://dev.plone.org/ticket/11673
-        request = self.layer['request']
-        interface.alsoProvides(request, IPloneKeywordManagerLayer)
