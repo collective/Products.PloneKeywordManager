@@ -34,6 +34,7 @@ from OFS.SimpleItem import SimpleItem
 from AccessControl import ClassSecurityInfo
 from AccessControl import getSecurityManager
 from AccessControl import Unauthorized
+from plone.app.discussion.interfaces import IComment
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from zope import interface
 
@@ -260,9 +261,16 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         Returns None if it can't get the function
         """
         fieldName = self.fieldNameForIndex(indexName)
+        field = None
+        if IComment.providedBy(obj):
+            #Discussion
+            field = getattr(obj, 'getField', None)
+        else:
+            #Archetype
+            field = getattr(aq_base(obj), 'getField', None)
         # Archetypes:
-        if getattr(aq_base(obj), 'getField', None) is not None:
-            fieldObj = obj.getField(fieldName) or obj.getField(fieldName.lower())
+        if field:
+            fieldObj = field(fieldName) or field(fieldName.lower())
             if not fieldObj and fieldName.startswith('get'):
                 fieldName = fieldName.lstrip('get_')
                 fieldName = fieldName[0].lower() + fieldName[1:]

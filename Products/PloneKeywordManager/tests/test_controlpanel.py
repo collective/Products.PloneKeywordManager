@@ -1,27 +1,19 @@
 # -*- coding: utf-8 -*-
 from plone.app.testing import logout
-from plone.app.testing import setRoles
-from plone.app.testing import TEST_USER_ID
 from Products.PloneKeywordManager.config import PROJECTNAME
-from Products.PloneKeywordManager.testing import INTEGRATION_TESTING
+from Products.PloneKeywordManager.tests.base import BaseIntegrationTestCase
 from zope.component import getMultiAdapter
 
-import unittest2 as unittest
 
-
-class ControlPanelTestCase(unittest.TestCase):
-
-    layer = INTEGRATION_TESTING
+class ControlPanelTestCase(BaseIntegrationTestCase):
 
     def setUp(self):
-        self.portal = self.layer['portal']
+        super(ControlPanelTestCase, self).setUp()
         self.controlpanel = self.portal['portal_controlpanel']
-        setRoles(self.portal, TEST_USER_ID, ['Manager'])
 
     def test_controlpanel_has_view(self):
-        request = self.layer['request']
         view = getMultiAdapter(
-            (self.portal, request), name='prefs_keywords_view')
+            (self.portal, self.request), name='prefs_keywords_view')
         view = view.__of__(self.portal)
         self.assertTrue(view())
 

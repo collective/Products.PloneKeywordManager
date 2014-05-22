@@ -2,6 +2,9 @@
 
 <object name="portal_controlpanel" meta_type="Plone Control Panel Tool">
 
-  <configlet title="Keyword Manager" action_id="keywordmanager" remove="True" />
+  <configlet title="Keyword Manager"
+             action_id="keywordmanager"
+             appId="PloneKeywordManager"
+             remove="True" />
 
 </object>

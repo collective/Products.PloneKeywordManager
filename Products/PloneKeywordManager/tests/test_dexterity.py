@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from plone.dexterity.fti import DexterityFTI
-from Products.PloneKeywordManager.tests.base import IntegrationTestCase
+from Products.PloneKeywordManager.tests.base import PKMTestCase
 
 
-class DexterityContentTestCase(IntegrationTestCase):
+class DexterityContentTestCase(PKMTestCase):
     """Test the keyword manager with Dexterity content types"""
 
     def setUp(self):
