@@ -94,10 +94,13 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         if MULTILINGUAL:
             query['Language'] = 'all'
 
-        old_keywords = [k.decode('utf8') if isinstance(k, str) else k for k in old_keywords]
         new_keyword = new_keyword.decode('utf8') if isinstance(new_keyword, str) else new_keyword
-
-        querySet = self._query(**query)
+        try:
+            querySet = self._query(**query)
+        except UnicodeDecodeError:
+            old_keywords = [k.decode('utf8') if isinstance(k, str) else k for k in old_keywords]
+            query[indexName] = old_keywords
+            querySet = self._query(**query)
         for item in querySet:
             obj = item.getObject()
             # #MOD Dynamic field getting
