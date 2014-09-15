@@ -1,8 +1,8 @@
 Changelog
 =========
 
-2.2 (unreleased)
-----------------
+2.1.1 (2014-09-15)
+------------------
 
 - Don't break when searching encoded indexes. [davisagli]
 
