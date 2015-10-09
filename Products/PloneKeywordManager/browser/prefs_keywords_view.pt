@@ -181,9 +181,8 @@
                    tal:attributes="href string:${portal_url}/@@search?Subject=${subject}">
                    <img i18n:attributes="alt"
                         i18n:domain="plone"
-                        tal:attributes="src string:${portal_url}/search_icon.png;
-                                        alt string:Search;
-                        "
+                        tal:attributes="src string:${portal_url}/search_icon.png;"
+                        alt="Search"
                       /></a>
          </dt>
          <dd>
@@ -199,9 +198,9 @@
                    tal:attributes="href string:${portal_url}/@@search?Subject=${subject}">
                    <img i18n:attributes="alt"
                         i18n:domain="plone"
-                        tal:attributes="src string:${portal_url}/search_icon.png;
-                                        alt string:Search;
-                   "/></a>
+                        tal:attributes="src string:${portal_url}/search_icon.png;"
+                        alt="Search"
+                   /></a>
              </span>
            </span>
          </dd>
