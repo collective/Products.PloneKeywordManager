@@ -178,7 +178,13 @@
                <label tal:content="subject" tal:attributes="for string:subject-${subject_id};">
                  Subject</label>
                <a href="#"
-                   tal:attributes="href string:${portal_url}/@@search?Subject=${subject}"><img tal:attributes="src string:${portal_url}/search_icon.png" /></a>
+                   tal:attributes="href string:${portal_url}/@@search?Subject=${subject}">
+                   <img i18n:attributes="alt"
+                        i18n:domain="plone"
+                        tal:attributes="src string:${portal_url}/search_icon.png;
+                                        alt string:Search;
+                        "
+                      /></a>
          </dt>
          <dd>
            <span tal:repeat="item python:pkm.getScoredMatches(subject, catalogSubjects, num, score, context=context)" style="white-space: nowrap;">
@@ -190,7 +196,12 @@
                                       onclick string: document.forms['keyword_edit_form'].changeto.value='${item}';; return true;;" />
                <label tal:content="item" tal:attributes="for string:item-${item_id};">Subject</label>
                <a href="#"
-                   tal:attributes="href string:${portal_url}/@@search?Subject=${subject}"><img tal:attributes="src string:${portal_url}/search_icon.png" /></a>
+                   tal:attributes="href string:${portal_url}/@@search?Subject=${subject}">
+                   <img i18n:attributes="alt"
+                        i18n:domain="plone"
+                        tal:attributes="src string:${portal_url}/search_icon.png;
+                                        alt string:Search;
+                   "/></a>
              </span>
            </span>
          </dd>
