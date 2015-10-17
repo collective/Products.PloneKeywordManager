@@ -91,7 +91,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         if context is not None:
             query['path'] = '/'.join(context.getPhysicalPath())
 
-        if MULTILINGUAL:
+        if MULTILINGUAL and indexName != 'Language':
             query['Language'] = 'all'
 
         new_keyword = new_keyword.decode('utf8') if isinstance(new_keyword, str) else new_keyword
