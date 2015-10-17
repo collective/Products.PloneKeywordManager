@@ -48,6 +48,7 @@ setup(name='Products.PloneKeywordManager',
           'plone.app.testing',
           'plone.app.dexterity',
           'Products.ATContentTypes',
+          'unittest2',
           ],
         },
       entry_points="""
