@@ -8,6 +8,15 @@ from plone.app.testing import FunctionalTesting
 from plone.testing import z2
 
 
+try:
+    from Products.CMFPlone.factory import _IMREALLYPLONE5
+    _IMREALLYPLONE5  # pyflakes
+except ImportError:
+    PLONE_5 = False
+else:
+    PLONE_5 = True
+
+
 class Fixture(PloneSandboxLayer):
 
     defaultBases = (PLONE_FIXTURE,)
@@ -29,7 +38,9 @@ class Fixture(PloneSandboxLayer):
         # Install into Plone site using portal_setup
         self.applyProfile(portal, 'Products.PloneKeywordManager:default')
         self.applyProfile(portal, 'plone.app.dexterity:default')
-        self.applyProfile(portal, 'Products.ATContentTypes:default')
+
+        if PLONE_5:
+            self.applyProfile(portal, 'Products.ATContentTypes:default')
 
 FIXTURE = Fixture()
 INTEGRATION_TESTING = IntegrationTesting(
