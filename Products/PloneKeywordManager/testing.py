@@ -16,16 +16,20 @@ class Fixture(PloneSandboxLayer):
         # Load ZCML
         import Products.PloneKeywordManager
         import plone.app.dexterity
+        import Products.ATContentTypes
         self.loadZCML(package=plone.app.dexterity)
+        self.loadZCML(package=Products.ATContentTypes)
         self.loadZCML(package=Products.PloneKeywordManager)
 
         # Install product and call its initialize() function
+        z2.installProduct(app, 'Products.ATContentTypes')
         z2.installProduct(app, 'Products.PloneKeywordManager')
 
     def setUpPloneSite(self, portal):
         # Install into Plone site using portal_setup
         self.applyProfile(portal, 'Products.PloneKeywordManager:default')
         self.applyProfile(portal, 'plone.app.dexterity:default')
+        self.applyProfile(portal, 'Products.ATContentTypes:default')
 
 FIXTURE = Fixture()
 INTEGRATION_TESTING = IntegrationTesting(
