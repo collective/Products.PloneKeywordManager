@@ -4,7 +4,12 @@ Changelog
 2.1.2 (unreleased)
 ------------------
 
-- add compatibility with Plone 5 [cewing]
+
+- add compatibility with Plone 5
+  [cewing]
+
+- Drop support for Python 2.6.
+  [hvelarde]
 
 
 2.1.1 (2014-09-15)
