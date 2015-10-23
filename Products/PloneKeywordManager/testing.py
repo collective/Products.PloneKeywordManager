@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+from plone import api
 from plone.app.testing import PloneSandboxLayer
 from plone.app.testing import PLONE_FIXTURE
 from plone.app.testing import IntegrationTesting
@@ -8,13 +8,7 @@ from plone.app.testing import FunctionalTesting
 from plone.testing import z2
 
 
-try:
-    from Products.CMFPlone.factory import _IMREALLYPLONE5
-    _IMREALLYPLONE5  # pyflakes
-except ImportError:
-    PLONE_5 = False
-else:
-    PLONE_5 = True
+PLONE_5 = api.env.plone_version() >= '5'
 
 
 class Fixture(PloneSandboxLayer):
