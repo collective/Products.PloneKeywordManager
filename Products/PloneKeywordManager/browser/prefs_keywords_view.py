@@ -1,3 +1,4 @@
+from plone import api
 from Products.Five import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from Products.PloneKeywordManager import keywordmanagerMessageFactory as _
@@ -5,6 +6,10 @@ from Products.CMFCore.utils import getToolByName
 import logging
 
 logger = logging.getLogger("Products.PloneKeywordManager")
+
+
+PLONE_5 = api.env.plone_version() >= '5'
+
 
 class PrefsKeywordsView(BrowserView):
     """
@@ -14,6 +19,7 @@ class PrefsKeywordsView(BrowserView):
     template = ViewPageTemplateFile('prefs_keywords_view.pt')
 
     def __call__(self):
+        self.is_plone_5 = PLONE_5
         if not self.request.form.get('form.button.Merge', '') and not self.request.form.get('form.button.Delete', ''):
             return self.template({})
         pkm = getToolByName(self.context, 'portal_keyword_manager')
