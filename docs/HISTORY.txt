@@ -4,6 +4,12 @@ Changelog
 2.1.2 (unreleased)
 ------------------
 
+- accessibility improvements
+  [daniele-andreotti]
+
+- add compatibility with Plone 5
+  [cewing]
+
 - Drop support for Python 2.6.
   [hvelarde]
 

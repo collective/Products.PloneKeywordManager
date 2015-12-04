@@ -21,6 +21,7 @@ setup(name='Products.PloneKeywordManager',
         "Framework :: Plone",
         "Framework :: Plone :: 4.2",
         "Framework :: Plone :: 4.3",
+        "Framework :: Plone :: 5.0",
         "Intended Audience :: End Users/Desktop",
         "Intended Audience :: System Administrators",
         "License :: OSI Approved :: GNU General Public License (GPL)",
@@ -40,12 +41,15 @@ setup(name='Products.PloneKeywordManager',
       zip_safe=False,
       install_requires=[
         'setuptools',
+        'plone.api',
         ],
       extras_require={
         'Levenshtein': ['python-Levenshtein'],
         'test': [
           'plone.app.testing',
           'plone.app.dexterity',
+          'Products.ATContentTypes',
+          'unittest2',
           ],
         },
       entry_points="""
