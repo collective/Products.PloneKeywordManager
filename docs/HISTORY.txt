@@ -4,7 +4,9 @@ Changelog
 2.2.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- fix searchlink button to respect the selected index field in the query
+  and quote the value for the search parameter
+  [petschki]
 
 
 2.2.0 (2016-03-07)

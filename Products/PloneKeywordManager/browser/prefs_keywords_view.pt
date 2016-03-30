@@ -18,7 +18,8 @@
                  many_kws python: 20;
                  pkm    context/portal_keyword_manager;
                  catalogSubjects python:pkm.getKeywords(context=context,indexName=field);
-                 show_filters python: len(catalogSubjects) > many_kws;">
+                 show_filters python: len(catalogSubjects) > many_kws;
+                 url_quote python:modules['Products.PythonScripts.standard'].url_quote">
 
   <h1 i18n:translate="heading_keyword_manager">Keyword Manager</h1>
 
@@ -169,7 +170,8 @@
         <dl tal:repeat="subject python:search and [search] or catalogSubjects">
          <tal:block
             condition="python:not show_filters or search or limit=='a-z' or (subject and limit==subject.lower()[0])"
-            define="subject_id python:context.plone_utils.normalizeString(subject)">
+            define="subject_id python:context.plone_utils.normalizeString(subject);
+                    subject_quote python:url_quote(subject)">
          <dt>
           <input type="checkbox" name="keywords:list"
                  tal:attributes="value subject;
@@ -177,11 +179,11 @@
                                  onclick string:document.forms['keyword_edit_form'].changeto.value='${subject}';; return true;;" />
           <label tal:content="subject" tal:attributes="for string:subject-${subject_id};">Subject</label>
           <tal:p5 tal:condition="view/is_plone_5">
-            <a href="#" tal:attributes="href string:${portal_url}/@@search?Subject=${subject}">
+            <a href="#" tal:attributes="href string:${portal_url}/@@search?${field}=${subject_quote}">
               <span class="icon-search"></span></a>
           </tal:p5>
           <tal:p4 tal:condition="not: view/is_plone_5">
-            <a href="#" tal:attributes="href string:${portal_url}/@@search?Subject=${subject}">
+            <a href="#" tal:attributes="href string:${portal_url}/@@search?${field}=${subject_quote}">
               <img i18n:attributes="alt"
                    i18n:domain="plone"
                    tal:attributes="src string:${portal_url}/search_icon.png;"
@@ -198,11 +200,11 @@
                                      onclick string: document.forms['keyword_edit_form'].changeto.value='${item}';; return true;;" />
               <label tal:content="item" tal:attributes="for string:item-${item_id};">Subject</label>
               <tal:p5 tal:condition="view/is_plone_5">
-                <a href="#" tal:attributes="href string:${portal_url}/@@search?Subject=${subject}">
+                <a href="#" tal:attributes="href string:${portal_url}/@@search?${field}=${subject_quote}">
                   <span class="icon-search"></span></a>
               </tal:p5>
               <tal:p4 tal:condition="not: view/is_plone_5">
-                <a href="#" tal:attributes="href string:${portal_url}/@@search?Subject=${subject}">
+                <a href="#" tal:attributes="href string:${portal_url}/@@search?${field}=${subject_quote}">
                   <img i18n:attributes="alt"
                        i18n:domain="plone"
                        tal:attributes="src string:${portal_url}/search_icon.png;"
