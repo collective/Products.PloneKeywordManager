@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<object name="portal_actions" meta_type="Plone Actions Tool"
+   xmlns:i18n="http://xml.zope.org/namespaces/i18n">
+ <action-provider name="portal_workflow"/>
+ <action-provider name="portal_types"/>
+ <action-provider name="portal_actions" />
+ <object name="user" meta_type="CMF Action Category" purge="False">
+  <property name="title" i18n:translate="">User actions</property>
+  
+  <object name="keyword_manager_setup" meta_type="CMF Action" i18n:domain="plone" insert-before="logout">
+   <property name="title" i18n:translate="">Keyword Manager</property>
+   <property name="description" i18n:translate=""></property>
+   <property
+      name="url_expr">string:${portal_url}/prefs_keywords_view</property>
+   <property name="icon_expr"></property>
+   <property name="available_expr">python:member is not None</property>
+   <property name="permissions">
+    <element value="PloneKeywordManager: Use PloneKeywordManager"/>
+   </property>
+   <property name="visible">True</property>
+  </object> 
+ </object>
+</object>
