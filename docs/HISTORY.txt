@@ -3,7 +3,8 @@ Changelog
 
 2.2.1 (unreleased)
 ------------------
-
+- added user action for authorized users. Added translations.
+  [daniele-andreotti]
 - fix searchlink button to respect the selected index field in the query
   and quote the value for the search parameter
   [petschki]
