@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: 2.0\n"
-"POT-Creation-Date: 2013-10-02 19:36+0000\n"
+"POT-Creation-Date: 2018-02-07 10:04+0000\n"
 "PO-Revision-Date: 2013-10-02 10:31+0100\n"
 "Last-Translator: Thomas Desvenain <thomasdesvenain@ecreall.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,121 +15,129 @@ msgstr ""
 "Domain: Products.PloneKeywordManager\n"
 "X-Generator: Poedit 1.5.4\n"
 
-#: ./browser/prefs_keywords_view.pt:214
+#: ./browser/prefs_keywords_view.pt:240
 msgid "Delete"
 msgstr "Supprimer"
 
+#: ./profiles/default/actions.xml
 #: ./profiles/default/controlpanel.xml
 msgid "Keyword Manager"
 msgstr "Gestionnaire de mots-clés"
 
-#: ./browser/prefs_keywords_view.pt:202
+#: ./configure.zcml:22
+msgid "Keyword manager"
+msgstr ""
+
+#: ./browser/prefs_keywords_view.pt:228
 msgid "Keyword to apply"
 msgstr "Mot-clé à appliquer"
 
-#: ./browser/prefs_keywords_view.pt:207
+#: ./browser/prefs_keywords_view.pt:233
 msgid "Merge / Replace"
 msgstr "Fusionner / Remplacer"
 
-#: ./browser/prefs_keywords_view.pt:207
+#: ./browser/prefs_keywords_view.pt:233
 msgid "Merge all selected keywords and/or replace them by filled value"
 msgstr "Fusionner tous les mots clés sélectionnés et/ou les remplacer par la valeur saisie"
 
-#: ./browser/prefs_keywords_view.py:36
+#: ./browser/prefs_keywords_view.py:42
 msgid "Please provide a new term"
 msgstr "Veuillez indiquer le nouveau terme"
 
-#: ./browser/prefs_keywords_view.py:29
+#: ./browser/prefs_keywords_view.py:35
 msgid "Please select a valid keyword field"
 msgstr "Veuillez choisir un mot clé valide"
 
-#: ./browser/prefs_keywords_view.py:25
+#: ./browser/prefs_keywords_view.py:31
 msgid "Please select at least one keyword"
 msgstr "Veuillez sélectionner au moins un mot-clé"
 
-#: ./browser/prefs_keywords_view.pt:214
+#: ./configure.zcml:22
+msgid "Plone Keyword Manager"
+msgstr ""
+
+#: ./browser/prefs_keywords_view.pt:240
 msgid "Remove all selected keywords"
 msgstr "Supprimer tous les mots clés sélectionnés"
 
-#: ./browser/prefs_keywords_view.pt:141
+#: ./browser/prefs_keywords_view.pt:145
 msgid "Search"
 msgstr "Rechercher"
 
-#: ./browser/prefs_keywords_view.pt:64
+#: ./browser/prefs_keywords_view.pt:65
 msgid "Select Field"
 msgstr "Choisir ce champ"
 
-#: ./browser/prefs_keywords_view.pt:104
+#: ./browser/prefs_keywords_view.pt:107
 msgid "View keywords"
 msgstr "Voir les mots-clés"
 
 #. Default: "The Keyword Manager allows you to delete and merge keywords in your portal."
-#: ./browser/prefs_keywords_view.pt:33
+#: ./browser/prefs_keywords_view.pt:34
 msgid "description_keyword_manager"
 msgstr "Le gestionnaire de mots-clés vous offre la possibilité d'effacer et de fusionner les mots-clés au sein de votre portail."
 
 #. Default: "No content in this site has any keywords assigned yet, so there's nothing to manage at this time. (To assign keywords to a piece of content, use the item's \"Categorization\" tab while editing.)"
-#: ./browser/prefs_keywords_view.pt:229
+#: ./browser/prefs_keywords_view.pt:255
 msgid "description_no_keywords"
 msgstr "Aucun contenu de ce site n'a encore de mot clé associé pour ce champ. Pour utiliser cette fonctionnalité, assignez tout d'abord des mots-clés sur des contenus via l'onglet 'Catégorisation'."
 
 #. Default: "Keyword Manager"
-#: ./browser/prefs_keywords_view.pt:23
+#: ./browser/prefs_keywords_view.pt:24
 msgid "heading_keyword_manager"
 msgstr "Gestionnaire de mots-clés"
 
 #. Default: "Select one or more keywords, then set a replacement keyword and click on 'Merge / Replace' to replace all selected value by this one. Click on Delete to remove selected values."
-#: ./browser/prefs_keywords_view.pt:162
+#: ./browser/prefs_keywords_view.pt:166
 msgid "help_keyword_assignments"
 msgstr "Choisissez un ou plusieurs mots clés, puis saisissez un mot clé de remplacement et cliquez sur 'Fusionner / Remplacer' pour remplacer tous les mots clés sélectionnés par celui-ci. Cliquez sur 'Supprimer' pour retirer les valeurs sélectionnées."
 
 #. Default: "Choose Keyword Field/Index"
-#: ./browser/prefs_keywords_view.pt:43
+#: ./browser/prefs_keywords_view.pt:44
 msgid "label_choose_keyword_field"
 msgstr "Choisissez le mot clé / l'index"
 
 #. Default: "Keyword"
-#: ./browser/prefs_keywords_view.pt:124
+#: ./browser/prefs_keywords_view.pt:127
 msgid "label_keyword"
 msgstr "Mots-clés"
 
 #. Default: "Keyword assignments"
-#: ./browser/prefs_keywords_view.pt:159
+#: ./browser/prefs_keywords_view.pt:163
 msgid "label_keyword_assignments"
 msgstr "Affectation de mots-clés"
 
 #. Default: "Keyword Field"
-#: ./browser/prefs_keywords_view.pt:48
+#: ./browser/prefs_keywords_view.pt:49
 msgid "label_keyword_field"
 msgstr "Champ de mots-clés"
 
 #. Default: "List alphabetically"
-#: ./browser/prefs_keywords_view.pt:80
+#: ./browser/prefs_keywords_view.pt:81
 msgid "label_list_alphabetically"
 msgstr "Liste alphabétique"
 
 #. Default: "Search by keyword"
-#: ./browser/prefs_keywords_view.pt:118
+#: ./browser/prefs_keywords_view.pt:121
 msgid "label_search_by_keyword"
 msgstr "Recherche par mots-clés"
 
 #. Default: "Select..."
-#: ./browser/prefs_keywords_view.pt:130
+#: ./browser/prefs_keywords_view.pt:134
 msgid "label_select"
 msgstr "Sélectionner..."
 
 #. Default: "View range"
-#: ./browser/prefs_keywords_view.pt:85
+#: ./browser/prefs_keywords_view.pt:86
 msgid "label_view_range"
 msgstr "Intervalle de visualisation"
 
 #. Default: "Changed ${from} to ${to} for ${num} object(s)."
-#: ./browser/prefs_keywords_view.py:50
+#: ./browser/prefs_keywords_view.py:56
 msgid "msg_changed_keywords"
 msgstr "Changement de ${from} en ${to} sur ${num} objet(s)."
 
 #. Default: "Deleted ${keywords} for ${num} object(s)."
-#: ./browser/prefs_keywords_view.py:65
+#: ./browser/prefs_keywords_view.py:71
 msgid "msg_deleted_keywords"
 msgstr "Supprimer de ${keywords} sur ${num} objet(s)."
-

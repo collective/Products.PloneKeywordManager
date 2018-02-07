@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2013-10-02 19:36+0000\n"
+"POT-Creation-Date: 2018-02-07 10:04+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -14,121 +14,129 @@ msgstr ""
 "Preferred-Encodings: utf-8 latin1\n"
 "Domain: Products.PloneKeywordManager\n"
 
-#: ./browser/prefs_keywords_view.pt:214
+#: ./browser/prefs_keywords_view.pt:240
 msgid "Delete"
 msgstr "Verwijderen"
 
+#: ./profiles/default/actions.xml
 #: ./profiles/default/controlpanel.xml
 msgid "Keyword Manager"
 msgstr ""
 
-#: ./browser/prefs_keywords_view.pt:202
+#: ./configure.zcml:22
+msgid "Keyword manager"
+msgstr ""
+
+#: ./browser/prefs_keywords_view.pt:228
 msgid "Keyword to apply"
 msgstr ""
 
-#: ./browser/prefs_keywords_view.pt:207
+#: ./browser/prefs_keywords_view.pt:233
 msgid "Merge / Replace"
 msgstr ""
 
-#: ./browser/prefs_keywords_view.pt:207
+#: ./browser/prefs_keywords_view.pt:233
 msgid "Merge all selected keywords and/or replace them by filled value"
 msgstr ""
 
-#: ./browser/prefs_keywords_view.py:36
+#: ./browser/prefs_keywords_view.py:42
 msgid "Please provide a new term"
 msgstr ""
 
-#: ./browser/prefs_keywords_view.py:29
+#: ./browser/prefs_keywords_view.py:35
 msgid "Please select a valid keyword field"
 msgstr ""
 
-#: ./browser/prefs_keywords_view.py:25
+#: ./browser/prefs_keywords_view.py:31
 msgid "Please select at least one keyword"
 msgstr ""
 
-#: ./browser/prefs_keywords_view.pt:214
+#: ./configure.zcml:22
+msgid "Plone Keyword Manager"
+msgstr ""
+
+#: ./browser/prefs_keywords_view.pt:240
 msgid "Remove all selected keywords"
 msgstr ""
 
-#: ./browser/prefs_keywords_view.pt:141
+#: ./browser/prefs_keywords_view.pt:145
 msgid "Search"
 msgstr "Zoeken"
 
-#: ./browser/prefs_keywords_view.pt:64
+#: ./browser/prefs_keywords_view.pt:65
 msgid "Select Field"
 msgstr ""
 
-#: ./browser/prefs_keywords_view.pt:104
+#: ./browser/prefs_keywords_view.pt:107
 msgid "View keywords"
 msgstr "Toon trefwoorden"
 
 #. Default: "The Keyword Manager allows you to delete and merge keywords in your portal."
-#: ./browser/prefs_keywords_view.pt:33
+#: ./browser/prefs_keywords_view.pt:34
 msgid "description_keyword_manager"
 msgstr "Met de Keyword Manager kan je trefwoorden wijzigen, verwijderen en samenvoegen."
 
 #. Default: "No content in this site has any keywords assigned yet, so there's nothing to manage at this time. (To assign keywords to a piece of content, use the item's \"Categorization\" tab while editing.)"
-#: ./browser/prefs_keywords_view.pt:229
+#: ./browser/prefs_keywords_view.pt:255
 msgid "description_no_keywords"
 msgstr "Er werden geen trefwoorden gevonden in deze site. Gebruik de \"Categorisatie\" tab (onder \"Bewerken\") om trefwoorden te zetten op inhoudsitems."
 
 #. Default: "Keyword Manager"
-#: ./browser/prefs_keywords_view.pt:23
+#: ./browser/prefs_keywords_view.pt:24
 msgid "heading_keyword_manager"
 msgstr "Keyword Manager"
 
 #. Default: "Select one or more keywords, then set a replacement keyword and click on 'Merge / Replace' to replace all selected value by this one. Click on Delete to remove selected values."
-#: ./browser/prefs_keywords_view.pt:162
+#: ./browser/prefs_keywords_view.pt:166
 msgid "help_keyword_assignments"
 msgstr ""
 
 #. Default: "Choose Keyword Field/Index"
-#: ./browser/prefs_keywords_view.pt:43
+#: ./browser/prefs_keywords_view.pt:44
 msgid "label_choose_keyword_field"
 msgstr ""
 
 #. Default: "Keyword"
-#: ./browser/prefs_keywords_view.pt:124
+#: ./browser/prefs_keywords_view.pt:127
 msgid "label_keyword"
 msgstr "Trefwoord"
 
 #. Default: "Keyword assignments"
-#: ./browser/prefs_keywords_view.pt:159
+#: ./browser/prefs_keywords_view.pt:163
 msgid "label_keyword_assignments"
 msgstr "Gevonden trefwoorden"
 
 #. Default: "Keyword Field"
-#: ./browser/prefs_keywords_view.pt:48
+#: ./browser/prefs_keywords_view.pt:49
 msgid "label_keyword_field"
 msgstr ""
 
 #. Default: "List alphabetically"
-#: ./browser/prefs_keywords_view.pt:80
+#: ./browser/prefs_keywords_view.pt:81
 msgid "label_list_alphabetically"
 msgstr "Alfabetische lijst"
 
 #. Default: "Search by keyword"
-#: ./browser/prefs_keywords_view.pt:118
+#: ./browser/prefs_keywords_view.pt:121
 msgid "label_search_by_keyword"
 msgstr "Zoeken op trefwoord"
 
 #. Default: "Select..."
-#: ./browser/prefs_keywords_view.pt:130
+#: ./browser/prefs_keywords_view.pt:134
 msgid "label_select"
 msgstr ""
 
 #. Default: "View range"
-#: ./browser/prefs_keywords_view.pt:85
+#: ./browser/prefs_keywords_view.pt:86
 msgid "label_view_range"
 msgstr "Toon reeks"
 
 #. Default: "Changed ${from} to ${to} for ${num} object(s)."
-#: ./browser/prefs_keywords_view.py:50
+#: ./browser/prefs_keywords_view.py:56
 msgid "msg_changed_keywords"
 msgstr ""
 
 #. Default: "Deleted ${keywords} for ${num} object(s)."
-#: ./browser/prefs_keywords_view.py:65
+#: ./browser/prefs_keywords_view.py:71
 msgid "msg_deleted_keywords"
 msgstr ""
-

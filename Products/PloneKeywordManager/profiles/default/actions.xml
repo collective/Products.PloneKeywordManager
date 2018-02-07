@@ -7,7 +7,7 @@
  <object name="user" meta_type="CMF Action Category" purge="False">
   <property name="title" i18n:translate="">User actions</property>
   
-  <object name="keyword_manager_setup" meta_type="CMF Action" i18n:domain="plone" insert-before="logout">
+  <object name="keyword_manager_setup" meta_type="CMF Action" i18n:domain="Products.PloneKeywordManager" insert-before="logout">
    <property name="title" i18n:translate="">Keyword Manager</property>
    <property name="description" i18n:translate=""></property>
    <property
