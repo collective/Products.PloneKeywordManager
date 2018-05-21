@@ -4,7 +4,10 @@ Changelog
 2.2.1 (unreleased)
 ------------------
 
-- fix searchlink button to respect the selected index field in the query
+- Add translation to Brazilian Portuguese.
+  [hvelarde]
+
+- Fix searchlink button to respect the selected index field in the query
   and quote the value for the search parameter
   [petschki]
 
