@@ -1,0 +1,135 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2013-10-02 19:36+0000\n"
+"PO-Revision-Date: 2018-05-21 14:46-0300\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Language-Code: en\n"
+"Language-Name: English\n"
+"Preferred-Encodings: utf-8 latin1\n"
+"Domain: Products.PloneKeywordManager\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: pt_BR\n"
+"X-Generator: Poedit 1.8.7.1\n"
+
+#: browser/prefs_keywords_view.pt:214
+msgid "Delete"
+msgstr "Excluir"
+
+#: profiles/default/controlpanel.xml
+msgid "Keyword Manager"
+msgstr "Gerenciador de tags"
+
+#: browser/prefs_keywords_view.pt:202
+msgid "Keyword to apply"
+msgstr "Tags para aplicar"
+
+#: browser/prefs_keywords_view.pt:207
+msgid "Merge / Replace"
+msgstr "Mesclar/substituir"
+
+#: browser/prefs_keywords_view.pt:207
+msgid "Merge all selected keywords and/or replace them by filled value"
+msgstr "Mesclar todas as tags e/ou substituir com o termo informado."
+
+#: browser/prefs_keywords_view.py:36
+msgid "Please provide a new term"
+msgstr "Por favor informe um novo termo"
+
+#: browser/prefs_keywords_view.py:29
+msgid "Please select a valid keyword field"
+msgstr "Por favor selecione pelo menos um campo de tags válido"
+
+#: browser/prefs_keywords_view.py:25
+msgid "Please select at least one keyword"
+msgstr "Por favor selecione pelo menos uma tag"
+
+#: browser/prefs_keywords_view.pt:214
+msgid "Remove all selected keywords"
+msgstr "Excluir todas as tags"
+
+#: browser/prefs_keywords_view.pt:141
+msgid "Search"
+msgstr "Busca"
+
+#: browser/prefs_keywords_view.pt:64
+msgid "Select Field"
+msgstr "Selecionar campo"
+
+#: browser/prefs_keywords_view.pt:104
+msgid "View keywords"
+msgstr "Visualizar tags"
+
+#. Default: "The Keyword Manager allows you to delete and merge keywords in your portal."
+#: browser/prefs_keywords_view.pt:33
+msgid "description_keyword_manager"
+msgstr "O Gerenciador de tags permite excluir e alterar as tags do seu portal"
+
+#. Default: "No content in this site has any keywords assigned yet, so there's nothing to manage at this time. (To assign keywords to a piece of content, use the item's \"Categorization\" tab while editing.)"
+#: browser/prefs_keywords_view.pt:229
+msgid "description_no_keywords"
+msgstr "Ainda não existe conteúdo neste site com tags associadas (para adicionar tags ao conteúdo, utilize a aba \\\"Categorização\\\" ao editar)."
+
+#. Default: "Keyword Manager"
+#: browser/prefs_keywords_view.pt:23
+msgid "heading_keyword_manager"
+msgstr "Gerenciador de tags"
+
+#. Default: "Select one or more keywords, then set a replacement keyword and click on 'Merge / Replace' to replace all selected value by this one. Click on Delete to remove selected values."
+#: browser/prefs_keywords_view.pt:162
+msgid "help_keyword_assignments"
+msgstr "Selecione uma ou mais tags, depois escolha a tag de substituição e selecione 'Mesclar/substituir' para substituir todas as tags pelo novo termo. Selecione Excluir para eliminar os termos selecionados."
+
+#. Default: "Choose Keyword Field/Index"
+#: browser/prefs_keywords_view.pt:43
+msgid "label_choose_keyword_field"
+msgstr "Selecionar um campo/índice de tags"
+
+#. Default: "Keyword"
+#: browser/prefs_keywords_view.pt:124
+msgid "label_keyword"
+msgstr "Tags"
+
+#. Default: "Keyword assignments"
+#: browser/prefs_keywords_view.pt:159
+msgid "label_keyword_assignments"
+msgstr "Tags atribuídas"
+
+#. Default: "Keyword Field"
+#: browser/prefs_keywords_view.pt:48
+msgid "label_keyword_field"
+msgstr "Campo de tags"
+
+#. Default: "List alphabetically"
+#: browser/prefs_keywords_view.pt:80
+msgid "label_list_alphabetically"
+msgstr "Lista em ordem alfabética"
+
+#. Default: "Search by keyword"
+#: browser/prefs_keywords_view.pt:118
+msgid "label_search_by_keyword"
+msgstr "Buscar por tag"
+
+#. Default: "Select..."
+#: browser/prefs_keywords_view.pt:130
+msgid "label_select"
+msgstr "Selecionar…"
+
+#. Default: "View range"
+#: browser/prefs_keywords_view.pt:85
+msgid "label_view_range"
+msgstr "Ver escala"
+
+#. Default: "Changed ${from} to ${to} for ${num} object(s)."
+#: browser/prefs_keywords_view.py:50
+msgid "msg_changed_keywords"
+msgstr "Modificada ${from} para ${to} para ${num} objeto(s).\""
+
+#. Default: "Deleted ${keywords} for ${num} object(s)."
+#: browser/prefs_keywords_view.py:65
+msgid "msg_deleted_keywords"
+msgstr "Excluídas ${keywords} de ${num} objeto(s).\""
