@@ -54,6 +54,7 @@ except ImportError:
         pass
 
 
+@interface.implementer(IPloneKeywordManager)
 class PloneKeywordManager(UniqueObject, SimpleItem):
     """A portal wide tool for managing keywords within Plone."""
 
@@ -62,8 +63,6 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
     id = "portal_keyword_manager"
     meta_type = "Plone Keyword Manager Tool"
     security = ClassSecurityInfo()
-
-    interface.implements(IPloneKeywordManager)
 
     manage_options = ({'label': 'Overview', 'action': 'manage_overview'},)
 
@@ -94,7 +93,8 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         if MULTILINGUAL and indexName != 'Language':
             query['Language'] = 'all'
 
-        new_keyword = new_keyword.decode('utf8') if isinstance(new_keyword, str) else new_keyword
+        if isinstance(new_keyword, bytes):
+            new_keyword = new_keyword.decode('utf8')
         try:
             querySet = self._query(**query)
         except UnicodeDecodeError:
@@ -174,7 +174,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
     def getKeywords(self, context=None, indexName='Subject'):
         self._checkPermission(context)
         if indexName not in self.getKeywordIndexes():
-            raise ValueError, "%s is not a valid field" % indexName
+            raise ValueError("%s is not a valid field" % indexName)
 
         catalog = getToolByName(self, 'portal_catalog')
         keywords = list(catalog.uniqueValuesFor(indexName))
@@ -207,7 +207,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
             elif isinstance(item, type(oword)):
                 lscore = Levenshtein.ratio(oword, item)
             else:
-                raise ValueError, "%s is not a normal, or unicode string" % item
+                raise ValueError("%s is not a normal, or unicode string" % item)
             if lscore > score:
                 res.append((item, lscore))
 

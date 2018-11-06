@@ -54,8 +54,8 @@ class PrefsKeywordsView(BrowserView):
         changed_objects = pkm.change(keywords, changeto, context=self.context, indexName=field)
 
         msg = _('msg_changed_keywords', default=u"Changed ${from} to ${to} for ${num} object(s).",
-                mapping={'from': ','.join(keywords).decode('utf-8'),
-                         'to': changeto.decode('utf-8'),
+                mapping={'from': ','.join(keywords),
+                         'to': changeto,
                          'num': changed_objects})
         if changed_objects:
             msg_type = 'info'
@@ -69,7 +69,7 @@ class PrefsKeywordsView(BrowserView):
         deleted_objects = pkm.delete(keywords, context=self.context, indexName=field)
 
         msg = _('msg_deleted_keywords', default=u"Deleted ${keywords} for ${num} object(s).",
-                mapping={'keywords': ','.join(keywords).decode('utf-8'),
+                mapping={'keywords': ','.join(keywords),
                          'num': deleted_objects})
 
         if deleted_objects:

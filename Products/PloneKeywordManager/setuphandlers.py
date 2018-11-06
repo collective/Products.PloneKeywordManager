@@ -13,6 +13,8 @@ def importKeywords(context):
     if keywords is None:
         return
 
+    if not isinstance(keywords, str):
+        keywords = keywords.decode('utf-8')
     keywordlist = [i for i in keywords.split('\n') if i]
     if len(keywordlist) < 1:
         return

@@ -14,7 +14,6 @@ class ControlPanelTestCase(BaseIntegrationTestCase):
     def test_controlpanel_has_view(self):
         view = getMultiAdapter(
             (self.portal, self.request), name='prefs_keywords_view')
-        view = view.__of__(self.portal)
         self.assertTrue(view())
 
     def test_controlpanel_view_is_protected(self):
