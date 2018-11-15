@@ -46,6 +46,7 @@ from Products.CMFCore import permissions as CMFCorePermissions
 # Sibling imports
 from Products.PloneKeywordManager.interfaces import IPloneKeywordManager
 from Products.PloneKeywordManager import config
+from Products.PloneKeywordManager.compat import to_str
 
 try:
     from plone.dexterity.interfaces import IDexterityContent
@@ -93,8 +94,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         if MULTILINGUAL and indexName != 'Language':
             query['Language'] = 'all'
 
-        if isinstance(new_keyword, bytes):
-            new_keyword = new_keyword.decode('utf8')
+        new_keyword = to_str(new_keyword)
         try:
             querySet = self._query(**query)
         except UnicodeDecodeError:

@@ -1,9 +1,12 @@
 from plone import api
+from Products.CMFCore.utils import getToolByName
 from Products.Five import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from Products.PloneKeywordManager import keywordmanagerMessageFactory as _
-from Products.CMFCore.utils import getToolByName
+from Products.PloneKeywordManager.compat import to_str
+
 import logging
+
 
 logger = logging.getLogger("Products.PloneKeywordManager")
 
@@ -54,8 +57,8 @@ class PrefsKeywordsView(BrowserView):
         changed_objects = pkm.change(keywords, changeto, context=self.context, indexName=field)
 
         msg = _('msg_changed_keywords', default=u"Changed ${from} to ${to} for ${num} object(s).",
-                mapping={'from': ','.join(keywords),
-                         'to': changeto,
+                mapping={'from': ','.join(to_str(keywords)),
+                         'to': to_str(changeto),
                          'num': changed_objects})
         if changed_objects:
             msg_type = 'info'
@@ -69,7 +72,7 @@ class PrefsKeywordsView(BrowserView):
         deleted_objects = pkm.delete(keywords, context=self.context, indexName=field)
 
         msg = _('msg_deleted_keywords', default=u"Deleted ${keywords} for ${num} object(s).",
-                mapping={'keywords': ','.join(keywords),
+                mapping={'keywords': ','.join(to_str(keywords)),
                          'num': deleted_objects})
 
         if deleted_objects:

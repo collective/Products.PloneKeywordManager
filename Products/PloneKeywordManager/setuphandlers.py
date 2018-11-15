@@ -1,5 +1,7 @@
-#from Products.CMFCore.utils import getToolByName
 from Products.PloneKeywordManager import HAS_DEXTERITY
+from Products.PloneKeywordManager.compat import to_str
+
+
 if HAS_DEXTERITY:
     from plone.dexterity.interfaces import IDexterityContent
 else:
@@ -13,8 +15,7 @@ def importKeywords(context):
     if keywords is None:
         return
 
-    if not isinstance(keywords, str):
-        keywords = keywords.decode('utf-8')
+    keywords = to_str(keywords)
     keywordlist = [i for i in keywords.split('\n') if i]
     if len(keywordlist) < 1:
         return
