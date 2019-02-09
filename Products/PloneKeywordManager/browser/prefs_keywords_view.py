@@ -1,9 +1,11 @@
 from plone import api
+from Products.CMFCore.utils import getToolByName
 from Products.Five import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from Products.PloneKeywordManager import keywordmanagerMessageFactory as _
-from Products.CMFCore.utils import getToolByName
+
 import logging
+
 
 logger = logging.getLogger("Products.PloneKeywordManager")
 
@@ -20,7 +22,9 @@ class PrefsKeywordsView(BrowserView):
 
     def __call__(self):
         self.is_plone_5 = PLONE_5
-        if not self.request.form.get('form.button.Merge', '') and not self.request.form.get('form.button.Delete', ''):
+        if not self.request.form.get(
+            'form.button.Merge', ''
+        ) and not self.request.form.get('form.button.Delete', ''):
             return self.template({})
         pkm = getToolByName(self.context, 'portal_keyword_manager')
 
@@ -51,12 +55,19 @@ class PrefsKeywordsView(BrowserView):
         """
         """
         pkm = getToolByName(self.context, 'portal_keyword_manager')
-        changed_objects = pkm.change(keywords, changeto, context=self.context, indexName=field)
+        changed_objects = pkm.change(
+            keywords, changeto, context=self.context, indexName=field
+        )
 
-        msg = _('msg_changed_keywords', default=u"Changed ${from} to ${to} for ${num} object(s).",
-                mapping={'from': ','.join(keywords).decode('utf-8'),
-                         'to': changeto.decode('utf-8'),
-                         'num': changed_objects})
+        msg = _(
+            'msg_changed_keywords',
+            default=u"Changed ${from} to ${to} for ${num} object(s).",
+            mapping={
+                'from': ','.join(keywords).decode('utf-8'),
+                'to': changeto.decode('utf-8'),
+                'num': changed_objects,
+            },
+        )
         if changed_objects:
             msg_type = 'info'
         else:
@@ -66,11 +77,18 @@ class PrefsKeywordsView(BrowserView):
 
     def deleteKeywords(self, keywords, field):
         pkm = getToolByName(self.context, "portal_keyword_manager")
-        deleted_objects = pkm.delete(keywords, context=self.context, indexName=field)
+        deleted_objects = pkm.delete(
+            keywords, context=self.context, indexName=field
+        )
 
-        msg = _('msg_deleted_keywords', default=u"Deleted ${keywords} for ${num} object(s).",
-                mapping={'keywords': ','.join(keywords).decode('utf-8'),
-                         'num': deleted_objects})
+        msg = _(
+            'msg_deleted_keywords',
+            default=u"Deleted ${keywords} for ${num} object(s).",
+            mapping={
+                'keywords': ','.join(keywords).decode('utf-8'),
+                'num': deleted_objects,
+            },
+        )
 
         if deleted_objects:
             msg_type = 'info'

@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-from plone.app.discussion.interfaces import IDiscussionSettings
-from Products.PloneKeywordManager.tests.base import PKMTestCase
-from plone.registry.interfaces import IRegistry
-from zope.component import createObject, queryUtility
 from plone.app.discussion.interfaces import IConversation
+from plone.app.discussion.interfaces import IDiscussionSettings
+from plone.registry.interfaces import IRegistry
+from Products.PloneKeywordManager.tests.base import PKMTestCase
+from zope.component import createObject
+from zope.component import queryUtility
 
 
 class NonAsciiKeywordsTestCase(PKMTestCase):
-
     def setUp(self):
         super(NonAsciiKeywordsTestCase, self).setUp()
         self.portal.invokeFactory('Document', 'keyword_doc')
@@ -17,7 +17,9 @@ class NonAsciiKeywordsTestCase(PKMTestCase):
                 u'Fr\\xfchst\\xfcck',
                 'Mitagessen',
                 'Abendessen',
-                u'Fr\\xfchessen'])
+                u'Fr\\xfchessen',
+            ]
+        )
 
     # def test_show_non_ascii_bugs(self):
     #     """
@@ -31,19 +33,24 @@ class NonAsciiKeywordsTestCase(PKMTestCase):
     def test_pref_keywords_action_change_keywords(self):
         """ test the bugfix for prefs_keywords_action_change when keywords
         contains at least one element with non ASCII characters """
-        self._action_change([u'Fr\\xfchst\\xfcck', 'Mittagessen', ], 'Abendessen')
+        self._action_change(
+            [u'Fr\\xfchst\\xfcck', 'Mittagessen'], 'Abendessen'
+        )
 
     def test_pref_keywords_action_change_changeto(self):
         """ test the bugfix for prefs_keywords_action_change when changeto contains non ASCII characters """
-        self._action_change([u'Fr\\xfchst\\xfcck', 'Mittagessen', ], u'Fr\\xfchessen')
+        self._action_change(
+            [u'Fr\\xfchst\\xfcck', 'Mittagessen'], u'Fr\\xfchessen'
+        )
 
     def test_pref_keywords_action_delete(self):
         """ test the bugfix for prefs_keywords_action_delete """
-        self._action_delete([u'Fr\\xfchst\\xfcck', ])
+        self._action_delete([u'Fr\\xfchst\\xfcck'])
 
     def test_only_one_index_is_updated(self):
         def search(**kw):
             return [r.getObject() for r in self.portal.portal_catalog(**kw)]
+
         self.document.edit(title='Foo')
         self.assertEqual(self.document.Title(), 'Foo')
         # setting the attribute directly...
@@ -85,5 +92,5 @@ class NonAsciiKeywordsTestCase(PKMTestCase):
         comment = createObject('plone.Comment')
         comment.text = 'Comment text'
         conversation.addComment(comment)
-        self._action_delete([u'Fr\\xfchst\\xfcck', ])
+        self._action_delete([u'Fr\\xfchst\\xfcck'])
         self.assertFalse(u'Fr\\xfchst\\xfcck' in self.pkm.getKeywords())

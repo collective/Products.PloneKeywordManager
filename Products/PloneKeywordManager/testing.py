@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 from plone import api
-from plone.app.testing import PloneSandboxLayer
-from plone.app.testing import PLONE_FIXTURE
-from plone.app.testing import IntegrationTesting
 from plone.app.testing import FunctionalTesting
-
+from plone.app.testing import IntegrationTesting
+from plone.app.testing import PLONE_FIXTURE
+from plone.app.testing import PloneSandboxLayer
 from plone.testing import z2
 
 
@@ -20,6 +19,7 @@ class Fixture(PloneSandboxLayer):
         import Products.PloneKeywordManager
         import plone.app.dexterity
         import Products.ATContentTypes
+
         self.loadZCML(package=plone.app.dexterity)
         self.loadZCML(package=Products.ATContentTypes)
         self.loadZCML(package=Products.PloneKeywordManager)
@@ -36,12 +36,11 @@ class Fixture(PloneSandboxLayer):
         if PLONE_5:
             self.applyProfile(portal, 'Products.ATContentTypes:default')
 
+
 FIXTURE = Fixture()
 INTEGRATION_TESTING = IntegrationTesting(
-    bases=(FIXTURE,),
-    name='Products.PloneKeywordManager:Integration',
+    bases=(FIXTURE,), name='Products.PloneKeywordManager:Integration'
 )
 FUNCTIONAL_TESTING = FunctionalTesting(
-    bases=(FIXTURE,),
-    name='Products.PloneKeywordManager:Functional',
+    bases=(FIXTURE,), name='Products.PloneKeywordManager:Functional'
 )

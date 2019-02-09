@@ -1,8 +1,11 @@
-#from Products.CMFCore.utils import getToolByName
+# from Products.CMFCore.utils import getToolByName
 from Products.PloneKeywordManager import HAS_DEXTERITY
+
+
 if HAS_DEXTERITY:
     from plone.dexterity.interfaces import IDexterityContent
 else:
+
     class IDexterityContent(object):
         pass
 
@@ -26,7 +29,9 @@ def importKeywords(context):
         doc = getattr(site, id)
 
     doc.setSubject(keywordlist)
-    if hasattr(IDexterityContent, 'providedBy') and IDexterityContent.providedBy(doc):
+    if hasattr(
+        IDexterityContent, 'providedBy'
+    ) and IDexterityContent.providedBy(doc):
         doc.exclude_from_nav = True
     else:
         doc.setExcludeFromNav(True)
