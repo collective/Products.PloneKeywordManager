@@ -1,29 +1,40 @@
 language: python
-python: 2.7
 sudo: false
 cache:
+  pip: true
   directories:
   - eggs
-env:
-- PLONE_VERSION=4.2
-- PLONE_VERSION=4.3
-- PLONE_VERSION=5.0
+  - downloads
 matrix:
-  fast_finish: true
+  include:
+    - python: "2.7"
+      env: PLONE_VERSION=51
+    - python: "2.7"
+      env: PLONE_VERSION=52
+    - python: "3.6"
+      env: PLONE_VERSION=52
+    - python: "3.7"
+      env: PLONE_VERSION=52
+      dist: xenial
+fast_finish: true
+before_install:
+  - pyversion=$(python --version 2>&1)
+  - if [ ${pyversion:7:1} = 3 ]; then pip install black; else echo "Skip black install"; fi
+  - pip install -r requirements.txt -c constraints_plone${PLONE_VERSION}.txt
+
 install:
-- sed -ie "s#test-4.3.x.cfg#test-$PLONE_VERSION.x.cfg#" buildout.cfg
-- python bootstrap.py
-- bin/buildout annotate
-- bin/buildout
-before_script:
-- export DISPLAY=:99.0
-- sh -e /etc/init.d/xvfb start
-- firefox -v
+  - buildout -c test_plone${PLONE_VERSION}.cfg -N -t 3 code-analysis:return-status-codes=True annotate
+  - buildout -c test_plone${PLONE_VERSION}.cfg -N -t 3 code-analysis:return-status-codes=True
+
 script:
-- bin/code-analysis
-- bin/test
+  - if [ ${pyversion:7:1} = 3 ]; then black --check; else echo "Skip black check"; fi
+  - bin/test --all
+
+after_script:
+  - bin/createcoverage --output-dir=parts/test/coverage
+
 after_success:
-- bin/createcoverage
-- coveralls
-notifications:
-  irc: irc.freenode.org#plone-testing
+  - pip install coverage
+  - python -m coverage.pickle2json
+  - pip install -q coveralls
+  - coveralls

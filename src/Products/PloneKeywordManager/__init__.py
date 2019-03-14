@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 ###
 ##
 # Plone-Keyword-Manager
@@ -17,48 +18,31 @@
 # http://trific.ath.cx/resources/python/levenshtein/
 ##
 ###
-
-# Zope imports
 from AccessControl.Permission import registerPermissions
-
-# CMF imports
 from Products.CMFCore.utils import ToolInit
-
-# Sibling imports
 from Products.PloneKeywordManager import config
 from Products.PloneKeywordManager import tool
 from zope.i18nmessageid import MessageFactory
 
 import logging
-import pkg_resources
-
 
 global cmf_keyword_manager_globals
 
 
-try:
-    pkg_resources.get_distribution('plone.dexterity')
-except pkg_resources.DistributionNotFound:
-    HAS_DEXTERITY = False
-else:
-    HAS_DEXTERITY = True
-
-
 cmf_keyword_manager_globals = globals()
 
-keywordmanagerMessageFactory = MessageFactory('Products.PloneKeywordManager')
+keywordmanagerMessageFactory = MessageFactory("Products.PloneKeywordManager")
 logger = logging.getLogger("Products.PloneKeywordManager")
 
 
 registerPermissions(
-    [(config.MANAGE_KEYWORDS_PERMISSION, [])],
-    ('Manager', 'Site Administrator'),
+    [(config.MANAGE_KEYWORDS_PERMISSION, [])], ("Manager", "Site Administrator")
 )
 
 
 def initialize(context):
 
     new_tool = ToolInit(
-        config.TOOL_NAME, tools=(tool.PloneKeywordManager,), icon='tool.gif'
+        config.TOOL_NAME, tools=(tool.PloneKeywordManager,), icon="tool.gif"
     )
     new_tool.initialize(context)
