@@ -105,5 +105,4 @@ class NonAsciiKeywordsTestCase(PKMTestCase):
         conversation.addComment(comment)
         self._action_delete(["Fr\\xfchst\\xfcck"])
         self.assertNotIn("Fr\\xfchst\\xfcck", self.document.subject)
-        import pdb; pdb.set_trace()
         self.assertNotIn("Fr\\xfchst\\xfcck", self.pkm.getKeywords())

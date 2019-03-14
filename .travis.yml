@@ -5,42 +5,36 @@ cache:
   directories:
   - eggs
   - downloads
-python:
-  - "2.7"
 matrix:
   include:
     - python: "2.7"
       env: PLONE_VERSION=51
     - python: "2.7"
       env: PLONE_VERSION=52
+    - python: "3.6"
+      env: PLONE_VERSION=52
     - python: "3.7"
       env: PLONE_VERSION=52
       dist: xenial
 fast_finish: true
 before_install:
-  - virtualenv -p `which python` .
-  - mkdir -p $HOME/buildout-cache/{eggs,downloads}
-  - mkdir $HOME/.buildout
-  - echo "[buildout]" > $HOME/.buildout/default.cfg
-  - echo "download-cache = $HOME/buildout-cache/downloads" >> $HOME/.buildout/default.cfg
-  - echo "eggs-directory = $HOME/buildout-cache/eggs" >> $HOME/.buildout/default.cfg
-  - bin/pip install -r requirements.txt -c constraints_plone$PLONE_VERSION.txt
-  - cp test_$PLONE_VERSION.cfg buildout.cfg
+  - pyversion=$(python --version 2>&1)
+  - if [ ${pyversion:7:1} = 3 ]; then pip install black; else echo "Skip black install"; fi
+  - pip install -r requirements.txt -c constraints_plone${PLONE_VERSION}.txt
 
 install:
-  - buildout -N -t 3 code-analysis:return-status-codes=True annotate
-  - buildout -N -t 3 code-analysis:return-status-codes=True
+  - buildout -c test_plone${PLONE_VERSION}.cfg -N -t 3 code-analysis:return-status-codes=True annotate
+  - buildout -c test_plone${PLONE_VERSION}.cfg -N -t 3 code-analysis:return-status-codes=True
 
 script:
-# Run code-analysis, except on Python 3.6, which mysteriously fails to find zc.buildout.
-  - python --version 2> /dev/stdout | grep 3.6 || bin/code-analysis
+  - if [ ${pyversion:7:1} = 3 ]; then black --check; else echo "Skip black check"; fi
   - bin/test --all
 
 after_script:
   - bin/createcoverage --output-dir=parts/test/coverage
 
 after_success:
-  - bin/pip install coverage
-  - bin/python -m coverage.pickle2json
-  - bin/pip install -q coveralls
+  - pip install coverage
+  - python -m coverage.pickle2json
+  - pip install -q coveralls
   - coveralls
