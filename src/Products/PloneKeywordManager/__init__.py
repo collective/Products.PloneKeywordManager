@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 ###
 ##
 # Plone-Keyword-Manager
@@ -20,10 +21,8 @@
 
 # Zope imports
 from AccessControl.Permission import registerPermissions
-
 # CMF imports
 from Products.CMFCore.utils import ToolInit
-
 # Sibling imports
 from Products.PloneKeywordManager import config
 from Products.PloneKeywordManager import tool

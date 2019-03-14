@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
 from Products.PloneKeywordManager import HAS_DEXTERITY
 from Products.PloneKeywordManager.compat import to_str
+
 
 if HAS_DEXTERITY:
     from plone.dexterity.interfaces import IDexterityContent

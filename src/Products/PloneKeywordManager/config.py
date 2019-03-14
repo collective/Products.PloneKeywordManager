@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 PROJECTNAME = "PloneKeywordManager"
 
 MANAGE_KEYWORDS_PERMISSION = "Manage Keywords"

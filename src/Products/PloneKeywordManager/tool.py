@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright (c) 2005 gocept gmbh & co. kg
 # See also LICENSE.txt
 from AccessControl import ClassSecurityInfo
@@ -11,8 +12,8 @@ from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.utils import UniqueObject
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from Products.PloneKeywordManager import config
-from Products.PloneKeywordManager.interfaces import IPloneKeywordManager
 from Products.PloneKeywordManager.compat import to_str
+from Products.PloneKeywordManager.interfaces import IPloneKeywordManager
 from zope import interface
 
 import pkg_resources
