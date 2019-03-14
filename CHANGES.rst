@@ -4,6 +4,9 @@ Changelog
 3.0.0 (unreleased)
 ------------------
 
+- Fix problem with non-visible changes due to a side effect with collective.indexing beeing merged in core.
+  [jensens]
+
 - Python 3, Plone 5.2 compatibility.
   Drop support for Plone < 5.1.
   [vangheem, jensens]
