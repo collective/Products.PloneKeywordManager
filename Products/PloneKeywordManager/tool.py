@@ -30,11 +30,11 @@ except ImportError:
 
 # multiligual detection
 try:
-    pkg_resources.get_distribution('plone.app.multilingual')
+    pkg_resources.get_distribution("plone.app.multilingual")
     MULTILINGUAL = True
 except pkg_resources.DistributionNotFound:
     try:
-        pkg_resources.get_distribution('Products.LinguaPlone')
+        pkg_resources.get_distribution("Products.LinguaPlone")
         MULTILINGUAL = True
     except pkg_resources.DistributionNotFound:
         MULTILINGUAL = False
@@ -63,24 +63,20 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
     meta_type = "Plone Keyword Manager Tool"
     security = ClassSecurityInfo()
 
-    manage_options = ({'label': 'Overview', 'action': 'manage_overview'},)
+    manage_options = ({"label": "Overview", "action": "manage_overview"},)
 
-    security.declareProtected(
-        CMFCorePermissions.ManagePortal, 'manage_overview'
-    )
+    security.declareProtected(CMFCorePermissions.ManagePortal, "manage_overview")
     manage_overview = PageTemplateFile(
-        'www/explainTool', globals(), __name__='manage_overview'
+        "www/explainTool", globals(), __name__="manage_overview"
     )
 
-    security.declarePublic('change')
+    security.declarePublic("change")
 
     def _getFullIndexList(self, indexName):
         idxs = set([indexName]).union(config.ALWAYS_REINDEX)
         return list(idxs)
 
-    def change(
-        self, old_keywords, new_keyword, context=None, indexName='Subject'
-    ):
+    def change(self, old_keywords, new_keyword, context=None, indexName="Subject"):
         """Updates all objects using the old_keywords.
 
         Objects using the old_keywords will be using the new_keywords
@@ -92,18 +88,17 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         # #MOD Dynamic field getting
         query = {indexName: old_keywords}
         if context is not None:
-            query['path'] = '/'.join(context.getPhysicalPath())
+            query["path"] = "/".join(context.getPhysicalPath())
 
-        if MULTILINGUAL and indexName != 'Language':
-            query['Language'] = 'all'
+        if MULTILINGUAL and indexName != "Language":
+            query["Language"] = "all"
 
         new_keyword = to_str(new_keyword)
         try:
             querySet = self._query(**query)
         except UnicodeDecodeError:
             old_keywords = [
-                k.decode('utf8') if isinstance(k, str) else k
-                for k in old_keywords
+                k.decode("utf8") if isinstance(k, str) else k for k in old_keywords
             ]
             query[indexName] = old_keywords
             querySet = self._query(**query)
@@ -138,9 +133,9 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
 
         return len(querySet)
 
-    security.declarePublic('delete')
+    security.declarePublic("delete")
 
-    def delete(self, keywords, context=None, indexName='Subject'):
+    def delete(self, keywords, context=None, indexName="Subject"):
         """Removes the keywords from all objects using it.
 
         Returns the number of objects that have been updated.
@@ -149,9 +144,9 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         # #Mod Dynamic field
         query = {indexName: keywords}
         if context is not None:
-            query['path'] = '/'.join(context.getPhysicalPath())
+            query["path"] = "/".join(context.getPhysicalPath())
         if MULTILINGUAL:
-            query['Language'] = 'all'
+            query["Language"] = "all"
         querySet = self._query(**query)
 
         for item in querySet:
@@ -177,19 +172,19 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
 
         return len(querySet)
 
-    security.declarePublic('getKeywords')
+    security.declarePublic("getKeywords")
 
-    def getKeywords(self, context=None, indexName='Subject'):
+    def getKeywords(self, context=None, indexName="Subject"):
         self._checkPermission(context)
         if indexName not in self.getKeywordIndexes():
             raise ValueError("%s is not a valid field" % indexName)
 
-        catalog = getToolByName(self, 'portal_catalog')
+        catalog = getToolByName(self, "portal_catalog")
         keywords = list(catalog.uniqueValuesFor(indexName))
         keywords.sort(key=lambda x: x.lower())
         return keywords
 
-    security.declarePublic('getScoredMatches')
+    security.declarePublic("getScoredMatches")
 
     def getScoredMatches(self, word, possibilities, num, score, context=None):
         """ Take a word,
@@ -206,9 +201,9 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
 
         # Search for all similar terms in possibilities
         if isinstance(word, str):
-            oword = unicode(word, 'utf-8')
+            oword = unicode(word, "utf-8")
         else:
-            oword = word.encode('utf-8')
+            oword = word.encode("utf-8")
 
         for item in possibilities:
             if isinstance(item, type(word)):
@@ -216,9 +211,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
             elif isinstance(item, type(oword)):
                 lscore = Levenshtein.ratio(oword, item)
             else:
-                raise ValueError(
-                    "%s is not a normal, or unicode string" % item
-                )
+                raise ValueError("%s is not a normal, or unicode string" % item)
             if lscore > score:
                 res.append((item, lscore))
 
@@ -229,7 +222,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         return [item[0] for item in res[:num]]
 
     def _query(self, **kwargs):
-        catalog = getToolByName(self, 'portal_catalog')
+        catalog = getToolByName(self, "portal_catalog")
         return catalog(**kwargs)
 
     def _checkPermission(self, context):
@@ -241,8 +234,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
             config.MANAGE_KEYWORDS_PERMISSION, context
         ):
             raise Unauthorized(
-                "You don't have the necessary permissions to "
-                "access %r." % context
+                "You don't have the necessary permissions to " "access %r." % context
             )
 
     def getKeywordIndexes(self):
@@ -250,35 +242,32 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         meta type and filters out a subset of known indexes that should not be
         managed.
         """
-        catalog = getToolByName(self, 'portal_catalog')
+        catalog = getToolByName(self, "portal_catalog")
         idxs = catalog.index_objects()
         idxs = [
             i.id
             for i in idxs
-            if i.meta_type == config.META_TYPE
-            and i.id not in config.IGNORE_INDEXES
+            if i.meta_type == config.META_TYPE and i.id not in config.IGNORE_INDEXES
         ]
         idxs.sort()
         return idxs
 
-    security.declarePrivate('fieldNameForIndex')
+    security.declarePrivate("fieldNameForIndex")
 
     def fieldNameForIndex(self, indexName):
         """The name of the index may not be the same as the field on the object, and we need
            the actual field name in order to find its mutator.
         """
-        catalog = getToolByName(self, 'portal_catalog')
-        indexObjs = [
-            idx for idx in catalog.index_objects() if idx.getId() == indexName
-        ]
+        catalog = getToolByName(self, "portal_catalog")
+        indexObjs = [idx for idx in catalog.index_objects() if idx.getId() == indexName]
         try:
             fieldName = indexObjs[0].indexed_attrs[0]
         except IndexError:
-            raise ValueError('Found no index named %s' % indexName)
+            raise ValueError("Found no index named %s" % indexName)
 
         return fieldName
 
-    security.declarePrivate('getSetter')
+    security.declarePrivate("getSetter")
 
     def getSetter(self, obj, indexName):
         """Gets the setter function for the field based on the index name.
@@ -289,28 +278,28 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         field = None
         if IComment.providedBy(obj):
             # Discussion
-            field = getattr(obj, 'getField', None)
+            field = getattr(obj, "getField", None)
         else:
             # Archetype
-            field = getattr(aq_base(obj), 'getField', None)
+            field = getattr(aq_base(obj), "getField", None)
         # Archetypes:
         if field:
             fieldObj = field(fieldName) or field(fieldName.lower())
-            if not fieldObj and fieldName.startswith('get'):
-                fieldName = fieldName.lstrip('get_')
+            if not fieldObj and fieldName.startswith("get"):
+                fieldName = fieldName.lstrip("get_")
                 fieldName = fieldName[0].lower() + fieldName[1:]
                 fieldObj = obj.getField(fieldName)
             if fieldObj is not None:
                 return fieldObj.getMutator(obj)
             return None
         # DefaultDublinCoreImpl:
-        setterName = 'set' + indexName
+        setterName = "set" + indexName
         if getattr(aq_base(obj), setterName, None) is not None:
             return getattr(obj, setterName)
         # Dexterity
         if IDexterityContent.providedBy(obj):
-            if fieldName.startswith('get'):
-                fieldName = fieldName.lstrip('get_')
+            if fieldName.startswith("get"):
+                fieldName = fieldName.lstrip("get_")
                 fieldName = fieldName[0].lower() + fieldName[1:]
             return lambda value: setattr(obj, fieldName, value)
 
@@ -319,8 +308,8 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
     def getFieldValue(self, obj, indexName):
         fieldName = self.fieldNameForIndex(indexName)
         fieldVal = getattr(obj, fieldName, ())
-        if not fieldVal and fieldName.startswith('get'):
-            fieldName = fieldName.lstrip('get_')
+        if not fieldVal and fieldName.startswith("get"):
+            fieldName = fieldName.lstrip("get_")
             fieldName = fieldName[0].lower() + fieldName[1:]
             fieldVal = getattr(obj, fieldName, ())
 

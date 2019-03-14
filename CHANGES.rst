@@ -1,11 +1,12 @@
 Changelog
 =========
 
-2.2.2 (unreleased)
+3.0.0 (unreleased)
 ------------------
 
 - Python 3, Plone 5.2 compatibility
-  [vangheem]
+  Drop support for Plone < 5.1
+  [vangheem, jensens]
 
 
 2.2.1 (2018-07-09)

@@ -10,16 +10,14 @@ from zope.component import getMultiAdapter
 
 class InstallTestCase(BaseIntegrationTestCase):
     def test_installed(self):
-        qi = getattr(self.portal, 'portal_quickinstaller')
+        qi = getattr(self.portal, "portal_quickinstaller")
         self.assertTrue(qi.isProductInstalled(PROJECTNAME))
 
     def test_prefs_keywords_view(self):
         """
         test if the view is registered
         """
-        view = getMultiAdapter(
-            (self.portal, self.request), name="prefs_keywords_view"
-        )
+        view = getMultiAdapter((self.portal, self.request), name="prefs_keywords_view")
         self.assertTrue(view())
 
     def test_prefs_keywords_view_protected(self):
@@ -30,18 +28,16 @@ class InstallTestCase(BaseIntegrationTestCase):
 
         logout()
         self.assertRaises(
-            Unauthorized,
-            self.portal.restrictedTraverse,
-            '@@prefs_keywords_view',
+            Unauthorized, self.portal.restrictedTraverse, "@@prefs_keywords_view"
         )
 
 
 class UninstallTestCase(BaseIntegrationTestCase):
     def setUp(self):
-        self.portal = self.layer['portal']
-        self.request = self.layer['request']
-        setRoles(self.portal, TEST_USER_ID, ['Manager'])
-        self.qi = getattr(self.portal, 'portal_quickinstaller')
+        self.portal = self.layer["portal"]
+        self.request = self.layer["request"]
+        setRoles(self.portal, TEST_USER_ID, ["Manager"])
+        self.qi = getattr(self.portal, "portal_quickinstaller")
         self.qi.uninstallProducts(products=[PROJECTNAME])
 
     def test_uninstalled(self):

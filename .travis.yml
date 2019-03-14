@@ -1,29 +1,46 @@
 language: python
-python: 2.7
 sudo: false
 cache:
+  pip: true
   directories:
   - eggs
-env:
-- PLONE_VERSION=4.2
-- PLONE_VERSION=4.3
-- PLONE_VERSION=5.0
+  - downloads
+python:
+  - "2.7"
 matrix:
-  fast_finish: true
+  include:
+    - python: "2.7"
+      env: PLONE_VERSION=51
+    - python: "2.7"
+      env: PLONE_VERSION=52
+    - python: "3.7"
+      env: PLONE_VERSION=52
+      dist: xenial
+fast_finish: true
+before_install:
+  - virtualenv -p `which python` .
+  - mkdir -p $HOME/buildout-cache/{eggs,downloads}
+  - mkdir $HOME/.buildout
+  - echo "[buildout]" > $HOME/.buildout/default.cfg
+  - echo "download-cache = $HOME/buildout-cache/downloads" >> $HOME/.buildout/default.cfg
+  - echo "eggs-directory = $HOME/buildout-cache/eggs" >> $HOME/.buildout/default.cfg
+  - bin/pip install -r requirements.txt -c constraints_plone$PLONE_VERSION.txt
+  - cp test_$PLONE_VERSION.cfg buildout.cfg
+
 install:
-- sed -ie "s#test-4.3.x.cfg#test-$PLONE_VERSION.x.cfg#" buildout.cfg
-- python bootstrap.py
-- bin/buildout annotate
-- bin/buildout
-before_script:
-- export DISPLAY=:99.0
-- sh -e /etc/init.d/xvfb start
-- firefox -v
+  - buildout -N -t 3 code-analysis:return-status-codes=True annotate
+  - buildout -N -t 3 code-analysis:return-status-codes=True
+
 script:
-- bin/code-analysis
-- bin/test
+# Run code-analysis, except on Python 3.6, which mysteriously fails to find zc.buildout.
+  - python --version 2> /dev/stdout | grep 3.6 || bin/code-analysis
+  - bin/test --all
+
+after_script:
+  - bin/createcoverage --output-dir=parts/test/coverage
+
 after_success:
-- bin/createcoverage
-- coveralls
-notifications:
-  irc: irc.freenode.org#plone-testing
+  - bin/pip install coverage
+  - bin/python -m coverage.pickle2json
+  - bin/pip install -q coveralls
+  - coveralls

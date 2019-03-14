@@ -37,7 +37,7 @@ global cmf_keyword_manager_globals
 
 
 try:
-    pkg_resources.get_distribution('plone.dexterity')
+    pkg_resources.get_distribution("plone.dexterity")
 except pkg_resources.DistributionNotFound:
     HAS_DEXTERITY = False
 else:
@@ -46,19 +46,18 @@ else:
 
 cmf_keyword_manager_globals = globals()
 
-keywordmanagerMessageFactory = MessageFactory('Products.PloneKeywordManager')
+keywordmanagerMessageFactory = MessageFactory("Products.PloneKeywordManager")
 logger = logging.getLogger("Products.PloneKeywordManager")
 
 
 registerPermissions(
-    [(config.MANAGE_KEYWORDS_PERMISSION, [])],
-    ('Manager', 'Site Administrator'),
+    [(config.MANAGE_KEYWORDS_PERMISSION, [])], ("Manager", "Site Administrator")
 )
 
 
 def initialize(context):
 
     new_tool = ToolInit(
-        config.TOOL_NAME, tools=(tool.PloneKeywordManager,), icon='tool.gif'
+        config.TOOL_NAME, tools=(tool.PloneKeywordManager,), icon="tool.gif"
     )
     new_tool.initialize(context)

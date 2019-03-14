@@ -4,6 +4,7 @@
 *~
 .installed.cfg
 .mr.developer.cfg
+.python-version
 bin/
 coverage/
 develop-eggs/
