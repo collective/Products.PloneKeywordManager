@@ -5,6 +5,7 @@
 .installed.cfg
 .mr.developer.cfg
 .python-version
+.coveragerc
 bin/
 coverage/
 develop-eggs/
@@ -20,3 +21,4 @@ parts/
 report.html
 selenium*
 var/
+__pycache__
