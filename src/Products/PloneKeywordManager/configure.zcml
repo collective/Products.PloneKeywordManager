@@ -1,41 +1,36 @@
 <configure
-  xmlns="http://namespaces.zope.org/zope"
-  xmlns:cmf="http://namespaces.zope.org/cmf"
-  xmlns:five="http://namespaces.zope.org/five"
-  xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
-  xmlns:i18n="http://namespaces.zope.org/i18n"
-  i18n_domain="Products.PloneKeywordManager">
-
+    i18n_domain="Products.PloneKeywordManager"
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:cmf="http://namespaces.zope.org/cmf"
+    xmlns:five="http://namespaces.zope.org/five"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    xmlns:i18n="http://namespaces.zope.org/i18n">
   <!-- Include configuration for dependencies listed in setup.py -->
   <includeDependencies package="." />
-
   <include package=".browser" />
   <include file="upgrades.zcml" />
   <i18n:registerTranslations directory="locales" />
-
   <genericsetup:registerProfile
-    name="default"
-    title="Plone Keyword Manager"
-    directory="profiles/default"
-    description="Keyword manager"
-    provides="Products.GenericSetup.interfaces.EXTENSION"
-    />
-
+      description="Keyword manager"
+      directory="profiles/default"
+      name="default"
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      title="Plone Keyword Manager"
+  />
   <genericsetup:registerProfile
-    name="uninstall"
-    title="Plone Keyword Manager"
-    directory="profiles/uninstall"
-    description="Keyword manager"
-    provides="Products.GenericSetup.interfaces.EXTENSION"
-    />
-
+      description="Keyword manager"
+      directory="profiles/uninstall"
+      name="uninstall"
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      title="Plone Keyword Manager"
+  />
   <genericsetup:importStep
-    name="keywords"
-    title="Create or update keywords"
-    description="Create all keywords"
-    handler=".setuphandlers.importKeywords">
-  </genericsetup:importStep>
-
-  <!-- Place the exportstep here -->
-
+      description="Create all keywords"
+      handler=".setuphandlers.importKeywords"
+      name="keywords"
+      title="Create or update keywords"></genericsetup:importStep>
+  <utility
+      factory=".setuphandlers.HiddenProfiles"
+      name="PloneKeywordManager-hiddenprofiles"
+  />
 </configure>
