@@ -4,8 +4,8 @@ Changelog
 3.0.0 (unreleased)
 ------------------
 
-- Python 3, Plone 5.2 compatibility
-  Drop support for Plone < 5.1
+- Python 3, Plone 5.2 compatibility.
+  Drop support for Plone < 5.1.
   [vangheem, jensens]
 
 

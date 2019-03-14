@@ -3,7 +3,7 @@ from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
 from Products.CMFCore.utils import getToolByName
 from Products.PloneKeywordManager.browser.interfaces import IPloneKeywordManagerLayer
-from Products.PloneKeywordManager.testing import INTEGRATION_TESTING
+from Products.PloneKeywordManager.testing import PLONEKEYWORDMANAGER_INTEGRATION_TESTING
 from zope import interface
 from zope.component import getMultiAdapter
 
@@ -12,7 +12,7 @@ import unittest
 
 class BaseIntegrationTestCase(unittest.TestCase):
 
-    layer = INTEGRATION_TESTING
+    layer = PLONEKEYWORDMANAGER_INTEGRATION_TESTING
 
     def setUp(self):
         self.portal = self.layer["portal"]

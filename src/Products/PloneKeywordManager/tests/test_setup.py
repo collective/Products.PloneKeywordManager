@@ -1,44 +1,63 @@
 # -*- coding: utf-8 -*-
-
-from plone.app.testing import logout
+"""Setup tests for this package."""
+from plone import api
 from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
-from Products.PloneKeywordManager.config import PROJECTNAME
-from Products.PloneKeywordManager.tests.base import BaseIntegrationTestCase
-from zope.component import getMultiAdapter
+from Products.CMFPlone.utils import get_installer
+from Products.PloneKeywordManager.testing import PLONEKEYWORDMANAGER_INTEGRATION_TESTING
+
+import unittest
 
 
-class InstallTestCase(BaseIntegrationTestCase):
-    def test_installed(self):
-        qi = getattr(self.portal, "portal_quickinstaller")
-        self.assertTrue(qi.isProductInstalled(PROJECTNAME))
+class TestSetup(unittest.TestCase):
+    """Test that Products.PloneKeywordManager is properly installed."""
 
-    def test_prefs_keywords_view(self):
-        """
-        test if the view is registered
-        """
-        view = getMultiAdapter((self.portal, self.request), name="prefs_keywords_view")
-        self.assertTrue(view())
+    layer = PLONEKEYWORDMANAGER_INTEGRATION_TESTING
 
-    def test_prefs_keywords_view_protected(self):
-        """
-        test if the view is protected
-        """
-        from AccessControl import Unauthorized
+    def setUp(self):
+        """Custom shared utility setup for tests."""
+        self.portal = self.layer["portal"]
+        self.installer = get_installer(self.portal, self.layer["request"])
 
-        logout()
-        self.assertRaises(
-            Unauthorized, self.portal.restrictedTraverse, "@@prefs_keywords_view"
+    def test_product_installed(self):
+        """Test if Products.PloneKeywordManager is installed."""
+        self.assertTrue(
+            self.installer.is_product_installed("Products.PloneKeywordManager")
         )
 
+    def test_browserlayer(self):
+        """Test that IPloneKeywordManagerLayer is registered."""
+        from Products.PloneKeywordManager.browser.interfaces import (
+            IPloneKeywordManagerLayer,
+        )
+        from plone.browserlayer import utils
 
-class UninstallTestCase(BaseIntegrationTestCase):
+        self.assertIn(IPloneKeywordManagerLayer, utils.registered_layers())
+
+
+class TestUninstall(unittest.TestCase):
+
+    layer = PLONEKEYWORDMANAGER_INTEGRATION_TESTING
+
     def setUp(self):
         self.portal = self.layer["portal"]
-        self.request = self.layer["request"]
+        self.installer = get_installer(self.portal, self.layer["request"])
+        roles_before = api.user.get_roles(TEST_USER_ID)
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
-        self.qi = getattr(self.portal, "portal_quickinstaller")
-        self.qi.uninstallProducts(products=[PROJECTNAME])
+        self.installer.uninstall_product("Products.PloneKeywordManager")
+        setRoles(self.portal, TEST_USER_ID, roles_before)
 
-    def test_uninstalled(self):
-        self.assertFalse(self.qi.isProductInstalled(PROJECTNAME))
+    def test_product_uninstalled(self):
+        """Test if Products.PloneKeywordManager is cleanly uninstalled."""
+        self.assertFalse(
+            self.installer.is_product_installed("Products.PloneKeywordManager")
+        )
+
+    def test_browserlayer_removed(self):
+        """Test that IPloneKeywordManagerLayer is removed."""
+        from Products.PloneKeywordManager.browser.interfaces import (
+            IPloneKeywordManagerLayer,
+        )
+        from plone.browserlayer import utils
+
+        self.assertNotIn(IPloneKeywordManagerLayer, utils.registered_layers())

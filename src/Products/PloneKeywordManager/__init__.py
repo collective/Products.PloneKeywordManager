@@ -18,29 +18,15 @@
 # http://trific.ath.cx/resources/python/levenshtein/
 ##
 ###
-
-# Zope imports
 from AccessControl.Permission import registerPermissions
-# CMF imports
 from Products.CMFCore.utils import ToolInit
-# Sibling imports
 from Products.PloneKeywordManager import config
 from Products.PloneKeywordManager import tool
 from zope.i18nmessageid import MessageFactory
 
 import logging
-import pkg_resources
-
 
 global cmf_keyword_manager_globals
-
-
-try:
-    pkg_resources.get_distribution("plone.dexterity")
-except pkg_resources.DistributionNotFound:
-    HAS_DEXTERITY = False
-else:
-    HAS_DEXTERITY = True
 
 
 cmf_keyword_manager_globals = globals()

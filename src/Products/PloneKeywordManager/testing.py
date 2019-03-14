@@ -1,54 +1,41 @@
 # -*- coding: utf-8 -*-
-from plone import api
+from plone.app.contenttypes.testing import PLONE_APP_CONTENTTYPES_FIXTURE
+from plone.app.testing import applyProfile
 from plone.app.testing import FunctionalTesting
 from plone.app.testing import IntegrationTesting
-from plone.app.testing import PLONE_FIXTURE
 from plone.app.testing import PloneSandboxLayer
-from plone.testing import z2
 
 
-PLONE_5 = api.env.plone_version() >= "5"
+class PloneKeywordManagerLayer(PloneSandboxLayer):
 
-
-class Fixture(PloneSandboxLayer):
-
-    defaultBases = (PLONE_FIXTURE,)
+    defaultBases = (PLONE_APP_CONTENTTYPES_FIXTURE,)
 
     def setUpZope(self, app, configurationContext):
-        # Load ZCML
+        # Load any other ZCML that is required for your tests.
+        # The z3c.autoinclude feature is disabled in the Plone fixture base
+        # layer.
+        import plone.restapi
+
+        self.loadZCML(package=plone.restapi)
+
         import Products.PloneKeywordManager
-        import plone.app.dexterity
 
-        self.loadZCML(package=plone.app.dexterity)
-        try:
-            import Products.ATContentTypes
-
-            self.loadZCML(package=Products.ATContentTypes)
-        except ImportError:
-            pass
         self.loadZCML(package=Products.PloneKeywordManager)
 
-        # Install product and call its initialize() function
-        z2.installProduct(app, "Products.PloneKeywordManager")
-
     def setUpPloneSite(self, portal):
-        # Install into Plone site using portal_setup
-        self.applyProfile(portal, "Products.PloneKeywordManager:default")
-        self.applyProfile(portal, "plone.app.dexterity:default")
-
-        if PLONE_5:
-            try:
-                import Products.ATContentTypes  # noqa
-
-                self.applyProfile(portal, "Products.ATContentTypes:default")
-            except ImportError:
-                pass
+        applyProfile(portal, "Products.PloneKeywordManager:default")
 
 
-FIXTURE = Fixture()
-INTEGRATION_TESTING = IntegrationTesting(
-    bases=(FIXTURE,), name="Products.PloneKeywordManager:Integration"
+PLONEKEYWORDMANAGER_FIXTURE = PloneKeywordManagerLayer()
+
+
+PLONEKEYWORDMANAGER_INTEGRATION_TESTING = IntegrationTesting(
+    bases=(PLONEKEYWORDMANAGER_FIXTURE,),
+    name="PloneKeywordManagerLayer:IntegrationTesting",
 )
-FUNCTIONAL_TESTING = FunctionalTesting(
-    bases=(FIXTURE,), name="Products.PloneKeywordManager:Functional"
+
+
+PLONEKEYWORDMANAGER_FUNCTIONAL_TESTING = FunctionalTesting(
+    bases=(PLONEKEYWORDMANAGER_FIXTURE,),
+    name="PloneKeywordManagerLayer:FunctionalTesting",
 )

@@ -2,12 +2,14 @@
 # Copyright (c) 2005 gocept gmbh & co. kg
 # See also LICENSE.txt
 from AccessControl import ClassSecurityInfo
-from AccessControl import getSecurityManager
-from AccessControl import Unauthorized
 from Acquisition import aq_base
+from App.class_init import InitializeClass
 from OFS.SimpleItem import SimpleItem
+from plone import api
 from plone.app.discussion.interfaces import IComment
+from plone.dexterity.interfaces import IDexterityContent
 from Products.CMFCore import permissions as CMFCorePermissions
+from Products.CMFCore.indexing import processQueue
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.utils import UniqueObject
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
@@ -15,9 +17,6 @@ from Products.PloneKeywordManager import config
 from Products.PloneKeywordManager.compat import to_str
 from Products.PloneKeywordManager.interfaces import IPloneKeywordManager
 from zope import interface
-
-import pkg_resources
-
 
 # Python imports
 try:
@@ -28,30 +27,6 @@ except ImportError:
     import difflib
 
     USE_LEVENSHTEIN = False
-
-# multiligual detection
-try:
-    pkg_resources.get_distribution("plone.app.multilingual")
-    MULTILINGUAL = True
-except pkg_resources.DistributionNotFound:
-    try:
-        pkg_resources.get_distribution("Products.LinguaPlone")
-        MULTILINGUAL = True
-    except pkg_resources.DistributionNotFound:
-        MULTILINGUAL = False
-
-# Zope imports
-try:
-    from App.class_init import InitializeClass
-except ImportError:  # < Zope 2.13
-    from Globals import InitializeClass
-
-try:
-    from plone.dexterity.interfaces import IDexterityContent
-except ImportError:
-
-    class IDexterityContent(interface.Interface):
-        pass
 
 
 @interface.implementer(IPloneKeywordManager)
@@ -71,12 +46,11 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         "www/explainTool", globals(), __name__="manage_overview"
     )
 
-    security.declarePublic("change")
-
     def _getFullIndexList(self, indexName):
         idxs = set([indexName]).union(config.ALWAYS_REINDEX)
         return list(idxs)
 
+    @security.protected(config.MANAGE_KEYWORDS_PERMISSION)
     def change(self, old_keywords, new_keyword, context=None, indexName="Subject"):
         """Updates all objects using the old_keywords.
 
@@ -85,30 +59,26 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
 
         Returns the number of objects that have been updated.
         """
-        self._checkPermission(context)
         # #MOD Dynamic field getting
         query = {indexName: old_keywords}
         if context is not None:
             query["path"] = "/".join(context.getPhysicalPath())
 
-        if MULTILINGUAL and indexName != "Language":
-            query["Language"] = "all"
-
         new_keyword = to_str(new_keyword)
         try:
-            querySet = self._query(**query)
+            querySet = api.content.find(**query)
         except UnicodeDecodeError:
             old_keywords = [
                 k.decode("utf8") if isinstance(k, str) else k for k in old_keywords
             ]
             query[indexName] = old_keywords
-            querySet = self._query(**query)
+            querySet = api.content.find(**query)
         for item in querySet:
             obj = item.getObject()
             # #MOD Dynamic field getting
 
             value = self.getFieldValue(obj, indexName)
-            if type(value) in (list, tuple):
+            if isinstance(value, (list, tuple)):
                 # MULTIVALUED FIELD
                 value = list(value)
                 for element in old_keywords:
@@ -117,7 +87,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
 
                 # dedupe new Keyword list (an issue when combining multiple keywords)
                 value = list(set(value))
-            elif type(value) is set:
+            elif isinstance(value, set):
                 value = value - set(old_keywords)
                 value.add(new_keyword)
             else:
@@ -134,26 +104,22 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
 
         return len(querySet)
 
-    security.declarePublic("delete")
-
+    @security.protected(config.MANAGE_KEYWORDS_PERMISSION)
     def delete(self, keywords, context=None, indexName="Subject"):
         """Removes the keywords from all objects using it.
 
         Returns the number of objects that have been updated.
         """
-        self._checkPermission(context)
         # #Mod Dynamic field
         query = {indexName: keywords}
         if context is not None:
             query["path"] = "/".join(context.getPhysicalPath())
-        if MULTILINGUAL:
-            query["Language"] = "all"
-        querySet = self._query(**query)
+        querySet = api.content.find(**query)
 
         for item in querySet:
             obj = item.getObject()
             value = self.getFieldValue(obj, indexName)
-            if type(value) in (list, tuple):
+            if isinstance(value, (list, tuple)):
                 # MULTIVALUED
                 value = list(value)
                 for element in keywords:
@@ -173,26 +139,22 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
 
         return len(querySet)
 
-    security.declarePublic("getKeywords")
-
+    @security.protected(config.MANAGE_KEYWORDS_PERMISSION)
     def getKeywords(self, context=None, indexName="Subject"):
-        self._checkPermission(context)
+        processQueue()
         if indexName not in self.getKeywordIndexes():
             raise ValueError("%s is not a valid field" % indexName)
 
         catalog = getToolByName(self, "portal_catalog")
-        keywords = list(catalog.uniqueValuesFor(indexName))
-        keywords.sort(key=lambda x: x.lower())
-        return keywords
+        keywords = catalog.uniqueValuesFor(indexName)
+        return list(sorted(keywords, key=lambda x: x.lower()))
 
-    security.declarePublic("getScoredMatches")
-
+    @security.protected(config.MANAGE_KEYWORDS_PERMISSION)
     def getScoredMatches(self, word, possibilities, num, score, context=None):
         """ Take a word,
             compare it to a list of possibilities,
             return max. num matches > score).
         """
-        self._checkPermission(context)
         if not USE_LEVENSHTEIN:
             # No levenshtein module around. Fall back to difflib
             return difflib.get_close_matches(word, possibilities, num, score)
@@ -222,22 +184,6 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         # Return first n terms without scores
         return [item[0] for item in res[:num]]
 
-    def _query(self, **kwargs):
-        catalog = getToolByName(self, "portal_catalog")
-        return catalog(**kwargs)
-
-    def _checkPermission(self, context):
-        if context is not None:
-            context = context
-        else:
-            context = self
-        if not getSecurityManager().checkPermission(
-            config.MANAGE_KEYWORDS_PERMISSION, context
-        ):
-            raise Unauthorized(
-                "You don't have the necessary permissions to " "access %r." % context
-            )
-
     def getKeywordIndexes(self):
         """Gets a list of indexes from the catalog. Uses config.py to choose the
         meta type and filters out a subset of known indexes that should not be
@@ -253,8 +199,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         idxs.sort()
         return idxs
 
-    security.declarePrivate("fieldNameForIndex")
-
+    @security.private
     def fieldNameForIndex(self, indexName):
         """The name of the index may not be the same as the field on the object, and we need
            the actual field name in order to find its mutator.
@@ -268,15 +213,31 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
 
         return fieldName
 
-    security.declarePrivate("getSetter")
-
+    @security.private
     def getSetter(self, obj, indexName):
         """Gets the setter function for the field based on the index name.
 
         Returns None if it can't get the function
         """
+
+        # DefaultDublinCoreImpl:
+        setterName = "set" + indexName
+        if getattr(aq_base(obj), setterName, None) is not None:
+            return getattr(obj, setterName)
+
+        # other
         fieldName = self.fieldNameForIndex(indexName)
         field = None
+
+        # Dexterity
+        if IDexterityContent.providedBy(obj):
+            if fieldName.startswith("get"):
+                fieldName = fieldName.lstrip("get_")
+            # heuristics
+            fieldName = fieldName[0].lower() + fieldName[1:]
+            return lambda value: setattr(aq_base(obj), fieldName, value)
+
+        # AT and discussions left
         if IComment.providedBy(obj):
             # Discussion
             field = getattr(obj, "getField", None)
@@ -293,16 +254,6 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
             if fieldObj is not None:
                 return fieldObj.getMutator(obj)
             return None
-        # DefaultDublinCoreImpl:
-        setterName = "set" + indexName
-        if getattr(aq_base(obj), setterName, None) is not None:
-            return getattr(obj, setterName)
-        # Dexterity
-        if IDexterityContent.providedBy(obj):
-            if fieldName.startswith("get"):
-                fieldName = fieldName.lstrip("get_")
-                fieldName = fieldName[0].lower() + fieldName[1:]
-            return lambda value: setattr(obj, fieldName, value)
 
         return None
 
