@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.0.0 (unreleased)
+3.0.0 (2019-03-14)
 ------------------
 
 - Fix problem with non-visible changes due to a side effect with collective.indexing beeing merged in core.
