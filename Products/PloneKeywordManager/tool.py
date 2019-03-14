@@ -1,15 +1,31 @@
 # Copyright (c) 2005 gocept gmbh & co. kg
 # See also LICENSE.txt
-# $Id: tool.py 47645 2007-08-20 14:59:10Z glenfant $
+from AccessControl import ClassSecurityInfo
+from AccessControl import getSecurityManager
+from AccessControl import Unauthorized
+from Acquisition import aq_base
+from OFS.SimpleItem import SimpleItem
+from plone.app.discussion.interfaces import IComment
+from Products.CMFCore import permissions as CMFCorePermissions
+from Products.CMFCore.utils import getToolByName
+from Products.CMFCore.utils import UniqueObject
+from Products.PageTemplates.PageTemplateFile import PageTemplateFile
+from Products.PloneKeywordManager import config
+from Products.PloneKeywordManager.interfaces import IPloneKeywordManager
+from Products.PloneKeywordManager.compat import to_str
+from zope import interface
 
 import pkg_resources
+
 
 # Python imports
 try:
     import Levenshtein
+
     USE_LEVENSHTEIN = True
 except ImportError:
     import difflib
+
     USE_LEVENSHTEIN = False
 
 # multiligual detection
@@ -29,28 +45,10 @@ try:
 except ImportError:  # < Zope 2.13
     from Globals import InitializeClass
 
-from Acquisition import aq_base
-from OFS.SimpleItem import SimpleItem
-from AccessControl import ClassSecurityInfo
-from AccessControl import getSecurityManager
-from AccessControl import Unauthorized
-from plone.app.discussion.interfaces import IComment
-from Products.PageTemplates.PageTemplateFile import PageTemplateFile
-from zope import interface
-
-# CMF imports
-from Products.CMFCore.utils import getToolByName
-from Products.CMFCore.utils import UniqueObject
-from Products.CMFCore import permissions as CMFCorePermissions
-
-# Sibling imports
-from Products.PloneKeywordManager.interfaces import IPloneKeywordManager
-from Products.PloneKeywordManager import config
-from Products.PloneKeywordManager.compat import to_str
-
 try:
     from plone.dexterity.interfaces import IDexterityContent
 except ImportError:
+
     class IDexterityContent(interface.Interface):
         pass
 
@@ -67,9 +65,12 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
 
     manage_options = ({'label': 'Overview', 'action': 'manage_overview'},)
 
-    security.declareProtected(CMFCorePermissions.ManagePortal, 'manage_overview')
+    security.declareProtected(
+        CMFCorePermissions.ManagePortal, 'manage_overview'
+    )
     manage_overview = PageTemplateFile(
-        'www/explainTool', globals(), __name__='manage_overview')
+        'www/explainTool', globals(), __name__='manage_overview'
+    )
 
     security.declarePublic('change')
 
@@ -77,7 +78,9 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         idxs = set([indexName]).union(config.ALWAYS_REINDEX)
         return list(idxs)
 
-    def change(self, old_keywords, new_keyword, context=None, indexName='Subject'):
+    def change(
+        self, old_keywords, new_keyword, context=None, indexName='Subject'
+    ):
         """Updates all objects using the old_keywords.
 
         Objects using the old_keywords will be using the new_keywords
@@ -98,7 +101,10 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         try:
             querySet = self._query(**query)
         except UnicodeDecodeError:
-            old_keywords = [k.decode('utf8') if isinstance(k, str) else k for k in old_keywords]
+            old_keywords = [
+                k.decode('utf8') if isinstance(k, str) else k
+                for k in old_keywords
+            ]
             query[indexName] = old_keywords
             querySet = self._query(**query)
         for item in querySet:
@@ -107,7 +113,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
 
             value = self.getFieldValue(obj, indexName)
             if type(value) in (list, tuple):
-                #MULTIVALUED FIELD
+                # MULTIVALUED FIELD
                 value = list(value)
                 for element in old_keywords:
                     while (element in value) and (element != new_keyword):
@@ -119,7 +125,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
                 value = value - set(old_keywords)
                 value.add(new_keyword)
             else:
-                #MONOVALUED FIELD
+                # MONOVALUED FIELD
                 value = new_keyword
 
                 # #MOD Dynamic field update
@@ -133,6 +139,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         return len(querySet)
 
     security.declarePublic('delete')
+
     def delete(self, keywords, context=None, indexName='Subject'):
         """Removes the keywords from all objects using it.
 
@@ -171,6 +178,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         return len(querySet)
 
     security.declarePublic('getKeywords')
+
     def getKeywords(self, context=None, indexName='Subject'):
         self._checkPermission(context)
         if indexName not in self.getKeywordIndexes():
@@ -178,10 +186,11 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
 
         catalog = getToolByName(self, 'portal_catalog')
         keywords = list(catalog.uniqueValuesFor(indexName))
-        keywords.sort(key=lambda x:x.lower())
+        keywords.sort(key=lambda x: x.lower())
         return keywords
 
     security.declarePublic('getScoredMatches')
+
     def getScoredMatches(self, word, possibilities, num, score, context=None):
         """ Take a word,
             compare it to a list of possibilities,
@@ -207,7 +216,9 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
             elif isinstance(item, type(oword)):
                 lscore = Levenshtein.ratio(oword, item)
             else:
-                raise ValueError("%s is not a normal, or unicode string" % item)
+                raise ValueError(
+                    "%s is not a normal, or unicode string" % item
+                )
             if lscore > score:
                 res.append((item, lscore))
 
@@ -227,9 +238,12 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         else:
             context = self
         if not getSecurityManager().checkPermission(
-                config.MANAGE_KEYWORDS_PERMISSION, context):
-            raise Unauthorized("You don't have the necessary permissions to "
-                               "access %r." % context)
+            config.MANAGE_KEYWORDS_PERMISSION, context
+        ):
+            raise Unauthorized(
+                "You don't have the necessary permissions to "
+                "access %r." % context
+            )
 
     def getKeywordIndexes(self):
         """Gets a list of indexes from the catalog. Uses config.py to choose the
@@ -238,18 +252,25 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         """
         catalog = getToolByName(self, 'portal_catalog')
         idxs = catalog.index_objects()
-        idxs = [i.id for i in idxs if i.meta_type == config.META_TYPE and
-                i.id not in config.IGNORE_INDEXES]
+        idxs = [
+            i.id
+            for i in idxs
+            if i.meta_type == config.META_TYPE
+            and i.id not in config.IGNORE_INDEXES
+        ]
         idxs.sort()
         return idxs
 
     security.declarePrivate('fieldNameForIndex')
+
     def fieldNameForIndex(self, indexName):
         """The name of the index may not be the same as the field on the object, and we need
            the actual field name in order to find its mutator.
         """
         catalog = getToolByName(self, 'portal_catalog')
-        indexObjs = [idx for idx in catalog.index_objects() if idx.getId() == indexName]
+        indexObjs = [
+            idx for idx in catalog.index_objects() if idx.getId() == indexName
+        ]
         try:
             fieldName = indexObjs[0].indexed_attrs[0]
         except IndexError:
@@ -258,6 +279,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         return fieldName
 
     security.declarePrivate('getSetter')
+
     def getSetter(self, obj, indexName):
         """Gets the setter function for the field based on the index name.
 
@@ -266,10 +288,10 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         fieldName = self.fieldNameForIndex(indexName)
         field = None
         if IComment.providedBy(obj):
-            #Discussion
+            # Discussion
             field = getattr(obj, 'getField', None)
         else:
-            #Archetype
+            # Archetype
             field = getattr(aq_base(obj), 'getField', None)
         # Archetypes:
         if field:
@@ -306,5 +328,6 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
             return fieldVal()
         else:
             return fieldVal
+
 
 InitializeClass(PloneKeywordManager)

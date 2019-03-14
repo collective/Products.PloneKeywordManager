@@ -1,10 +1,10 @@
 from Products.PloneKeywordManager import HAS_DEXTERITY
 from Products.PloneKeywordManager.compat import to_str
 
-
 if HAS_DEXTERITY:
     from plone.dexterity.interfaces import IDexterityContent
 else:
+
     class IDexterityContent(object):
         pass
 
@@ -29,7 +29,9 @@ def importKeywords(context):
         doc = getattr(site, id)
 
     doc.setSubject(keywordlist)
-    if hasattr(IDexterityContent, 'providedBy') and IDexterityContent.providedBy(doc):
+    if hasattr(
+        IDexterityContent, 'providedBy'
+    ) and IDexterityContent.providedBy(doc):
         doc.exclude_from_nav = True
     else:
         doc.setExcludeFromNav(True)

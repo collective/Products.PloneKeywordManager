@@ -23,7 +23,9 @@ class PrefsKeywordsView(BrowserView):
 
     def __call__(self):
         self.is_plone_5 = PLONE_5
-        if not self.request.form.get('form.button.Merge', '') and not self.request.form.get('form.button.Delete', ''):
+        if not self.request.form.get(
+            'form.button.Merge', ''
+        ) and not self.request.form.get('form.button.Delete', ''):
             return self.template({})
         pkm = getToolByName(self.context, 'portal_keyword_manager')
 
@@ -54,12 +56,18 @@ class PrefsKeywordsView(BrowserView):
         """
         """
         pkm = getToolByName(self.context, 'portal_keyword_manager')
-        changed_objects = pkm.change(keywords, changeto, context=self.context, indexName=field)
-
-        msg = _('msg_changed_keywords', default=u"Changed ${from} to ${to} for ${num} object(s).",
-                mapping={'from': ','.join(to_str(keywords)),
-                         'to': to_str(changeto),
-                         'num': changed_objects})
+        changed_objects = pkm.change(
+            keywords, changeto, context=self.context, indexName=field
+        )
+        msg = _(
+            'msg_changed_keywords',
+            default=u"Changed ${from} to ${to} for ${num} object(s).",
+            mapping={
+                'from': ','.join(to_str(keywords)),
+                'to': to_str(changeto),
+                'num': changed_objects,
+            },
+        )
         if changed_objects:
             msg_type = 'info'
         else:
@@ -69,11 +77,17 @@ class PrefsKeywordsView(BrowserView):
 
     def deleteKeywords(self, keywords, field):
         pkm = getToolByName(self.context, "portal_keyword_manager")
-        deleted_objects = pkm.delete(keywords, context=self.context, indexName=field)
-
-        msg = _('msg_deleted_keywords', default=u"Deleted ${keywords} for ${num} object(s).",
-                mapping={'keywords': ','.join(to_str(keywords)),
-                         'num': deleted_objects})
+        deleted_objects = pkm.delete(
+            keywords, context=self.context, indexName=field
+        )
+        msg = _(
+            'msg_deleted_keywords',
+            default=u"Deleted ${keywords} for ${num} object(s).",
+            mapping={
+                'keywords': ','.join(to_str(keywords)),
+                'num': deleted_objects,
+            },
+        )
 
         if deleted_objects:
             msg_type = 'info'

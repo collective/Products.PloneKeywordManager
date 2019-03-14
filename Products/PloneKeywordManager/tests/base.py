@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
-import unittest
-
-from plone.app.testing import TEST_USER_ID
 from plone.app.testing import setRoles
-
+from plone.app.testing import TEST_USER_ID
 from Products.CMFCore.utils import getToolByName
+from Products.PloneKeywordManager.browser.interfaces import (
+    IPloneKeywordManagerLayer,
+)
 from Products.PloneKeywordManager.testing import INTEGRATION_TESTING
-from Products.PloneKeywordManager.browser.interfaces import IPloneKeywordManagerLayer
 from zope import interface
 from zope.component import getMultiAdapter
+
+import unittest
 
 
 class BaseIntegrationTestCase(unittest.TestCase):
@@ -29,13 +30,16 @@ class BaseIntegrationTestCase(unittest.TestCase):
 
 
 class PKMTestCase(BaseIntegrationTestCase):
-
     def _action_change(self, keywords, changeto, field='Subject'):
         """ calls changeKeywords method from  prefs_keywords_view """
-        view = getMultiAdapter((self.portal, self.request), name="prefs_keywords_view")
+        view = getMultiAdapter(
+            (self.portal, self.request), name="prefs_keywords_view"
+        )
         view.changeKeywords(keywords, changeto, field)
 
     def _action_delete(self, keywords, field='Subject'):
         """ calls deleteKeywords method from  prefs_keywords_view """
-        view = getMultiAdapter((self.portal, self.request), name="prefs_keywords_view")
+        view = getMultiAdapter(
+            (self.portal, self.request), name="prefs_keywords_view"
+        )
         view.deleteKeywords(keywords, field)
