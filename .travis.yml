@@ -10,11 +10,12 @@ env:
 - PLONE_VERSION=5.0
 matrix:
   fast_finish: true
+before_install:
+- pip install -r requirements.txt
 install:
 - sed -ie "s#test-4.3.x.cfg#test-$PLONE_VERSION.x.cfg#" buildout.cfg
-- python bootstrap.py
-- bin/buildout annotate
-- bin/buildout
+- buildout annotate
+- buildout
 script:
 - bin/code-analysis
 - bin/test
