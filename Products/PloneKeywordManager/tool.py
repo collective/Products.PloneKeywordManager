@@ -178,6 +178,8 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
 
         catalog = getToolByName(self, 'portal_catalog')
         keywords = list(catalog.uniqueValuesFor(indexName))
+        # Filter out empty keywords.  The sorting breaks when None is indexed.
+        keywords = filter(None, keywords)
         keywords.sort(key=lambda x:x.lower())
         return keywords
 

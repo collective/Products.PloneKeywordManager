@@ -4,7 +4,10 @@ Changelog
 2.2.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Filter out empty keywords before sorting.
+  Otherwise the control panel is broken for some indexes.
+  Fixes `issue #28 <https://github.com/collective/Products.PloneKeywordManager/issues/28>`_.
+  [maurits]
 
 
 2.2.1 (2018-07-09)
