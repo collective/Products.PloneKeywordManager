@@ -34,7 +34,5 @@ after_script:
   - bin/createcoverage --output-dir=parts/test/coverage
 
 after_success:
-  - pip install coverage
-  - python -m coverage.pickle2json
   - pip install -q coveralls
   - coveralls
