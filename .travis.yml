@@ -21,6 +21,7 @@ script:
 - bin/test
 after_success:
 - bin/createcoverage --output-dir=parts/test/coverage
+- pip install coveralls
 - coveralls
 notifications:
   irc: irc.freenode.org#plone-testing
