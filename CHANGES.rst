@@ -4,7 +4,10 @@ Changelog
 3.0.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Filter out empty keywords before sorting.
+  Otherwise the control panel is broken for some indexes.
+  Fixes `issue #28 <https://github.com/collective/Products.PloneKeywordManager/issues/28>`_.
+  [maurits]
 
 
 3.0.0 (2019-03-14)
