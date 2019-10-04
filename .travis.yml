@@ -30,11 +30,7 @@ script:
   - if [ ${pyversion:7:1} = 3 ]; then black --check; else echo "Skip black check"; fi
   - bin/test --all
 
-after_script:
-  - bin/createcoverage --output-dir=parts/test/coverage
-
 after_success:
-  - pip install coverage
-  - python -m coverage.pickle2json
+  - bin/createcoverage --output-dir=parts/test/coverage
   - pip install -q coveralls
   - coveralls
