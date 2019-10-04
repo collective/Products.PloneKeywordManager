@@ -1,10 +1,9 @@
-import os
 from setuptools import setup, find_packages
 
 version = '2.2.2.dev0'
 
 long_description = open("README.rst").read() + "\n" + \
-                   open(os.path.join("docs", "HISTORY.txt")).read()
+                   open("CHANGES.rst").read()
 
 
 setup(name='Products.PloneKeywordManager',
@@ -49,7 +48,6 @@ setup(name='Products.PloneKeywordManager',
           'plone.app.testing',
           'plone.app.dexterity',
           'Products.ATContentTypes',
-          'unittest2',
           ],
         },
       entry_points="""
