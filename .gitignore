@@ -5,12 +5,13 @@
 .installed.cfg
 .mr.developer.cfg
 .python-version
-.coveragerc
+.coverage
 bin/
 coverage/
 develop-eggs/
 downloads/
 eggs/
+htmlcov/
 include/
 lib/
 library-settings.txt
