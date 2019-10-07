@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.0.2 (unreleased)
+3.0.2 (2019-10-07)
 ------------------
 
 - Added a toggle to show/hide related keywords. By default every keyword
