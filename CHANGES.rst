@@ -4,7 +4,9 @@ Changelog
 3.0.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Added a toggle to show/hide related keywords. By default every keyword
+  will only show once.
+  [CorySanin]
 
 
 3.0.1 (2019-10-07)

@@ -72,6 +72,16 @@
         </form>
       </tal:kw_fields>
 
+      <fieldset>
+          <div class="field">
+              <input type="checkbox" name="simkeyword"
+                     id="simkeyword"
+                     tal:attributes="onclick string:$('.simkeywords').css('display', (this.checked)?'initial':'none');"
+                     />
+              <label for="simkeyword">Show similar keywords</label>
+          </div>
+      </fieldset>
+
   <tal:site_has_keywords condition="python:len(catalogSubjects) > 0">
     <form action="prefs_keywords_view" method="get"
           tal:attributes="action string:${context/absolute_url}/prefs_keywords_view"
@@ -190,7 +200,7 @@
                    alt="Search"/></a>
           </tal:p4>
          </dt>
-         <dd>
+         <dd class="simkeywords" style="display:none;">
            <span tal:repeat="item python:pkm.getScoredMatches(subject, catalogSubjects, num, score, context=context)" style="white-space: nowrap;">
              <span tal:condition="python:subject!=item"
                    tal:define="item_id python:context.plone_utils.normalizeString(item)">
@@ -249,6 +259,9 @@
 
       </fieldset>
     </form>
+    <script type="text/javascript">
+        $(document).ready(function(){$('#simkeyword')[0].checked=false;})
+    </script>
   </tal:site_has_keywords>
 
   <tal:no_keywords_yet condition="not:catalogSubjects">
