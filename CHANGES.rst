@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.0.1 (unreleased)
+3.0.1 (2019-10-07)
 ------------------
 
 - Filter out empty keywords before sorting.
