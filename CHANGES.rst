@@ -4,7 +4,9 @@ Changelog
 3.0.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix toggle to work with Chameleon.
+  Fixes `issue #33 <https://github.com/collective/Products.PloneKeywordManager/issues/33>`_.
+  [petschki]
 
 
 3.0.2 (2019-10-07)
