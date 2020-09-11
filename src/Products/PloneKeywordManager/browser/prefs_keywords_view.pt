@@ -76,8 +76,7 @@
           <div class="field">
               <input type="checkbox" name="simkeyword"
                      id="simkeyword"
-                     tal:attributes="onclick string:$('.simkeywords').css('display', (this.checked)?'initial':'none');"
-                     />
+                     onclick="$('.simkeywords').css('display', (this.checked)?'initial':'none');" />
               <label for="simkeyword">Show similar keywords</label>
           </div>
       </fieldset>
