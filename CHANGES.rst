@@ -4,6 +4,10 @@ Changelog
 3.0.3 (unreleased)
 ------------------
 
+- Ensure plone.app.discussion comments with acquired keywords are
+  consistently reindexed.
+  [alecpm]
+
 - Fix toggle to work with Chameleon.
   Fixes `issue #33 <https://github.com/collective/Products.PloneKeywordManager/issues/33>`_.
   [petschki]
