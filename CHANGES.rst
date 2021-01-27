@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.0.3 (unreleased)
+3.0.3 (2021-01-27)
 ------------------
 
 - Fix toggle to work with Chameleon.
