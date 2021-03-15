@@ -1,7 +1,13 @@
 Changelog
 =========
 
-3.0.3 (unreleased)
+3.0.4 (unreleased)
+------------------
+
+- Nothing changed yet.
+
+
+3.0.3 (2021-01-27)
 ------------------
 
 - Ensure plone.app.discussion comments with acquired keywords are
