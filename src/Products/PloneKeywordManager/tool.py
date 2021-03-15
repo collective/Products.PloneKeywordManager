@@ -239,13 +239,13 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
             fieldName = fieldName[0].lower() + fieldName[1:]
             return lambda value: setattr(aq_base(obj), fieldName, value)
 
-        # AT and discussions left
+        # Always reindex discussion objects, since their values
+        # # will have been acquired
         if IComment.providedBy(obj):
-            # Discussion
-            field = getattr(obj, "getField", None)
-        else:
-            # Archetype
-            field = getattr(aq_base(obj), "getField", None)
+            return lambda value: None
+
+        # Anything left is maybe AT content
+        field = getattr(aq_base(obj), "getField", None)
         # Archetypes:
         if field:
             fieldObj = field(fieldName) or field(fieldName.lower())
