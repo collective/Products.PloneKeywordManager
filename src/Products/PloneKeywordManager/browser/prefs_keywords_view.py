@@ -101,7 +101,7 @@ class PrefsKeywordsView(BrowserView):
             pu = getToolByName(self.context, "plone_utils")
             pu.addPortalMessage(safe_encode(message), type=msg_type)
 
-        logger.info(self.context.translate(message))
+        logger.info(safe_encode(message))
         portal_url = self.context.portal_url()
         url = "%s/prefs_keywords_view" % portal_url
         if field:
