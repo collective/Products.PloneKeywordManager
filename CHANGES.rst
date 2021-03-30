@@ -4,7 +4,8 @@ Changelog
 3.0.4 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix UnicodeDecodeError in portal status message after merging non-ascii keywords. 
+  [jensens]
 
 
 3.0.3 (2021-01-27)
