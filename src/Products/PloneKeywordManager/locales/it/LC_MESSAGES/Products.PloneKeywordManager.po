@@ -24,15 +24,15 @@ msgstr ""
 
 #: ./browser/prefs_keywords_view.pt:202
 msgid "Keyword to apply"
-msgstr ""
+msgstr "Parola chiave da applicare"
 
 #: ./browser/prefs_keywords_view.pt:207
 msgid "Merge / Replace"
-msgstr ""
+msgstr "Raggruppa / Sostituisci"
 
 #: ./browser/prefs_keywords_view.pt:207
 msgid "Merge all selected keywords and/or replace them by filled value"
-msgstr ""
+msgstr "Raggruppa tutte le parole chiave selezionate e/o sostituiscile col valore inserito"
 
 #: ./browser/prefs_keywords_view.py:36
 msgid "Please provide a new term"
@@ -48,7 +48,7 @@ msgstr "Per favore seleziona almeno una parola chiave"
 
 #: ./browser/prefs_keywords_view.pt:214
 msgid "Remove all selected keywords"
-msgstr ""
+msgstr "Cancella tutte le parole chiave selezionate"
 
 #: ./browser/prefs_keywords_view.pt:141
 msgid "Search"
@@ -80,7 +80,7 @@ msgstr ""
 #. Default: "Select one or more keywords, then set a replacement keyword and click on 'Merge / Replace' to replace all selected value by this one. Click on Delete to remove selected values."
 #: ./browser/prefs_keywords_view.pt:162
 msgid "help_keyword_assignments"
-msgstr ""
+msgstr "Seleziona una o più parole chiave, imposta la parola chiave che le andrà a sostituire e poi clicca su "Raggruppa / Sostituisci" per aggiornare le parole selezionate con il nuovo valore. Clicca su "Cancella" per eliminare i valori selezionati"
 
 #. Default: "Choose Keyword Field/Index"
 #: ./browser/prefs_keywords_view.pt:43
