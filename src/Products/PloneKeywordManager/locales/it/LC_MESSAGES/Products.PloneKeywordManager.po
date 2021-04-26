@@ -80,7 +80,7 @@ msgstr ""
 #. Default: "Select one or more keywords, then set a replacement keyword and click on 'Merge / Replace' to replace all selected value by this one. Click on Delete to remove selected values."
 #: ./browser/prefs_keywords_view.pt:162
 msgid "help_keyword_assignments"
-msgstr "Seleziona una o più parole chiave, imposta la parola chiave che le andrà a sostituire e poi clicca su "Raggruppa / Sostituisci" per aggiornare le parole selezionate con il nuovo valore. Clicca su "Cancella" per eliminare i valori selezionati"
+msgstr "Seleziona una o più parole chiave, imposta la parola chiave che le andrà a sostituire e poi clicca su \"Raggruppa / Sostituisci\" per aggiornare le parole selezionate con il nuovo valore. Clicca su \"Cancella\" per eliminare i valori selezionati"
 
 #. Default: "Choose Keyword Field/Index"
 #: ./browser/prefs_keywords_view.pt:43
