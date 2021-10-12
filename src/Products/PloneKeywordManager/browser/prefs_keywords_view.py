@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import json
+
 from plone import api
 from Products.CMFCore.utils import getToolByName
 from Products.Five import BrowserView
@@ -6,6 +8,7 @@ from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from Products.PloneKeywordManager import keywordmanagerMessageFactory as _
 from Products.PloneKeywordManager.compat import to_str
 from Products.CMFPlone.utils import safe_encode
+
 
 import logging
 
@@ -108,3 +111,11 @@ class PrefsKeywordsView(BrowserView):
             url = "%s?field=%s" % (url, field)
 
         self.request.RESPONSE.redirect(url)
+
+class KeywordsSearchResults(BrowserView):
+
+    def __call__(self):
+        self.request.response.setHeader("Content-type", "application/json")
+
+        result = {'some': 'json'}
+        return json.dumps(result)

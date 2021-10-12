@@ -17,4 +17,12 @@
       layer=".interfaces.IPloneKeywordManagerLayer"
       />
 
+  <browser:page
+      for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+      name="keywordsmanager-search-json"
+      class=".prefs_keywords_view.KeywordsSearchResults"
+      permission="plone_keyword_manager.UsePloneKeywordManager"
+      layer=".interfaces.IPloneKeywordManagerLayer"
+  />
+
 </configure>

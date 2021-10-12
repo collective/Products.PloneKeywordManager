@@ -21,6 +21,8 @@
                  show_filters python: len(catalogSubjects) > many_kws;
                  url_quote python:modules['Products.PythonScripts.standard'].url_quote">
 
+  <!-- catalogSubjects  -->
+
   <h1 i18n:translate="heading_keyword_manager">Keyword Manager</h1>
 
     <a href=""
@@ -124,7 +126,9 @@
 
     <form action="prefs_keywords_view"
           tal:attributes="action string:${context/absolute_url}/prefs_keywords_view"
-          tal:condition="show_filters">
+          tal:condition="show_filters"
+          class="pat-livesearch"
+          data-pat-livesearch="ajaxUrl:${context/absolute_url}/keywordsmanager-search-json">
       <input type="hidden" name="field" tal:attributes="value field" />
       <fieldset>
         <legend i18n:translate="label_search_by_keyword">
@@ -138,14 +142,10 @@
               Keyword
           </label>
 
-          <select id="select_keyword_list" name="search"
-                  onchange="javascript:this.form.submit()">
-            <option value="" i18n:translate="label_select">Select...</option>
-           <tal:block tal:repeat="subject catalogSubjects">
-            <option tal:content="subject"
-                    tal:attributes="selected python:subject==search">Subject</option>
-           </tal:block>
-          </select>
+          <input type="text" autocomplete="off">
+          <ul class="livesearch-results" style="display:none;">
+            <li i18n:translate="label_select">Select...</li>
+          </ul>
 
         </div>
 
