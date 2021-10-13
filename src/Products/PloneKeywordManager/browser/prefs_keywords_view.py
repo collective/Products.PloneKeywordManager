@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
+import typing
 
 from plone import api
 from Products.CMFCore.utils import getToolByName
@@ -8,6 +9,7 @@ from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from Products.PloneKeywordManager import keywordmanagerMessageFactory as _
 from Products.PloneKeywordManager.compat import to_str
 from Products.CMFPlone.utils import safe_encode
+from Products.CMFPlone.PloneBatch import Batch
 
 
 import logging
@@ -112,10 +114,40 @@ class PrefsKeywordsView(BrowserView):
 
         self.request.RESPONSE.redirect(url)
 
+
 class KeywordsSearchResults(BrowserView):
 
     def __call__(self):
+        items = []
+        try:
+            per_page = int(self.request.form.get('perPage'))
+        except ValueError:
+            per_page = 10
+        try:
+            page = int(self.request.form.get('page'))
+        except ValueError:
+            page = 1
+
+        search_string = self.request.form.get('s')
+        field = self.request.form.get('field')
+
+        results = self.results(search_string, index_name=field)
+
         self.request.response.setHeader("Content-type", "application/json")
 
-        result = {'some': 'json'}
-        return json.dumps(result)
+        return json.dumps({
+            'total': len(results),
+            'items': results
+        })
+
+    def results(self, search_string, index_name):
+        pkm = getToolByName(self.context, "portal_keyword_manager")
+
+        num = 100
+        score = 0.6
+        all_keywords = pkm.getKeywords(context=self.context, indexName=index_name)
+        return pkm.getScoredMatches(search_string, all_keywords, num, score, context=self.context)
+
+
+
+
