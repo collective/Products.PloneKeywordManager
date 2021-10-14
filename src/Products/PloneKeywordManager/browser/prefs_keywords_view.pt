@@ -18,7 +18,8 @@
                  many_kws python: 20;
                  pkm    context/portal_keyword_manager;
                  catalogSubjects python:pkm.getKeywords(context=context,indexName=field);
-                 show_filters python: len(catalogSubjects) > many_kws;
+                 too_many_keywords python: len(catalogSubjects) > many_kws;
+                 show_filters too_many_keywords;
                  url_quote python:modules['Products.PythonScripts.standard'].url_quote">
 
   <!-- catalogSubjects  -->
@@ -160,6 +161,11 @@
 
       </fieldset>
     </form>
+
+    <div tal:condition="too_many_keywords">
+    Too many keywords to show (<span tal:content="python: len(catalogSubjects)"> </span>)
+    Select a above range or search to show some keywords
+    </div>
 
     <form name="keyword_edit_form" action="." method="post"
           tal:condition="python:not show_filters or search or limit"
