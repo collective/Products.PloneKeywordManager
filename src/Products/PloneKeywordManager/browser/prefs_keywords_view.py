@@ -132,13 +132,23 @@ class KeywordsSearchResults(BrowserView):
         field = self.request.form.get('field')
 
         results = self.results(search_string, index_name=field)
+        portal_url = self.context.portal_url()
+
+        for result in results:
+            items.append({'id': result,
+                          'title': result,
+                          'description': '',
+                          'state': "keyword",
+                          'url': "%s/prefs_keywords_view?field=%s&s=%s" % (portal_url, field, search_string),
+                          })
 
         self.request.response.setHeader("Content-type", "application/json")
 
         return json.dumps({
             'total': len(results),
-            'items': results
+            'items': items
         })
+
 
     def results(self, search_string, index_name):
         pkm = getToolByName(self.context, "portal_keyword_manager")
