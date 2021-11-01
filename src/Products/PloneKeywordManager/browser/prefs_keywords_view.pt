@@ -13,16 +13,16 @@
                  search python:request.get('search', '');
                  limit  python:request.get('limit',  '');
                  score  python:request.get('score',  0.6);
-                 num    python:request.get('num',7);
+                 num_similar    python:request.get('num_similar',7);
                  field  python:request.get('field','Subject');
-                 many_kws python: 20;
-                 pkm    context/portal_keyword_manager;
-                 catalogSubjects python:pkm.getKeywords(context=context,indexName=field);
-                 too_many_keywords python: len(catalogSubjects) > many_kws;
-                 show_filters too_many_keywords;
-                 url_quote python:modules['Products.PythonScripts.standard'].url_quote">
 
-  <!-- catalogSubjects  -->
+                 batch_start python:request.get('b_start',0);
+                 batch_size python:request.get('b_size', 30);
+                 batch python:view.getKeywords(indexName=field, b_start=batch_start, b_size=batch_size);
+
+                 total_keywords python:batch.sequence_length;
+
+                 url_quote python:modules['Products.PythonScripts.standard'].url_quote">
 
   <h1 i18n:translate="heading_keyword_manager">Keyword Manager</h1>
 
@@ -39,7 +39,7 @@
     The Keyword Manager allows you to delete and merge keywords in your portal.
     </div>
 
-      <tal:kw_fields tal:define="kwfields pkm/getKeywordIndexes"
+      <tal:kw_fields tal:define="kwfields python:view.getKeywordIndexes()"
                      tal:condition="python:len(kwfields)>1">
         <form action="prefs_keywords_view" method="get"
               tal:attributes="action string:${context/absolute_url}/prefs_keywords_view">
@@ -84,50 +84,10 @@
           </div>
       </fieldset>
 
-  <tal:site_has_keywords condition="python:len(catalogSubjects) > 0">
-    <form action="prefs_keywords_view" method="get"
-          tal:attributes="action string:${context/absolute_url}/prefs_keywords_view"
-          tal:condition="show_filters">
-        <input type="hidden" name="field" tal:attributes="value field" />
-        <fieldset>
-        <legend i18n:translate="label_list_alphabetically">
-              List alphabetically
-        </legend>
-
-        <div class="field">
-            <label for="select_alphabet_list"
-                   i18n:translate="label_view_range">
-                  View range
-            </label>
-
-            <select id="select_alphabet_list"
-                    name="limit" tabindex="1"
-                    onchange="javascript:this.form.submit()">
-
-                <option value="a-z">a - z</option>
-
-                <tal:block tal:repeat="item python:range(ord('a'),ord('z')+1)">
-                    <option value="a" tal:attributes="value python:chr(item);
-                                                      selected python:limit==chr(item) and True or None"
-                            tal:content="python:chr(item)">a</option>
-                </tal:block>
-
-            </select>
-        </div>
-
-        <div class="formControls">
-            <input class="standalone"
-                   type="submit"
-                   value="View keywords"
-                   i18n:attributes="value" />
-        </div>
-
-      </fieldset>
-    </form>
+  <tal:site_has_keywords condition="total_keywords">
 
     <form action="prefs_keywords_view"
           tal:attributes="action string:${context/absolute_url}/prefs_keywords_view"
-          tal:condition="show_filters"
           class="pat-livesearch"
           data-pat-livesearch="ajaxUrl:${context/absolute_url}/keywordsmanager-search-json">
       <input type="hidden" name="field" tal:attributes="value field" />
@@ -162,13 +122,7 @@
       </fieldset>
     </form>
 
-    <div tal:condition="too_many_keywords">
-    Too many keywords to show (<span tal:content="python: len(catalogSubjects)"> </span>)
-    Select a above range or search to show some keywords
-    </div>
-
     <form name="keyword_edit_form" action="." method="post"
-          tal:condition="python:not show_filters or search or limit"
           tal:attributes="action string:${context/absolute_url}/prefs_keywords_view"
           >
                         <input type="hidden" name="form.submitted" value="1" />
@@ -179,47 +133,48 @@
           Keyword assignments
         </legend>
 		<p class="discreet" i18n:translate="help_keyword_assignments">
-		Select one or more keywords, then set a replacement keyword and click on 'Merge / Replace' to replace all selected value by this one. Click on Delete to remove selected values.
+		Select one or more keywords, then either
+		 set a replacement keyword and click on 'Merge / Replace' to replace all selected value by this one.
+		 Click on Delete to remove selected values.
 		</p>
         <div class="field">
-        <dl tal:repeat="subject python:search and [search] or catalogSubjects">
-         <tal:block
-            condition="python:not show_filters or search or limit=='a-z' or (subject and limit==subject.lower()[0])"
-            define="subject_id python:context.plone_utils.normalizeString(subject);
-                    subject_quote python:url_quote(subject)">
+        <dl tal:repeat="keyword python:batch">
+        <tal:def tal:define="keyword_id python:context.plone_utils.normalizeString(keyword);
+                             keyword_quote python:url_quote(keyword)">
          <dt>
           <input type="checkbox" name="keywords:list"
-                 tal:attributes="value subject;
-                                 id string:subject-${subject_id};
-                                 onclick string:document.forms['keyword_edit_form'].changeto.value='${subject}';; return true;;" />
-          <label tal:content="subject" tal:attributes="for string:subject-${subject_id};">Subject</label>
+                 tal:attributes="value keyword;
+                                 id string:keyword-${keyword_id};
+                                 onclick string:document.forms['keyword_edit_form'].changeto.value='${keyword}';; return true;;" />
+          <label tal:content="keyword" tal:attributes="for string:keyword-${keyword_id};">Keyword</label>
           <tal:p5 tal:condition="view/is_plone_5">
-            <a href="#" tal:attributes="href string:${portal_url}/@@search?${field}=${subject_quote}">
+            <a href="#" tal:attributes="href string:${portal_url}/@@search?${field}=${keyword_quote}">
               <span class="icon-search"></span></a>
           </tal:p5>
           <tal:p4 tal:condition="not: view/is_plone_5">
-            <a href="#" tal:attributes="href string:${portal_url}/@@search?${field}=${subject_quote}">
+            <a href="#" tal:attributes="href string:${portal_url}/@@search?${field}=${keyword_quote}">
               <img i18n:attributes="alt"
                    i18n:domain="plone"
                    tal:attributes="src string:${portal_url}/search_icon.png;"
                    alt="Search"/></a>
           </tal:p4>
          </dt>
+
          <dd class="simkeywords" style="display:none;">
-           <span tal:repeat="item python:pkm.getScoredMatches(subject, catalogSubjects, num, score, context=context)" style="white-space: nowrap;">
-             <span tal:condition="python:subject!=item"
+           <span tal:repeat="item python:view.getScoredMatches(keyword, batch, num_similar, score)" style="white-space: nowrap;">
+             <span tal:condition="python:keyword!=item"
                    tal:define="item_id python:context.plone_utils.normalizeString(item)">
               <input type="checkbox" name="keywords:list"
                      tal:attributes="value item;
                                      id string:item-${item_id};
                                      onclick string: document.forms['keyword_edit_form'].changeto.value='${item}';; return true;;" />
-              <label tal:content="item" tal:attributes="for string:item-${item_id};">Subject</label>
+              <label tal:content="item" tal:attributes="for string:item-${item_id};">Keyword</label>
               <tal:p5 tal:condition="view/is_plone_5">
-                <a href="#" tal:attributes="href string:${portal_url}/@@search?${field}=${subject_quote}">
+                <a href="#" tal:attributes="href string:${portal_url}/@@search?${field}=${keyword_quote}">
                   <span class="icon-search"></span></a>
               </tal:p5>
               <tal:p4 tal:condition="not: view/is_plone_5">
-                <a href="#" tal:attributes="href string:${portal_url}/@@search?${field}=${subject_quote}">
+                <a href="#" tal:attributes="href string:${portal_url}/@@search?${field}=${keyword_quote}">
                   <img i18n:attributes="alt"
                        i18n:domain="plone"
                        tal:attributes="src string:${portal_url}/search_icon.png;"
@@ -228,11 +183,12 @@
              </span>
            </span>
          </dd>
-
-         </tal:block>
-
+         </tal:def>
         </dl>
 	  </div>
+	  <tal:batchnavigation
+        define="batchnavigation nocall:context/@@batchnavigation"
+        replace="structure python:batchnavigation(batch)" />
       <div class="field">
                 <div class="error"
                      tal:define="err errors/changeto|nothing"
@@ -269,7 +225,7 @@
     </script>
   </tal:site_has_keywords>
 
-  <tal:no_keywords_yet condition="not:catalogSubjects">
+  <tal:no_keywords_yet condition="not:total_keywords">
     <div i18n:translate="description_no_keywords">
       No content in this site has any keywords assigned yet, so there's nothing
       to manage at this time.  (To assign keywords to a piece of content, use
