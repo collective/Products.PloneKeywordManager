@@ -1,6 +1,17 @@
 Changelog
 =========
 
+3.0.4?  issue-17 branch (unmerged)
+-----------------
+* Improvements to form performance when site has an extreme amount of keywords. [flipmcf]
+  -- Implemented use of CMFPlone.PloneBatch for result set.
+  -- Removed the "View range" form as that should be handled by plone batching now.
+
+- Removed direct calls to PloneKeywordManager tool from template (best practice)  [flipmcf] 
+    template must go through view for everything.
+    
+- Renaming variables in template from 'subject' to 'keyword' - better reflects the option to view different fields. [flipmcf]
+
 3.0.4 (unreleased)
 ------------------
 
