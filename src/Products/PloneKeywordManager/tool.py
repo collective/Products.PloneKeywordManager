@@ -140,7 +140,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         return len(querySet)
 
     @security.protected(config.MANAGE_KEYWORDS_PERMISSION)
-    def getKeywords(self, context=None, indexName="Subject"):
+    def getKeywords(self, indexName="Subject"):
         processQueue()
         if indexName not in self.getKeywordIndexes():
             raise ValueError("%s is not a valid field" % indexName)
