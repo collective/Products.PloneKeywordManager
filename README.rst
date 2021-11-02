@@ -31,7 +31,7 @@ Installation
 ============
 
 In your buildout add ``Products.PloneKeywordManager`` to your instances eggs section or policy packages ``setup.py``.
-If you want similiarity search add ``Products.PloneKeywordManager`[Levenshtein]`` instead.
+If you want similiarity search add ``Products.PloneKeywordManager[Levenshtein]`` instead.
 
 Run buildout.
 Activate it at Site Setups Add Ons page.
