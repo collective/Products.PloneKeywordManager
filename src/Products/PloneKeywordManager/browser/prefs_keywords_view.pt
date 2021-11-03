@@ -6,8 +6,22 @@
 <tal:block metal:fill-slot="top_slot">
    <tal:block tal:define="dummy python:request.set('disable_border',1)" />
 </tal:block>
+<tal:styleslot metal:fill-slot="style_slot" >
+<style>
+div.keyword{
+}
 
+div.keywordvalue {
+￼    float: unset;
+}
+
+div.simkeywords {
+￼    color: gray;
+}
+</style>
+</tal:styleslot>
 <body>
+
 <div metal:fill-slot="prefs_configlet_main"
      tal:define="errors python:request.get('errors', {});
                  search python:request.get('search', '');
@@ -75,15 +89,6 @@
         </form>
       </tal:kw_fields>
 
-      <fieldset>
-          <div class="field">
-              <input type="checkbox" name="simkeyword"
-                     id="simkeyword"
-                     onclick="$('.simkeywords').css('display', (this.checked)?'initial':'none');" />
-              <label for="simkeyword">Show similar keywords</label>
-          </div>
-      </fieldset>
-
   <tal:site_has_keywords condition="total_keywords">
 
     <form action="prefs_keywords_view"
@@ -132,43 +137,29 @@
         <legend i18n:translate="label_keyword_assignments">
           Keyword assignments
         </legend>
+        <div class="field">
+           <input type="checkbox" name="simkeyword"
+                  id="simkeyword"
+                  onclick="$('.simkeywords').css('display', (this.checked)?'initial':'none');" />
+           <label for="simkeyword">Show similar keywords</label>
+        </div>
 		<p class="discreet" i18n:translate="help_keyword_assignments">
 		Select one or more keywords, then either
 		 set a replacement keyword and click on 'Merge / Replace' to replace all selected value by this one.
 		 Click on Delete to remove selected values.
 		</p>
+
         <div class="field">
-        <dl tal:repeat="keyword python:batch">
+        <div class="keyword"
+             tal:repeat="keyword python:batch">
         <tal:def tal:define="keyword_id python:context.plone_utils.normalizeString(keyword);
                              keyword_quote python:url_quote(keyword)">
-         <dt>
-          <input type="checkbox" name="keywords:list"
-                 tal:attributes="value keyword;
-                                 id string:keyword-${keyword_id};
-                                 onclick string:document.forms['keyword_edit_form'].changeto.value='${keyword}';; return true;;" />
-          <label tal:content="keyword" tal:attributes="for string:keyword-${keyword_id};">Keyword</label>
-          <tal:p5 tal:condition="view/is_plone_5">
-            <a href="#" tal:attributes="href string:${portal_url}/@@search?${field}=${keyword_quote}">
-              <span class="icon-search"></span></a>
-          </tal:p5>
-          <tal:p4 tal:condition="not: view/is_plone_5">
-            <a href="#" tal:attributes="href string:${portal_url}/@@search?${field}=${keyword_quote}">
-              <img i18n:attributes="alt"
-                   i18n:domain="plone"
-                   tal:attributes="src string:${portal_url}/search_icon.png;"
-                   alt="Search"/></a>
-          </tal:p4>
-         </dt>
-
-         <dd class="simkeywords" style="display:none;">
-           <span tal:repeat="item python:view.getScoredMatches(keyword, batch, num_similar, score)" style="white-space: nowrap;">
-             <span tal:condition="python:keyword!=item"
-                   tal:define="item_id python:context.plone_utils.normalizeString(item)">
+         <div class="keywordvalue">
               <input type="checkbox" name="keywords:list"
-                     tal:attributes="value item;
-                                     id string:item-${item_id};
-                                     onclick string: document.forms['keyword_edit_form'].changeto.value='${item}';; return true;;" />
-              <label tal:content="item" tal:attributes="for string:item-${item_id};">Keyword</label>
+                     tal:attributes="value keyword;
+                                     id string:keyword-${keyword_id};
+                                     onclick string:document.forms['keyword_edit_form'].changeto.value='${keyword}';; return true;;" />
+              <label tal:content="keyword" tal:attributes="for string:keyword-${keyword_id};">Keyword</label>
               <tal:p5 tal:condition="view/is_plone_5">
                 <a href="#" tal:attributes="href string:${portal_url}/@@search?${field}=${keyword_quote}">
                   <span class="icon-search"></span></a>
@@ -180,11 +171,34 @@
                        tal:attributes="src string:${portal_url}/search_icon.png;"
                        alt="Search"/></a>
               </tal:p4>
-             </span>
-           </span>
-         </dd>
+
+
+             <div class="simkeywords" style="display:none;">
+               <span tal:repeat="item python:view.getScoredMatches(keyword, batch, num_similar, score)" style="white-space: nowrap;">
+                 <span tal:condition="python:keyword!=item"
+                       tal:define="item_id python:context.plone_utils.normalizeString(item)">
+                  <input type="checkbox" name="keywords:list"
+                         tal:attributes="value item;
+                                         id string:item-${item_id};
+                                         onclick string: document.forms['keyword_edit_form'].changeto.value='${item}';; return true;;" />
+                  <label tal:content="item" tal:attributes="for string:item-${item_id};">Keyword</label>
+                  <tal:p5 tal:condition="view/is_plone_5">
+                    <a href="#" tal:attributes="href string:${portal_url}/@@search?${field}=${keyword_quote}">
+                      <span class="icon-search"></span></a>
+                  </tal:p5>
+                  <tal:p4 tal:condition="not: view/is_plone_5">
+                    <a href="#" tal:attributes="href string:${portal_url}/@@search?${field}=${keyword_quote}">
+                      <img i18n:attributes="alt"
+                           i18n:domain="plone"
+                           tal:attributes="src string:${portal_url}/search_icon.png;"
+                           alt="Search"/></a>
+                  </tal:p4>
+                 </span>
+               </span>
+             </div>
+         </div> <!-- keywordvalue -->
          </tal:def>
-        </dl>
+        </div>
 	  </div>
 	  <tal:batchnavigation
         define="batchnavigation nocall:context/@@batchnavigation"
