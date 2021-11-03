@@ -8,7 +8,24 @@
 </tal:block>
 <tal:styleslot metal:fill-slot="style_slot" >
 <style>
+
+div#keyword_searcher {
+    display: inline-block;
+    width: 60%;
+    border-left: 1px solid #c0c0c0;
+    padding-left: 10px;
+}
+div#keyword_searcher .field {   display: inline-block; }
+div#keyword_searcher .formControls { display: inline-block; border-top: 0px; }
+
+div#index_chooser{
+    display: inline-block;
+    width: 30%;
+    padding-right: 10px;
+}
+
 div.keyword{
+    margin-bottom: 1em;
 }
 
 div.keywordvalue {
@@ -50,47 +67,35 @@ div.simkeywords {
 
     <div class="documentDescription"
          i18n:translate="description_keyword_manager">
-    The Keyword Manager allows you to delete and merge keywords in your portal.
+    The Keyword Manager allows you to delete and rename/merge keywords in your portal.
     </div>
+    <div id="index_chooser">
+    <form action="prefs_keywords_view" method="get"
+          tal:attributes="action string:${context/absolute_url}/prefs_keywords_view">
+      <fieldset>
+        <legend i18n:translate="label_choose_keyword_field">
+        Choose Keyword Field/Index
+        </legend>
 
-      <tal:kw_fields tal:define="kwfields python:view.getKeywordIndexes()"
-                     tal:condition="python:len(kwfields)>1">
-        <form action="prefs_keywords_view" method="get"
-              tal:attributes="action string:${context/absolute_url}/prefs_keywords_view">
-            <fieldset>
-                <legend i18n:translate="label_choose_keyword_field">
-                 Choose Keyword Field/Index
-                </legend>
+        <div class="field">
+          <label for="kwfield" i18n:translate="label_keyword_field">
+          Keyword Field
+          </label>
 
-            <div class="field">
-                <label for="kwfield" i18n:translate="label_keyword_field">
-                    Keyword Field
-                </label>
-
-                <select id="kwfield" name="field"
-                        onchange="javascript:this.form.submit()">
-                    <option tal:repeat="fld kwfields"
-                            tal:attributes="value fld;
-                                            selected python:fld==field;"
-                            i18n:translate=""
-                            i18n:domain="plone"
-                            tal:content="python:fld.replace('get','',1)" />
-                </select>
-            </div>
-
-            <div class="formControls">
-              <input class="standalone"
-                     type="submit"
-                     value="Select Field"
-                     i18n:attributes="value" />
-            </div>
-
-            </fieldset>
-        </form>
-      </tal:kw_fields>
-
-  <tal:site_has_keywords condition="total_keywords">
-
+          <select id="kwfield" name="field"
+                  onchange="javascript:this.form.submit()">
+            <option tal:repeat="fld python:view.getKeywordIndexes()"
+                    tal:attributes="value fld;
+                                    selected python:fld==field;"
+                    i18n:translate=""
+                    i18n:domain="plone"
+                    tal:content="python:fld.replace('get','',1)" />
+          </select>
+        </div>
+      </fieldset>
+    </form>
+    </div>
+    <div id="keyword_searcher">
     <form action="prefs_keywords_view"
           tal:attributes="action string:${context/absolute_url}/prefs_keywords_view"
           class="pat-livesearch"
@@ -102,30 +107,24 @@ div.simkeywords {
         </legend>
 
         <div class="field">
-
           <label for="select_keyword_list"
                  i18n:translate="label_keyword">
               Keyword
           </label>
-
           <input type="text" name="s" autocomplete="off">
           <ul class="livesearch-results" style="display:none;">
             <li i18n:translate="label_select">Select...</li>
           </ul>
-
         </div>
-
         <div class="formControls">
-
           <input class="context"
                  type="submit"
                  value="Search"
                  i18n:attributes="value" />
-
         </div>
-
       </fieldset>
     </form>
+    </div>
 
     <form name="keyword_edit_form" action="." method="post"
           tal:attributes="action string:${context/absolute_url}/prefs_keywords_view"
@@ -231,7 +230,6 @@ div.simkeywords {
     <script type="text/javascript">
         $(document).ready(function(){$('#simkeyword')[0].checked=false;})
     </script>
-  </tal:site_has_keywords>
 
   <tal:no_keywords_yet condition="not:total_keywords">
     <div i18n:translate="description_no_keywords">
