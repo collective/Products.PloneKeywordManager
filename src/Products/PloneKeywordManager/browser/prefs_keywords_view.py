@@ -182,7 +182,7 @@ class KeywordsSearchResults(BrowserView):
                           'title': result,
                           'description': '',
                           'state': "keyword",
-                          'url': "%s/prefs_keywords_view?field=%s&s=%s" % (portal_url, field, search_string),
+                          'url': "%s/prefs_keywords_view?field=%s&s=%s" % (portal_url, field, result),
                           })
 
         self.request.response.setHeader("Content-type", "application/json")
