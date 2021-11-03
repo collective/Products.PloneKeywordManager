@@ -204,34 +204,28 @@ div.simkeywords {
         define="batchnavigation nocall:context/@@batchnavigation"
         replace="structure python:batchnavigation(batch)" />
       <div class="field">
-                <div class="error"
-                     tal:define="err errors/changeto|nothing"
-                     tal:condition="err"
-                     tal:content="err" i18n:translate="">
-                    Error message goes here
-                </div>
-       <label for="input_change_to" i18n:translate="">Keyword to apply</label>
-       <input id="input_change_to" type="text" name="changeto" />
+        <div class="error"
+               tal:define="err errors/changeto|nothing"
+               tal:condition="err"
+               tal:content="err" i18n:translate="">
+           Error message goes here
+        </div>
       </div>
-
-      <div class="formControls">
-          <input class="destructive"
-                 type="submit"
-                 name="form.button.Merge"
-                 title="Merge all selected keywords and/or replace them by filled value"
-                 i18n:attributes="value; title"
-                 value="Merge / Replace" />
-
-          <input class="destructive"
-                 id="input_delete_keyword"
-                 type="submit"
-                 name="form.button.Delete"
-                 i18n:attributes="value; title"
-                 title="Remove all selected keywords"
-                 value="Delete" />
-
-      </div>
-
+      <input class="context"
+             type="submit"
+             name="form.button.Merge"
+             title="Rename all selected keywords to new value"
+             i18n:attributes="value; title"
+             value="Rename All Keywords To:"
+             style="margin-right: 10px; float: left;padding-left: 21px;padding-right: 21px;"/>
+      <input id="input_change_to" type="text" name="changeto" style="width: 50%" />
+      <input class="destructive"
+             id="input_delete_keyword"
+             type="submit"
+             name="form.button.Delete"
+             i18n:attributes="value; title"
+             title="Delete all selected keywords"
+             value="Delete all selected keywords" />
       </fieldset>
     </form>
     <script type="text/javascript">
