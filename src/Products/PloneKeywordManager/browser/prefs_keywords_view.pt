@@ -41,7 +41,7 @@ div.simkeywords {
 
 <div metal:fill-slot="prefs_configlet_main"
      tal:define="errors python:request.get('errors', {});
-                 search python:request.get('search', '');
+                 search python:request.get('s', '');
                  limit  python:request.get('limit',  '');
                  score  python:request.get('score',  0.6);
                  num_similar    python:request.get('num_similar',7);
