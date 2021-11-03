@@ -69,9 +69,18 @@ class PrefsKeywordsView(BrowserView):
         :param b_size: Batching support - size of page
         :return: a Products.CMFPlone Batch object containing the entire list of keywords.
         """
+        search_string = self.request.get('s', None)
 
-        return Batch(self.pkm.getKeywords(indexName=indexName),
-                     b_size, b_start)
+        if not search_string:
+            return Batch(self.pkm.getKeywords(indexName=indexName),
+                         b_size, b_start)
+        else:
+            all = self.pkm.getKeywords(indexName=indexName)
+            max_results = 10000
+            score = 0.5
+            return Batch(self.pkm.getScoredMatches(search_string, all, max_results,
+                                                   score, context=self.context),
+                         b_size, b_start)
 
     def getKeywordIndexes(self):
         return self.pkm.getKeywordIndexes()
@@ -173,7 +182,7 @@ class KeywordsSearchResults(BrowserView):
                           'title': result,
                           'description': '',
                           'state': "keyword",
-                          'url': "%s/prefs_keywords_view?field=%s&s=%s" % (portal_url, field, search_string),
+                          'url': "%s/prefs_keywords_view?field=%s&s=%s" % (portal_url, field, result),
                           })
 
         self.request.response.setHeader("Content-type", "application/json")
@@ -189,7 +198,7 @@ class KeywordsSearchResults(BrowserView):
 
         num = 100
         score = 0.6
-        all_keywords = pkm.getKeywords(context=self.context, indexName=index_name)
+        all_keywords = pkm.getKeywords(indexName=index_name)
         return pkm.getScoredMatches(search_string, all_keywords, num, score, context=self.context)
 
 

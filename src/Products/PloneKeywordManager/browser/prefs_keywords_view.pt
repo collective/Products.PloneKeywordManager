@@ -41,7 +41,7 @@ div.simkeywords {
 
 <div metal:fill-slot="prefs_configlet_main"
      tal:define="errors python:request.get('errors', {});
-                 search python:request.get('search', '');
+                 search_term python:request.get('s', '');
                  limit  python:request.get('limit',  '');
                  score  python:request.get('score',  0.6);
                  num_similar    python:request.get('num_similar',7);
@@ -111,7 +111,7 @@ div.simkeywords {
                  i18n:translate="label_keyword">
               Keyword
           </label>
-          <input type="text" name="s" autocomplete="off">
+          <input type="text" name="s" autocomplete="off" tal:attributes="value search_term">
           <ul class="livesearch-results" style="display:none;">
             <li i18n:translate="label_select">Select...</li>
           </ul>
