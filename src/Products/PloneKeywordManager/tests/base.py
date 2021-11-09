@@ -23,6 +23,8 @@ class BaseIntegrationTestCase(unittest.TestCase):
 
     def markRequestWithLayer(self):
         # to be removed when p.a.testing will fix https://dev.plone.org/ticket/11673
+        # Well, that's a 404, but p.a.testing 4.2.2 -> 4.2.4 has a release note that it was fixed
+        #  Plone 4.3.3 release notes.
         request = self.layer["request"]
         interface.alsoProvides(request, IPloneKeywordManagerLayer)
 
