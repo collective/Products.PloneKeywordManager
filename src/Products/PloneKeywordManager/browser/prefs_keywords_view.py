@@ -76,11 +76,20 @@ class PrefsKeywordsView(BrowserView):
                          b_size, b_start)
         else:
             all = self.pkm.getKeywords(indexName=indexName)
-            max_results = 10000
+            max_results = 100000 #I don't want to limit the results here... this is simply a big number.
             score = 0.5
             return Batch(self.pkm.getScoredMatches(search_string, all, max_results,
                                                    score, context=self.context),
                          b_size, b_start)
+
+    def getNumObjects(self, keyword, indexName):
+        """
+        return the number of indexed objects with the specificed keyword
+        :param keyword: string
+        :return: int
+        """
+        return self.pkm.getKeywordLength(keyword, indexName)
+
 
     def getKeywordIndexes(self):
         return self.pkm.getKeywordIndexes()
