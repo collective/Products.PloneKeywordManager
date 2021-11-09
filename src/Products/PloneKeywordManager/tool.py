@@ -153,6 +153,37 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         #can we turn this into a yield?
         return list(sorted(keywords, key=lambda x: x.lower()))
 
+    def getKeywordsWithLengths(self, indexName="Subject"):
+        processQueue()
+        if indexName not in self.getKeywordIndexes():
+            raise ValueError("%s is not a valid field" % indexName)
+
+        catalog = getToolByName(self, "portal_catalog")
+        idx = catalog._catalog.getIndex(indexName)
+        keywords = idx.uniqueValues(withLengths=1)
+
+        return list(sorted(keywords, key=lambda x,y: x.lower()))
+
+    def getKeywordLength(self, key, indexName="Subject"):
+        processQueue()
+        if indexName not in self.getKeywordIndexes():
+            raise ValueError("%s is not a valid field" % indexName)
+
+        catalog = getToolByName(self, "portal_catalog")
+        idx = catalog._catalog.getIndex(indexName)
+
+        try:
+            val = idx._index[key]
+        except KeyError:
+            count = 0
+        else:
+            count = len(val)
+
+        return count
+
+
+
+
     @security.protected(config.MANAGE_KEYWORDS_PERMISSION)
     def getScoredMatches(self, word, possibilities, num, score, context=None):
         """ Take a word,

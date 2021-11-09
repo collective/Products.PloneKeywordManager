@@ -82,6 +82,15 @@ class PrefsKeywordsView(BrowserView):
                                                    score, context=self.context),
                          b_size, b_start)
 
+    def getNumObjects(self, keyword, indexName):
+        """
+        return the number of indexed objects with the specificed keyword
+        :param keyword: string
+        :return: int
+        """
+        return self.pkm.getKeywordLength(keyword, indexName)
+
+
     def getKeywordIndexes(self):
         return self.pkm.getKeywordIndexes()
 
