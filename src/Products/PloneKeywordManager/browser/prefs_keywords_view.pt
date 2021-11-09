@@ -31,8 +31,8 @@ div.keywordvalue {
 ￼    float: unset;
 }
 
-div.simkeywords {
-￼    color: gray;
+div.simkeywords{
+     color: gray;
 }
 
 div#change_to label{
