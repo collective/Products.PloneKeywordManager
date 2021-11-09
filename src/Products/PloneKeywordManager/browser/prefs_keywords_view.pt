@@ -12,8 +12,7 @@
 div#keyword_searcher {
     display: inline-block;
     width: 60%;
-    border-left: 1px solid #c0c0c0;
-    padding-left: 10px;
+    padding-left: 120px;
 }
 div#keyword_searcher .field {   display: inline-block; }
 div#keyword_searcher .formControls { display: inline-block; border-top: 0px; }
@@ -232,6 +231,7 @@ div#delete_keywords {
            Error message goes here
         </div>
       </div>
+      <hr/>
       <div id="change_to">
         <label for="changeto">enter value for keyword replacement / renaming</label>
         <input id="input_change_to" type="text" name="changeto"/>
