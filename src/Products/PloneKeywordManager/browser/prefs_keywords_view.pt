@@ -35,6 +35,27 @@ div.keywordvalue {
 div.simkeywords {
 ￼    color: gray;
 }
+
+div#change_to label{
+     width: 100%;
+}
+input#input_change_to{
+ width: 45%;
+ display: inline-block;
+}
+
+input#btn_change_to{
+   margin-left: 10px;
+   padding-left: 21px;
+   padding-right: 21px;
+}
+
+div#delete_keywords {
+ display: block;
+ margin-top: 20px
+}
+
+
 </style>
 </tal:styleslot>
 <body>
@@ -103,13 +124,13 @@ div.simkeywords {
       <input type="hidden" name="field" tal:attributes="value field" />
       <fieldset>
         <legend i18n:translate="label_search_by_keyword">
-            Search by keyword
+            Filter Keywords with search string
         </legend>
 
         <div class="field">
           <label for="select_keyword_list"
                  i18n:translate="label_keyword">
-              Keyword
+              Filter
           </label>
           <input type="text" name="s" autocomplete="off" tal:attributes="value search_term">
           <ul class="livesearch-results" style="display:none;">
@@ -199,6 +220,7 @@ div.simkeywords {
          </tal:def>
         </div>
 	  </div>
+      </fieldset>
 	  <tal:batchnavigation
         define="batchnavigation nocall:context/@@batchnavigation"
         replace="structure python:batchnavigation(batch)" />
@@ -210,22 +232,30 @@ div.simkeywords {
            Error message goes here
         </div>
       </div>
-      <input class="context"
-             type="submit"
-             name="form.button.Merge"
-             title="Rename all selected keywords to new value"
-             i18n:attributes="value; title"
-             value="Rename All Keywords To:"
-             style="margin-right: 10px; float: left;padding-left: 21px;padding-right: 21px;"/>
-      <input id="input_change_to" type="text" name="changeto" style="width: 50%" />
-      <input class="destructive"
-             id="input_delete_keyword"
-             type="submit"
-             name="form.button.Delete"
-             i18n:attributes="value; title"
-             title="Delete all selected keywords"
-             value="Delete all selected keywords" />
-      </fieldset>
+      <div id="change_to">
+        <label for="changeto">enter value for keyword replacement / renaming</label>
+        <input id="input_change_to" type="text" name="changeto"/>
+        <input class="context"
+               id="btn_change_to"
+               type="submit"
+               name="form.button.Merge"
+               title="Rename all selected keywords to new value"
+               i18n:attributes="value; title"
+               value="Rename All Selected Keywords"
+        />
+      </div>
+      <div id="delete_keywords">
+        <label for="form.button.Delete">Or you can delete all selected keywords</label>
+        <input class="destructive"
+               id="input_delete_keyword"
+               type="submit"
+               name="form.button.Delete"
+               i18n:attributes="value; title"
+               title="Delete all selected keywords"
+               value="Delete all selected keywords"
+        />
+      </div>
+
     </form>
     <script type="text/javascript">
         $(document).ready(function(){$('#simkeyword')[0].checked=false;})
