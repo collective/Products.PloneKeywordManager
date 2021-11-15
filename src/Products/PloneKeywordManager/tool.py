@@ -147,8 +147,9 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
 
         catalog = getToolByName(self, "portal_catalog")
         keywords = catalog.uniqueValuesFor(indexName)
-        # Filter out empty keywords.  The sorting breaks when None is indexed.
-        keywords = filter(None, keywords)
+        # Filter out Null keywords.  The sorting breaks when None is indexed.
+        def notNone(x): return x is not None
+        keywords = filter(notNone, keywords)
 
         #can we turn this into a yield?
         return list(sorted(keywords, key=lambda x: x.lower()))
