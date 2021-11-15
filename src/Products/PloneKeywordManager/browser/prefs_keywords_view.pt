@@ -54,6 +54,9 @@ div#delete_keywords {
  margin-top: 20px
 }
 
+nav.pagination {
+  text-align: center;
+}
 
 </style>
 </tal:styleslot>
