@@ -3,15 +3,15 @@ Changelog
 
 3.0.4?  issue-17 branch (unmerged)
 -----------------
-* Improvements to form performance when site has an extreme amount of keywords. [flipmcf]
-  -- Implemented use of CMFPlone.PloneBatch for result set.
-  -- Removed the "View range" form as that should be handled by plone batching now.
+- Improvements to form performance when site has an extreme amount of keywords. [flipmcf]
+  	- Implemented use of CMFPlone.PloneBatch for result set.
+  	- Removed the "View range" form as that should be handled by plone batching now.
+  	- Fixes `issue #17 <https://github.com/collective/Products.PloneKeywordManager/issues/17>`_.
+	
+- Removed direct calls to PloneKeywordManager tool from template (best practice). [flipmcf]
 
-- Removed direct calls to PloneKeywordManager tool from template (best practice)  [flipmcf] 
-    template must go through view for everything.
-
-- Fix https://github.com/collective/Products.PloneKeywordManager/issues/45 
-     Filter out only None keyword values, not false values [flipmcf]
+- Filter out only None keyword values, not false values. Fixes `issue #45 <https://github.com/collective/Products.PloneKeywordManager/issues/45>`_. [flipmcf]
+     
 
 3.0.4 (unreleased)
 ------------------
