@@ -93,13 +93,9 @@ div#delete_keywords {
     <form action="prefs_keywords_view" method="get"
           tal:attributes="action string:${context/absolute_url}/prefs_keywords_view">
       <fieldset>
-        <legend i18n:translate="label_choose_keyword_field">
-        Choose Keyword Field/Index
-        </legend>
-
         <div class="field">
-          <label for="kwfield" i18n:translate="label_keyword_field">
-          Keyword Field
+          <label for="kwfield" i18n:translate="label_choose_keyword_field">
+          Choose Keyword Field/Index
           </label>
 
           <select id="kwfield" name="field"
@@ -122,14 +118,9 @@ div#delete_keywords {
           data-pat-livesearch="ajaxUrl:${context/absolute_url}/keywordsmanager-search-json">
       <input type="hidden" name="field" tal:attributes="value field" />
       <fieldset>
-        <legend i18n:translate="label_search_by_keyword">
-            Filter Keywords with search string
-        </legend>
-
         <div class="field">
-          <label for="select_keyword_list"
-                 i18n:translate="label_keyword">
-              Filter
+          <label for="select_keyword_list" i18n:translate="label_search_by_keyword">
+            Filter Keywords with search string
           </label>
           <input type="text" name="s" autocomplete="off" tal:attributes="value search_term">
           <ul class="livesearch-results" style="display:none;">

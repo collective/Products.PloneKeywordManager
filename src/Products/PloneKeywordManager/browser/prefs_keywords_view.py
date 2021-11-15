@@ -135,8 +135,7 @@ class PrefsKeywordsView(BrowserView):
         return self.doReturn(msg, msg_type, field=field)
 
     def deleteKeywords(self, keywords, field):
-        pkm = getToolByName(self.context, "portal_keyword_manager")
-        deleted_objects = pkm.delete(keywords, context=self.context, indexName=field)
+        deleted_objects = self.pkm.delete(keywords, context=self.context, indexName=field)
         msg = _(
             "msg_deleted_keywords",
             default=u"Deleted ${keywords} for ${num} object(s).",
