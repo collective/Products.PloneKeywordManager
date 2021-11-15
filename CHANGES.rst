@@ -9,8 +9,9 @@ Changelog
 
 - Removed direct calls to PloneKeywordManager tool from template (best practice)  [flipmcf] 
     template must go through view for everything.
-    
-- Renaming variables in template from 'subject' to 'keyword' - better reflects the option to view different fields. [flipmcf]
+
+- Fix https://github.com/collective/Products.PloneKeywordManager/issues/45 
+     Filter out only None keyword values, not false values [flipmcf]
 
 3.0.4 (unreleased)
 ------------------
