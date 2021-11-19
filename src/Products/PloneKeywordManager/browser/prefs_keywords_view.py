@@ -62,6 +62,9 @@ class PrefsKeywordsView(BrowserView):
         if "form.button.Delete" in self.request.form:
             return self.deleteKeywords(keywords, field)
 
+    def getNavrootUrl(self):
+        return api.portal.get_navigation_root(self.context).absolute_url()
+
     def getKeywords(self, indexName, b_start=0, b_size=30):
         """
         :param indexName the name of the index we want to get all keywords for.
