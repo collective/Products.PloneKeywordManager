@@ -75,11 +75,12 @@ nav.pagination {
                  batch python:view.getKeywords(indexName=field, b_start=batch_start, b_size=batch_size);
 
                  total_keywords python:batch.sequence_length;
+                 navroot_url python:view.getNavrootUrl();
 
-                 url_quote python:modules['Products.PythonScripts.standard'].url_quote">
+                 url_quote python:modules['Products.PythonScripts.standard'].url_quote;
+                 ">
 
   <h1 i18n:translate="heading_keyword_manager">Keyword Manager</h1>
-
     <a href=""
        class="link-parent"
        tal:attributes="href string: $portal_url/plone_control_panel"
@@ -176,11 +177,11 @@ nav.pagination {
               <label tal:content="keyword" tal:attributes="for string:keyword-${keyword_id};">Keyword</label>
               <span class="keyword_count"> (<tal:count tal:content="keyword_count">0101</tal:count>) </span>
               <tal:p5 tal:condition="view/is_plone_5">
-                <a href="#" tal:attributes="href string:${portal_url}/@@search?${field}=${keyword_quote}">
+                <a href="#" tal:attributes="href string:${navroot_url}/@@search?${field}=${keyword_quote}">
                   <span class="icon-search"></span></a>
               </tal:p5>
               <tal:p4 tal:condition="not: view/is_plone_5">
-                <a href="#" tal:attributes="href string:${portal_url}/@@search?${field}=${keyword_quote}">
+                <a href="#" tal:attributes="href string:${navroot_url}/@@search?${field}=${keyword_quote}">
                   <img i18n:attributes="alt"
                        i18n:domain="plone"
                        tal:attributes="src string:${portal_url}/search_icon.png;"
