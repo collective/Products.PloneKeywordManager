@@ -168,13 +168,14 @@ nav.pagination {
              tal:repeat="keyword python:batch">
         <tal:def tal:define="keyword_id python:context.plone_utils.normalizeString(keyword);
                              keyword_quote python:url_quote(keyword);
-                             keyword_count python:view.getNumObjects(keyword, field)">
+                             keyword_count python:view.getNumObjects(keyword, field);
+                             keyword_display python:keyword.replace(' ', chr(0x00B7));">
          <div class="keywordvalue">
               <input type="checkbox" name="keywords:list"
                      tal:attributes="value keyword;
                                      id string:keyword-${keyword_id};
                                      onclick string:document.forms['keyword_edit_form'].changeto.value='${keyword}';; return true;;" />
-              <label tal:content="keyword" tal:attributes="for string:keyword-${keyword_id};">Keyword</label>
+              <label tal:content="keyword_display" tal:attributes="for string:keyword-${keyword_id};">Keyword</label>
               <span class="keyword_count"> (<tal:count tal:content="keyword_count">0101</tal:count>) </span>
               <tal:p5 tal:condition="view/is_plone_5">
                 <a href="#" tal:attributes="href string:${navroot_url}/@@search?${field}=${keyword_quote}">

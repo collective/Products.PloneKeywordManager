@@ -83,9 +83,6 @@ class PrefsKeywordsView(BrowserView):
             keywords = self.pkm.getScoredMatches(search_string, all, max_results,
                                                    score, context=self.context)
 
-        # we will repace spaces with midddot for readability
-        keywords = [x.replace(' ', chr(0x00B7)) for x in keywords]
-
         return Batch(keywords, b_size, b_start)
 
     def getNumObjects(self, keyword, indexName):
