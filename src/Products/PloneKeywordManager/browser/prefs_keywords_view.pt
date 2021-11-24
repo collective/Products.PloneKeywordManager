@@ -229,7 +229,6 @@ nav.pagination {
            Error message goes here
         </div>
       </div>
-      <hr/>
       <div id="change_to">
         <label for="changeto">enter value for keyword replacement / renaming</label>
         <input id="input_change_to" type="text" name="changeto"/>
