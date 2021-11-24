@@ -75,15 +75,18 @@ class PrefsKeywordsView(BrowserView):
         search_string = self.request.get('s', None)
 
         if not search_string:
-            return Batch(self.pkm.getKeywords(indexName=indexName),
-                         b_size, b_start)
+            keywords = self.pkm.getKeywords(indexName=indexName)
         else:
             all = self.pkm.getKeywords(indexName=indexName)
             max_results = 100000 #I don't want to limit the results here... this is simply a big number.
             score = 0.5
-            return Batch(self.pkm.getScoredMatches(search_string, all, max_results,
-                                                   score, context=self.context),
-                         b_size, b_start)
+            keywords = self.pkm.getScoredMatches(search_string, all, max_results,
+                                                   score, context=self.context)
+
+        # we will repace spaces with midddot for readability
+        keywords = [x.replace(' ', chr(0x00B7)) for x in keywords]
+
+        return Batch(keywords, b_size, b_start)
 
     def getNumObjects(self, keyword, indexName):
         """
