@@ -6,10 +6,6 @@
     :alt: Coveralls badge
     :target: https://coveralls.io/r/collective/Products.PloneKeywordManager
 
-.. image:: https://pypip.in/d/Products.PloneKeywordManager/badge.png
-    :target: https://pypi.python.org/pypi/Products.PloneKeywordManager/
-    :alt: Downloads
-
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
     :target: https://github.com/ambv/black
     :alt: Code style: black
@@ -31,7 +27,7 @@ Installation
 ============
 
 In your buildout add ``Products.PloneKeywordManager`` to your instances eggs section or policy packages ``setup.py``.
-If you want similiarity search add ``Products.PloneKeywordManager`[Levenshtein]`` instead.
+If you want similiarity search add ``Products.PloneKeywordManager[Levenshtein]`` instead.
 
 Run buildout.
 Activate it at Site Setups Add Ons page.
