@@ -229,7 +229,6 @@ nav.pagination {
            Error message goes here
         </div>
       </div>
-      <hr/>
       <div id="change_to">
         <label for="changeto">enter value for keyword replacement / renaming</label>
         <input id="input_change_to" type="text" name="changeto"/>
@@ -237,9 +236,9 @@ nav.pagination {
                id="btn_change_to"
                type="submit"
                name="form.button.Merge"
-               title="Rename all selected keywords to new value"
                i18n:attributes="value; title"
-               value="Rename All Selected Keywords"
+               title="Rename"
+               value="Rename"
         />
       </div>
       <div id="delete_keywords">
@@ -249,8 +248,8 @@ nav.pagination {
                type="submit"
                name="form.button.Delete"
                i18n:attributes="value; title"
-               title="Delete all selected keywords"
-               value="Delete all selected keywords"
+               title="Delete"
+               value="Delete"
         />
       </div>
 
