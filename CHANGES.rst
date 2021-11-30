@@ -4,8 +4,7 @@ Changelog
 
 3.0.4 (unreleased)
 ------------------
-
-- Fix UnicodeDecodeError in portal status message after merging non-ascii keywords. 
+- Fix UnicodeDecodeError in portal status message after merging non-ascii keywords.
   [jensens]
   
 - Improvements to form performance when site has an extreme amount of keywords. [flipmcf]
@@ -16,7 +15,6 @@ Changelog
 - Removed direct calls to PloneKeywordManager tool from template (best practice). [flipmcf]
 
 - Filter out only None keyword values, not false values. Fixes `issue #45 <https://github.com/collective/Products.PloneKeywordManager/issues/45>`_. [flipmcf]
-
 
 
 3.0.3 (2021-01-27)
