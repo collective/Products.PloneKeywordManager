@@ -3,10 +3,7 @@ Changelog
    
 
 3.0.4 (unreleased)
-------------------
-- Fix UnicodeDecodeError in portal status message after merging non-ascii keywords.
-  [jensens]
-  
+------------------ 
 - Improvements to form performance when site has an extreme amount of keywords. [flipmcf]
         - Implemented use of CMFPlone.PloneBatch for result set.
   	- Removed the "View range" form as that should be handled by plone batching now.
