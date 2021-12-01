@@ -31,7 +31,6 @@ class PrefsKeywordsView(BrowserView):
         super().__init__(context, request)
         self.pkm = getToolByName(self.context, "portal_keyword_manager")
 
-
     def __call__(self):
         self.is_plone_5 = PLONE_5
         if not self.request.form.get(
@@ -161,8 +160,8 @@ class PrefsKeywordsView(BrowserView):
             pu.addPortalMessage(message, type=msg_type)
 
         logger.info(self.context.translate(message))
-        portal_url = self.context.portal_url()
-        url = "%s/prefs_keywords_view" % portal_url
+        navroot_url = api.portal.get_navigation_root(self.context).absolute_url()
+        url = "%s/prefs_keywords_view" % navroot_url
         if field:
             url = "%s?field=%s" % (url, field)
 
@@ -186,14 +185,14 @@ class KeywordsSearchResults(BrowserView):
         field = self.request.form.get('field')
 
         results = self.results(search_string, index_name=field)
-        portal_url = self.context.portal_url()
+        navroot_url = api.portal.get_navigation_root(self.context).absolute_url()
 
         for result in results:
             items.append({'id': result,
                           'title': result,
                           'description': '',
                           'state': "keyword",
-                          'url': "%s/prefs_keywords_view?field=%s&s=%s" % (portal_url, field, result),
+                          'url': "%s/prefs_keywords_view?field=%s&s=%s" % (navroot_url, field, result),
                           })
 
         self.request.response.setHeader("Content-type", "application/json")
