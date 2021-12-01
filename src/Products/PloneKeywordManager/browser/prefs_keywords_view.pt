@@ -159,7 +159,7 @@ nav.pagination {
         </div>
 		<p class="discreet" i18n:translate="help_keyword_assignments">
 		Select one or more keywords, then either
-		 set a replacement keyword and click on 'Merge / Replace' to replace all selected value by this one.
+		 set a replacement keyword and click on 'Rename' to replace all selected value by this one.
 		 Click on Delete to remove selected values.
 		</p>
 
