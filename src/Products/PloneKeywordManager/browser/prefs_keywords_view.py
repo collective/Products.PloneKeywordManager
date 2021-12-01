@@ -10,6 +10,7 @@ from Products.PloneKeywordManager import keywordmanagerMessageFactory as _
 from Products.PloneKeywordManager.compat import to_str
 from Products.CMFPlone.utils import safe_encode
 from Products.CMFPlone.PloneBatch import Batch
+from ZTUtils import make_query
 
 import logging
 
@@ -31,7 +32,6 @@ class PrefsKeywordsView(BrowserView):
         super().__init__(context, request)
         self.pkm = getToolByName(self.context, "portal_keyword_manager")
 
-
     def __call__(self):
         self.is_plone_5 = PLONE_5
         if not self.request.form.get(
@@ -44,18 +44,18 @@ class PrefsKeywordsView(BrowserView):
 
         if not keywords:
             message = _(u"Please select at least one keyword")
-            return self.doReturn(message, "error", field=field)
+            return self.doReturn(message, "error")
 
         if not field or field not in self.pkm.getKeywordIndexes():
             message = _(u"Please select a valid keyword field")
-            return self.doReturn(message, "error", field=field)
+            return self.doReturn(message, "error")
 
         if "form.button.Merge" in self.request.form:
             # We should assume there is a 'changeto' filled
             changeto = self.request.get("changeto", None)
             if not changeto:
                 message = _(u"Please provide a new term")
-                return self.doReturn(message, "error", field=field)
+                return self.doReturn(message, "error")
 
             return self.changeKeywords(keywords, changeto, field)
 
@@ -135,7 +135,7 @@ class PrefsKeywordsView(BrowserView):
         else:
             msg_type = "warning"
 
-        return self.doReturn(msg, msg_type, field=field)
+        return self.doReturn(msg, msg_type)
 
     def deleteKeywords(self, keywords, field):
         deleted_objects = self.pkm.delete(keywords, context=self.context, indexName=field)
@@ -150,9 +150,9 @@ class PrefsKeywordsView(BrowserView):
         else:
             msg_type = "warning"
 
-        return self.doReturn(msg, msg_type, field=field)
+        return self.doReturn(msg, msg_type)
 
-    def doReturn(self, message="", msg_type="", field=""):
+    def doReturn(self, message="", msg_type=""):
         """
         set the message and return
         """
@@ -161,12 +161,19 @@ class PrefsKeywordsView(BrowserView):
             pu.addPortalMessage(message, type=msg_type)
 
         logger.info(self.context.translate(message))
-        portal_url = self.context.portal_url()
-        url = "%s/prefs_keywords_view" % portal_url
-        if field:
-            url = "%s?field=%s" % (url, field)
+        navroot_url = api.portal.get_navigation_root(self.context).absolute_url()
+        url = "%s/prefs_keywords_view" % navroot_url
+        
+        query = dict()
+        if self.request.get('field', False):
+            query['field'] = self.request['field']
+        if self.request.get('s', False):
+            query['s'] = self.request['s']
+        if self.request.get('b_start', False):
+            query['b_start'] = self.request['b_start']
 
-        self.request.RESPONSE.redirect(url)
+
+        self.request.RESPONSE.redirect(f"{url}?{make_query(**query)}")
 
 
 class KeywordsSearchResults(BrowserView):
@@ -186,14 +193,14 @@ class KeywordsSearchResults(BrowserView):
         field = self.request.form.get('field')
 
         results = self.results(search_string, index_name=field)
-        portal_url = self.context.portal_url()
+        navroot_url = api.portal.get_navigation_root(self.context).absolute_url()
 
         for result in results:
             items.append({'id': result,
                           'title': result,
                           'description': '',
                           'state': "keyword",
-                          'url': "%s/prefs_keywords_view?field=%s&s=%s" % (portal_url, field, result),
+                          'url': "%s/prefs_keywords_view?field=%s&s=%s" % (navroot_url, field, result),
                           })
 
         self.request.response.setHeader("Content-type", "application/json")

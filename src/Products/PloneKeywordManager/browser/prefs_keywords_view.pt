@@ -145,8 +145,10 @@ nav.pagination {
           tal:attributes="action string:${context/absolute_url}/prefs_keywords_view"
           >
                         <input type="hidden" name="form.submitted" value="1" />
-                        <input type="hidden" name="limit" tal:attributes="value limit" />
                         <input type="hidden" name="field" tal:attributes="value field" />
+                        <input type="hidden" name="s" tal:attributes="value search_term" />
+                        <input type="hidden" name="b_start:int" tal:attributes="value batch_start" />
+
       <fieldset>
         <legend i18n:translate="label_keyword_assignments">
           Keyword assignments
