@@ -42,10 +42,3 @@ jobs:
         pip install tox
     - name: Test
       run: tox -e ${{ matrix.config[1] }}
-    - name: Coverage
-      run: |
-        bin/createcoverage --output-dir=parts/test/coverage
-        pip install -q coveralls
-        coveralls
-
-
