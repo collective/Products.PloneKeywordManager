@@ -1,7 +1,7 @@
 
 
 
-.. image:: https://github.com/collective/Products.PloneKeywordManager/actions/workflows/CI.yml/badge.svg?branch=flipmcf/issue-17
+.. image:: https://github.com/collective/Products.PloneKeywordManager/actions/workflows/CI.yml/badge.svg
     :alt: Github Testing Badge
     :target: https://github.com/collective/Products.PloneKeywordManager/actions/workflows/CI.yml
 
