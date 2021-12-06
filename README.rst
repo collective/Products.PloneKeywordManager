@@ -1,6 +1,9 @@
-.. image:: https://travis-ci.org/collective/Products.PloneKeywordManager.png?branch=master
-    :alt: Travis CI badge
-    :target: https://travis-ci.org/collective/Products.PloneKeywordManager
+
+
+
+.. image:: https://github.com/collective/Products.PloneKeywordManager/actions/workflows/CI.yml/badge.svg?branch=flipmcf/issue-17
+    :alt: Github Testing Badge
+    :target: https://github.com/collective/Products.PloneKeywordManager/actions/workflows/CI.yml
 
 .. image:: https://coveralls.io/repos/collective/Products.PloneKeywordManager/badge.png?branch=master
     :alt: Coveralls badge
@@ -10,8 +13,6 @@
     :target: https://github.com/ambv/black
     :alt: Code style: black
     
- ![Testing](https://github.com/collective/Products.PloneKeywordManager/actions/workflows/CI.yml/badge.svg)
-
 
 Plone Keyword Manager
 =====================
