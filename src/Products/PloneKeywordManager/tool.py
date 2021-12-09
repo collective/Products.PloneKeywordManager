@@ -94,14 +94,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
                 # MONOVALUED FIELD
                 value = new_keyword
 
-                # #MOD Dynamic field update
-
-            updateField = self.getSetter(obj, indexName)
-            if updateField is not None:
-                updateField(value)
-                idxs = self._getFullIndexList(indexName)
-                obj.reindexObject(idxs=idxs)
-
+        self.updateObject(obj, indexName, value)
         return len(querySet)
 
     @security.protected(config.MANAGE_KEYWORDS_PERMISSION)
@@ -110,7 +103,6 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
 
         Returns the number of objects that have been updated.
         """
-        # #Mod Dynamic field
         query = {indexName: keywords}
         if context is not None:
             query["path"] = "/".join(context.getPhysicalPath())
@@ -131,13 +123,16 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
                 # MONOVALUED
                 value = None
 
-            updateField = self.getSetter(obj, indexName)
-            if updateField is not None:
-                updateField(value)
-                idxs = self._getFullIndexList(indexName)
-                obj.reindexObject(idxs=idxs)
+            self.updateObject(obj, indexName, value)
 
         return len(querySet)
+
+    def updateObject(self, obj, indexName, value):
+        updateField = self.getSetter(obj, indexName)
+        if updateField is not None:
+            updateField(value)
+            idxs = self._getFullIndexList(indexName)
+            obj.reindexObject(idxs=idxs)
 
     @security.protected(config.MANAGE_KEYWORDS_PERMISSION)
     def getKeywords(self, indexName="Subject"):
