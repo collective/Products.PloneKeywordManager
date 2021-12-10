@@ -94,14 +94,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
                 # MONOVALUED FIELD
                 value = new_keyword
 
-                # #MOD Dynamic field update
-
-            updateField = self.getSetter(obj, indexName)
-            if updateField is not None:
-                updateField(value)
-                idxs = self._getFullIndexList(indexName)
-                obj.reindexObject(idxs=idxs)
-
+        self.updateObject(obj, indexName, value)
         return len(querySet)
 
     @security.protected(config.MANAGE_KEYWORDS_PERMISSION)
@@ -110,7 +103,6 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
 
         Returns the number of objects that have been updated.
         """
-        # #Mod Dynamic field
         query = {indexName: keywords}
         if context is not None:
             query["path"] = "/".join(context.getPhysicalPath())
@@ -131,25 +123,62 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
                 # MONOVALUED
                 value = None
 
-            updateField = self.getSetter(obj, indexName)
-            if updateField is not None:
-                updateField(value)
-                idxs = self._getFullIndexList(indexName)
-                obj.reindexObject(idxs=idxs)
+            self.updateObject(obj, indexName, value)
 
         return len(querySet)
 
+    def updateObject(self, obj, indexName, value):
+        updateField = self.getSetter(obj, indexName)
+        if updateField is not None:
+            updateField(value)
+            idxs = self._getFullIndexList(indexName)
+            obj.reindexObject(idxs=idxs)
+
     @security.protected(config.MANAGE_KEYWORDS_PERMISSION)
-    def getKeywords(self, context=None, indexName="Subject"):
+    def getKeywords(self, indexName="Subject"):
         processQueue()
         if indexName not in self.getKeywordIndexes():
             raise ValueError("%s is not a valid field" % indexName)
 
         catalog = getToolByName(self, "portal_catalog")
         keywords = catalog.uniqueValuesFor(indexName)
-        # Filter out empty keywords.  The sorting breaks when None is indexed.
-        keywords = filter(None, keywords)
+        # Filter out Null keywords.  The sorting breaks when None is indexed.
+        def notNone(x): return x is not None
+        keywords = filter(notNone, keywords)
+
+        #can we turn this into a yield?
         return list(sorted(keywords, key=lambda x: x.lower()))
+
+    def getKeywordsWithLengths(self, indexName="Subject"):
+        processQueue()
+        if indexName not in self.getKeywordIndexes():
+            raise ValueError("%s is not a valid field" % indexName)
+
+        catalog = getToolByName(self, "portal_catalog")
+        idx = catalog._catalog.getIndex(indexName)
+        keywords = idx.uniqueValues(withLengths=1)
+
+        return list(sorted(keywords, key=lambda x,y: x.lower()))
+
+    def getKeywordLength(self, key, indexName="Subject"):
+        processQueue()
+        if indexName not in self.getKeywordIndexes():
+            raise ValueError("%s is not a valid field" % indexName)
+
+        catalog = getToolByName(self, "portal_catalog")
+        idx = catalog._catalog.getIndex(indexName)
+
+        try:
+            val = idx._index[key]
+        except KeyError:
+            count = 0
+        else:
+            count = len(val)
+
+        return count
+
+
+
 
     @security.protected(config.MANAGE_KEYWORDS_PERMISSION)
     def getScoredMatches(self, word, possibilities, num, score, context=None):

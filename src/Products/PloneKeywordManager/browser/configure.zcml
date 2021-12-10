@@ -9,12 +9,20 @@
       />
 
   <browser:page
-      for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+      for="*"
       name="prefs_keywords_view"
       template="prefs_keywords_view.pt"
       class=".prefs_keywords_view.PrefsKeywordsView"
       permission="plone_keyword_manager.UsePloneKeywordManager"
       layer=".interfaces.IPloneKeywordManagerLayer"
       />
+
+  <browser:page
+      for="*"
+      name="keywordsmanager-search-json"
+      class=".prefs_keywords_view.KeywordsSearchResults"
+      permission="plone_keyword_manager.UsePloneKeywordManager"
+      layer=".interfaces.IPloneKeywordManagerLayer"
+  />
 
 </configure>

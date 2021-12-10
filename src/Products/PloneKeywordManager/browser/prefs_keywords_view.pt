@@ -6,23 +6,81 @@
 <tal:block metal:fill-slot="top_slot">
    <tal:block tal:define="dummy python:request.set('disable_border',1)" />
 </tal:block>
+<tal:styleslot metal:fill-slot="style_slot" >
+<style>
 
+div#keyword_searcher {
+    display: inline-block;
+    width: 60%;
+    padding-left: 120px;
+}
+div#keyword_searcher .field {   display: inline-block; }
+div#keyword_searcher .formControls { display: inline-block; border-top: 0px; }
+
+div#index_chooser{
+    display: inline-block;
+    width: 30%;
+    padding-right: 10px;
+}
+
+div.keyword{
+    margin-bottom: 1em;
+}
+
+div.keywordvalue {
+￼    float: unset;
+}
+
+div.simkeywords{
+     color: gray;
+}
+
+div#change_to label{
+     width: 100%;
+}
+input#input_change_to{
+ width: 45%;
+ display: inline-block;
+}
+
+input#btn_change_to{
+   margin-left: 10px;
+   padding-left: 21px;
+   padding-right: 21px;
+}
+
+div#delete_keywords {
+ display: block;
+ margin-top: 20px
+}
+
+nav.pagination {
+  text-align: center;
+}
+
+</style>
+</tal:styleslot>
 <body>
+
 <div metal:fill-slot="prefs_configlet_main"
      tal:define="errors python:request.get('errors', {});
-                 search python:request.get('search', '');
+                 search_term python:request.get('s', '');
                  limit  python:request.get('limit',  '');
                  score  python:request.get('score',  0.6);
-                 num    python:request.get('num',7);
+                 num_similar    python:request.get('num_similar',7);
                  field  python:request.get('field','Subject');
-                 many_kws python: 20;
-                 pkm    context/portal_keyword_manager;
-                 catalogSubjects python:pkm.getKeywords(context=context,indexName=field);
-                 show_filters python: len(catalogSubjects) > many_kws;
-                 url_quote python:modules['Products.PythonScripts.standard'].url_quote">
+
+                 batch_start python:request.get('b_start',0);
+                 batch_size python:request.get('b_size', 30);
+                 batch python:view.getKeywords(indexName=field, b_start=batch_start, b_size=batch_size);
+
+                 total_keywords python:batch.sequence_length;
+                 navroot_url python:view.getNavrootUrl();
+
+                 url_quote python:modules['Products.PythonScripts.standard'].url_quote;
+                 ">
 
   <h1 i18n:translate="heading_keyword_manager">Keyword Manager</h1>
-
     <a href=""
        class="link-parent"
        tal:attributes="href string: $portal_url/plone_control_panel"
@@ -33,237 +91,176 @@
 
     <div class="documentDescription"
          i18n:translate="description_keyword_manager">
-    The Keyword Manager allows you to delete and merge keywords in your portal.
+    The Keyword Manager allows you to delete and rename/merge keywords in your portal.
     </div>
-
-      <tal:kw_fields tal:define="kwfields pkm/getKeywordIndexes"
-                     tal:condition="python:len(kwfields)>1">
-        <form action="prefs_keywords_view" method="get"
-              tal:attributes="action string:${context/absolute_url}/prefs_keywords_view">
-            <fieldset>
-                <legend i18n:translate="label_choose_keyword_field">
-                 Choose Keyword Field/Index
-                </legend>
-
-            <div class="field">
-                <label for="kwfield" i18n:translate="label_keyword_field">
-                    Keyword Field
-                </label>
-
-                <select id="kwfield" name="field"
-                        onchange="javascript:this.form.submit()">
-                    <option tal:repeat="fld kwfields"
-                            tal:attributes="value fld;
-                                            selected python:fld==field;"
-                            i18n:translate=""
-                            i18n:domain="plone"
-                            tal:content="python:fld.replace('get','',1)" />
-                </select>
-            </div>
-
-            <div class="formControls">
-              <input class="standalone"
-                     type="submit"
-                     value="Select Field"
-                     i18n:attributes="value" />
-            </div>
-
-            </fieldset>
-        </form>
-      </tal:kw_fields>
-
-      <fieldset>
-          <div class="field">
-              <input type="checkbox" name="simkeyword"
-                     id="simkeyword"
-                     onclick="$('.simkeywords').css('display', (this.checked)?'initial':'none');" />
-              <label for="simkeyword">Show similar keywords</label>
-          </div>
-      </fieldset>
-
-  <tal:site_has_keywords condition="python:len(catalogSubjects) > 0">
+    <div id="index_chooser">
     <form action="prefs_keywords_view" method="get"
-          tal:attributes="action string:${context/absolute_url}/prefs_keywords_view"
-          tal:condition="show_filters">
-        <input type="hidden" name="field" tal:attributes="value field" />
-        <fieldset>
-        <legend i18n:translate="label_list_alphabetically">
-              List alphabetically
-        </legend>
-
-        <div class="field">
-            <label for="select_alphabet_list"
-                   i18n:translate="label_view_range">
-                  View range
-            </label>
-
-            <select id="select_alphabet_list"
-                    name="limit" tabindex="1"
-                    onchange="javascript:this.form.submit()">
-
-                <option value="a-z">a - z</option>
-
-                <tal:block tal:repeat="item python:range(ord('a'),ord('z')+1)">
-                    <option value="a" tal:attributes="value python:chr(item);
-                                                      selected python:limit==chr(item) and True or None"
-                            tal:content="python:chr(item)">a</option>
-                </tal:block>
-
-            </select>
-        </div>
-
-        <div class="formControls">
-            <input class="standalone"
-                   type="submit"
-                   value="View keywords"
-                   i18n:attributes="value" />
-        </div>
-
-      </fieldset>
-    </form>
-
-    <form action="prefs_keywords_view"
-          tal:attributes="action string:${context/absolute_url}/prefs_keywords_view"
-          tal:condition="show_filters">
-      <input type="hidden" name="field" tal:attributes="value field" />
+          tal:attributes="action string:${context/absolute_url}/prefs_keywords_view">
       <fieldset>
-        <legend i18n:translate="label_search_by_keyword">
-            Search by keyword
-        </legend>
-
         <div class="field">
-
-          <label for="select_keyword_list"
-                 i18n:translate="label_keyword">
-              Keyword
+          <label for="kwfield" i18n:translate="label_choose_keyword_field">
+          Choose Keyword Field/Index
           </label>
 
-          <select id="select_keyword_list" name="search"
+          <select id="kwfield" name="field"
                   onchange="javascript:this.form.submit()">
-            <option value="" i18n:translate="label_select">Select...</option>
-           <tal:block tal:repeat="subject catalogSubjects">
-            <option tal:content="subject"
-                    tal:attributes="selected python:subject==search">Subject</option>
-           </tal:block>
+            <option tal:repeat="fld python:view.getKeywordIndexes()"
+                    tal:attributes="value fld;
+                                    selected python:fld==field;"
+                    i18n:translate=""
+                    i18n:domain="plone"
+                    tal:content="python:fld.replace('get','',1)" />
           </select>
-
         </div>
-
+      </fieldset>
+    </form>
+    </div>
+    <div id="keyword_searcher">
+    <form action="prefs_keywords_view"
+          tal:attributes="action string:${context/absolute_url}/prefs_keywords_view"
+          class="pat-livesearch"
+          data-pat-livesearch="ajaxUrl:${context/absolute_url}/keywordsmanager-search-json">
+      <input type="hidden" name="field" tal:attributes="value field" />
+      <fieldset>
+        <div class="field">
+          <label for="select_keyword_list" i18n:translate="label_search_by_keyword">
+            Filter Keywords with search string
+          </label>
+          <input type="text" name="s" autocomplete="off" tal:attributes="value search_term">
+          <ul class="livesearch-results" style="display:none;">
+            <li i18n:translate="label_select">Select...</li>
+          </ul>
+        </div>
         <div class="formControls">
-
           <input class="context"
                  type="submit"
                  value="Search"
                  i18n:attributes="value" />
-
         </div>
-
       </fieldset>
     </form>
+    </div>
 
     <form name="keyword_edit_form" action="." method="post"
-          tal:condition="python:not show_filters or search or limit"
           tal:attributes="action string:${context/absolute_url}/prefs_keywords_view"
           >
                         <input type="hidden" name="form.submitted" value="1" />
-                        <input type="hidden" name="limit" tal:attributes="value limit" />
                         <input type="hidden" name="field" tal:attributes="value field" />
+                        <input type="hidden" name="s" tal:attributes="value search_term" />
+                        <input type="hidden" name="b_start:int" tal:attributes="value batch_start" />
+
       <fieldset>
         <legend i18n:translate="label_keyword_assignments">
           Keyword assignments
         </legend>
-		<p class="discreet" i18n:translate="help_keyword_assignments">
-		Select one or more keywords, then set a replacement keyword and click on 'Merge / Replace' to replace all selected value by this one. Click on Delete to remove selected values.
-		</p>
         <div class="field">
-        <dl tal:repeat="subject python:search and [search] or catalogSubjects">
-         <tal:block
-            condition="python:not show_filters or search or limit=='a-z' or (subject and limit==subject.lower()[0])"
-            define="subject_id python:context.plone_utils.normalizeString(subject);
-                    subject_quote python:url_quote(subject)">
-         <dt>
-          <input type="checkbox" name="keywords:list"
-                 tal:attributes="value subject;
-                                 id string:subject-${subject_id};
-                                 onclick string:document.forms['keyword_edit_form'].changeto.value='${subject}';; return true;;" />
-          <label tal:content="subject" tal:attributes="for string:subject-${subject_id};">Subject</label>
-          <tal:p5 tal:condition="view/is_plone_5">
-            <a href="#" tal:attributes="href string:${portal_url}/@@search?${field}=${subject_quote}">
-              <span class="icon-search"></span></a>
-          </tal:p5>
-          <tal:p4 tal:condition="not: view/is_plone_5">
-            <a href="#" tal:attributes="href string:${portal_url}/@@search?${field}=${subject_quote}">
-              <img i18n:attributes="alt"
-                   i18n:domain="plone"
-                   tal:attributes="src string:${portal_url}/search_icon.png;"
-                   alt="Search"/></a>
-          </tal:p4>
-         </dt>
-         <dd class="simkeywords" style="display:none;">
-           <span tal:repeat="item python:pkm.getScoredMatches(subject, catalogSubjects, num, score, context=context)" style="white-space: nowrap;">
-             <span tal:condition="python:subject!=item"
-                   tal:define="item_id python:context.plone_utils.normalizeString(item)">
+           <input type="checkbox" name="simkeyword"
+                  id="simkeyword"
+                  onclick="$('.simkeywords').css('display', (this.checked)?'initial':'none');" />
+           <label for="simkeyword">Show similar keywords</label>
+        </div>
+		<p class="discreet" i18n:translate="help_keyword_assignments">
+		Select one or more keywords, then either
+		 set a replacement keyword and click on 'Rename' to replace all selected value by this one.
+		 Click on Delete to remove selected values.
+		</p>
+
+        <div class="field">
+        <div class="keyword"
+             tal:repeat="keyword python:batch">
+        <tal:def tal:define="keyword_id python:context.plone_utils.normalizeString(keyword);
+                             keyword_quote python:url_quote(keyword);
+                             keyword_count python:view.getNumObjects(keyword, field);
+                             keyword_display python:keyword.replace(' ', chr(0x00B7));">
+         <div class="keywordvalue">
               <input type="checkbox" name="keywords:list"
-                     tal:attributes="value item;
-                                     id string:item-${item_id};
-                                     onclick string: document.forms['keyword_edit_form'].changeto.value='${item}';; return true;;" />
-              <label tal:content="item" tal:attributes="for string:item-${item_id};">Subject</label>
+                     tal:attributes="value keyword;
+                                     id string:keyword-${keyword_id};
+                                     onclick string:document.forms['keyword_edit_form'].changeto.value='${keyword}';; return true;;" />
+              <label tal:content="keyword_display" tal:attributes="for string:keyword-${keyword_id};">Keyword</label>
+              <span class="keyword_count"> (<tal:count tal:content="keyword_count">0101</tal:count>) </span>
               <tal:p5 tal:condition="view/is_plone_5">
-                <a href="#" tal:attributes="href string:${portal_url}/@@search?${field}=${subject_quote}">
+                <a href="#" tal:attributes="href string:${navroot_url}/@@search?${field}=${keyword_quote}">
                   <span class="icon-search"></span></a>
               </tal:p5>
               <tal:p4 tal:condition="not: view/is_plone_5">
-                <a href="#" tal:attributes="href string:${portal_url}/@@search?${field}=${subject_quote}">
+                <a href="#" tal:attributes="href string:${navroot_url}/@@search?${field}=${keyword_quote}">
                   <img i18n:attributes="alt"
                        i18n:domain="plone"
                        tal:attributes="src string:${portal_url}/search_icon.png;"
                        alt="Search"/></a>
               </tal:p4>
-             </span>
-           </span>
-         </dd>
 
-         </tal:block>
 
-        </dl>
+             <div class="simkeywords" style="display:none;">
+               <span tal:repeat="item python:view.getScoredMatches(keyword, batch, num_similar, score)" style="white-space: nowrap;">
+                 <span tal:condition="python:keyword!=item"
+                       tal:define="item_id python:context.plone_utils.normalizeString(item)">
+                  <input type="checkbox" name="keywords:list"
+                         tal:attributes="value item;
+                                         id string:item-${item_id};
+                                         onclick string: document.forms['keyword_edit_form'].changeto.value='${item}';; return true;;" />
+                  <label tal:content="item" tal:attributes="for string:item-${item_id};">Keyword</label>
+                  <tal:p5 tal:condition="view/is_plone_5">
+                    <a href="#" tal:attributes="href string:${portal_url}/@@search?${field}=${keyword_quote}">
+                      <span class="icon-search"></span></a>
+                  </tal:p5>
+                  <tal:p4 tal:condition="not: view/is_plone_5">
+                    <a href="#" tal:attributes="href string:${portal_url}/@@search?${field}=${keyword_quote}">
+                      <img i18n:attributes="alt"
+                           i18n:domain="plone"
+                           tal:attributes="src string:${portal_url}/search_icon.png;"
+                           alt="Search"/></a>
+                  </tal:p4>
+                 </span>
+               </span>
+             </div>
+         </div> <!-- keywordvalue -->
+         </tal:def>
+        </div>
 	  </div>
-      <div class="field">
-                <div class="error"
-                     tal:define="err errors/changeto|nothing"
-                     tal:condition="err"
-                     tal:content="err" i18n:translate="">
-                    Error message goes here
-                </div>
-       <label for="input_change_to" i18n:translate="">Keyword to apply</label>
-       <input id="input_change_to" type="text" name="changeto" />
-      </div>
-
-      <div class="formControls">
-          <input class="destructive"
-                 type="submit"
-                 name="form.button.Merge"
-                 title="Merge all selected keywords and/or replace them by filled value"
-                 i18n:attributes="value; title"
-                 value="Merge / Replace" />
-
-          <input class="destructive"
-                 id="input_delete_keyword"
-                 type="submit"
-                 name="form.button.Delete"
-                 i18n:attributes="value; title"
-                 title="Remove all selected keywords"
-                 value="Delete" />
-
-      </div>
-
       </fieldset>
+	  <tal:batchnavigation
+        define="batchnavigation nocall:context/@@batchnavigation"
+        replace="structure python:batchnavigation(batch)" />
+      <div class="field">
+        <div class="error"
+               tal:define="err errors/changeto|nothing"
+               tal:condition="err"
+               tal:content="err" i18n:translate="">
+           Error message goes here
+        </div>
+      </div>
+      <div id="change_to">
+        <label for="changeto">enter value for keyword replacement / renaming</label>
+        <input id="input_change_to" type="text" name="changeto"/>
+        <input class="context"
+               id="btn_change_to"
+               type="submit"
+               name="form.button.Merge"
+               i18n:attributes="value; title"
+               title="Rename"
+               value="Rename"
+        />
+      </div>
+      <div id="delete_keywords">
+        <label for="form.button.Delete">Or you can delete all selected keywords</label>
+        <input class="destructive"
+               id="input_delete_keyword"
+               type="submit"
+               name="form.button.Delete"
+               i18n:attributes="value; title"
+               title="Delete"
+               value="Delete"
+        />
+      </div>
+
     </form>
     <script type="text/javascript">
         $(document).ready(function(){$('#simkeyword')[0].checked=false;})
     </script>
-  </tal:site_has_keywords>
 
-  <tal:no_keywords_yet condition="not:catalogSubjects">
+  <tal:no_keywords_yet condition="not:total_keywords">
     <div i18n:translate="description_no_keywords">
       No content in this site has any keywords assigned yet, so there's nothing
       to manage at this time.  (To assign keywords to a piece of content, use
