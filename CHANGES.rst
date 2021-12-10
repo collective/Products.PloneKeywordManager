@@ -2,16 +2,21 @@ Changelog
 =========
    
 
-3.0.4 (unreleased)
+4.0.0 (unreleased)
 ------------------ 
-- Improvements to form performance when site has an extreme amount of keywords. [flipmcf]
-        - Implemented use of CMFPlone.PloneBatch for result set.
-  	- Removed the "View range" form as that should be handled by plone batching now.
-  	- Fixes `issue #17 <https://github.com/collective/Products.PloneKeywordManager/issues/17>`_.
-	
-- Removed direct calls to PloneKeywordManager tool from template (best practice). [flipmcf]
+- Improvements to form performance when site has an extreme amount of keywords. 
+  Fixes `issue #17 <https://github.com/collective/Products.PloneKeywordManager/issues/17>`_.
+  [flipmcf]
 
-- Filter out only None keyword values, not false values. Fixes `issue #45 <https://github.com/collective/Products.PloneKeywordManager/issues/45>`_. [flipmcf]
+- Improvements to UI/UX [flipmcf]
+
+- Filter out only None keyword values, not false values.   [flipmcf]
+
+- Updating SearchableText index after keyword delete/rename  [flipmcf]
+
+- Highlight Whitespace in keyword values enhancement [flipmcf]
+
+- Update Italian Translations [cekk]
 
 
 3.0.3 (2021-01-27)
