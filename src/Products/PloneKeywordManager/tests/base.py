@@ -31,11 +31,11 @@ class BaseIntegrationTestCase(unittest.TestCase):
 
 class PKMTestCase(BaseIntegrationTestCase):
     def _action_change(self, keywords, changeto, field="Subject"):
-        """ calls changeKeywords method from  prefs_keywords_view """
+        """calls changeKeywords method from  prefs_keywords_view"""
         view = getMultiAdapter((self.portal, self.request), name="prefs_keywords_view")
         view.changeKeywords(keywords, changeto, field)
 
     def _action_delete(self, keywords, field="Subject"):
-        """ calls deleteKeywords method from  prefs_keywords_view """
+        """calls deleteKeywords method from  prefs_keywords_view"""
         view = getMultiAdapter((self.portal, self.request), name="prefs_keywords_view")
         view.deleteKeywords(keywords, field)

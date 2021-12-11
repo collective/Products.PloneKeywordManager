@@ -21,5 +21,5 @@ IGNORE_INDEXES = [
 # keywords on objects. Most people won't need this.
 ALWAYS_REINDEX = (
     #'Subject',
-    'SearchableText',
+    "SearchableText",
 )

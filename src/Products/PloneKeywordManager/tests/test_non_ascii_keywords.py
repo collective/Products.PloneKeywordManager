@@ -38,8 +38,8 @@ class NonAsciiKeywordsTestCase(PKMTestCase):
     #     )
 
     def test_pref_keywords_action_change_keywords(self):
-        """ test the bugfix for prefs_keywords_action_change when keywords
-        contains at least one element with non ASCII characters """
+        """test the bugfix for prefs_keywords_action_change when keywords
+        contains at least one element with non ASCII characters"""
         self._action_change([u"Fr\\xfchst\\xfcck", "Mittagessen"], "Abendessen")
 
     def test_pref_keywords_action_change_changeto(self):
@@ -48,7 +48,7 @@ class NonAsciiKeywordsTestCase(PKMTestCase):
         self._action_change([u"Fr\\xfchst\\xfcck", "Mittagessen"], u"Fr\\xfchessen")
 
     def test_pref_keywords_action_delete(self):
-        """ test the bugfix for prefs_keywords_action_delete """
+        """test the bugfix for prefs_keywords_action_delete"""
         self._action_delete([u"Fr\\xfchst\\xfcck"])
 
     def test_only_one_index_is_updated(self):

@@ -143,10 +143,12 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         catalog = getToolByName(self, "portal_catalog")
         keywords = catalog.uniqueValuesFor(indexName)
         # Filter out Null keywords.  The sorting breaks when None is indexed.
-        def notNone(x): return x is not None
+        def notNone(x):
+            return x is not None
+
         keywords = filter(notNone, keywords)
 
-        #can we turn this into a yield?
+        # can we turn this into a yield?
         return list(sorted(keywords, key=lambda x: x.lower()))
 
     def getKeywordsWithLengths(self, indexName="Subject"):
@@ -158,7 +160,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         idx = catalog._catalog.getIndex(indexName)
         keywords = idx.uniqueValues(withLengths=1)
 
-        return list(sorted(keywords, key=lambda x,y: x.lower()))
+        return list(sorted(keywords, key=lambda x, y: x.lower()))
 
     def getKeywordLength(self, key, indexName="Subject"):
         processQueue()
@@ -177,14 +179,11 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
 
         return count
 
-
-
-
     @security.protected(config.MANAGE_KEYWORDS_PERMISSION)
     def getScoredMatches(self, word, possibilities, num, score, context=None):
-        """ Take a word,
-            compare it to a list of possibilities,
-            return max. num matches > score).
+        """Take a word,
+        compare it to a list of possibilities,
+        return max. num matches > score).
         """
         if not USE_LEVENSHTEIN:
             # No levenshtein module around. Fall back to difflib
@@ -233,7 +232,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
     @security.private
     def fieldNameForIndex(self, indexName):
         """The name of the index may not be the same as the field on the object, and we need
-           the actual field name in order to find its mutator.
+        the actual field name in order to find its mutator.
         """
         catalog = getToolByName(self, "portal_catalog")
         indexObjs = [idx for idx in catalog.index_objects() if idx.getId() == indexName]
