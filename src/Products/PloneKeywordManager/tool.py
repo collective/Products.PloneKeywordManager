@@ -4,6 +4,7 @@ from AccessControl import ClassSecurityInfo
 from AccessControl.class_init import InitializeClass
 from Acquisition import aq_base
 from OFS.SimpleItem import SimpleItem
+from operator import itemgetter
 from plone import api
 from plone.app.discussion.interfaces import IComment
 from plone.dexterity.interfaces import IDexterityContent
@@ -137,7 +138,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
     def getKeywords(self, indexName="Subject"):
         processQueue()
         if indexName not in self.getKeywordIndexes():
-            raise ValueError("%s is not a valid field" % indexName)
+            raise ValueError("{indexName} is not a valid field")
 
         catalog = api.portal.get_tool("portal_catalog")
         keywords = catalog.uniqueValuesFor(indexName)
@@ -153,7 +154,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
     def getKeywordsWithLengths(self, indexName="Subject"):
         processQueue()
         if indexName not in self.getKeywordIndexes():
-            raise ValueError("%s is not a valid field" % indexName)
+            raise ValueError("{indexName} is not a valid field")
 
         catalog = api.portal.get_tool("portal_catalog")
         idx = catalog._catalog.getIndex(indexName)
@@ -164,7 +165,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
     def getKeywordLength(self, key, indexName="Subject"):
         processQueue()
         if indexName not in self.getKeywordIndexes():
-            raise ValueError("%s is not a valid field" % indexName)
+            raise ValueError("{indexName} is not a valid field")
 
         catalog = api.portal.get_tool("portal_catalog")
         idx = catalog._catalog.getIndex(indexName)
@@ -192,8 +193,8 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         res = []
 
         # Search for all similar terms in possibilities
-        if isinstance(word, str):
-            oword = unicode(word, "utf-8")
+        if isinstance(word, bytes):
+            oword = str(word, encoding="utf-8")
         else:
             oword = word.encode("utf-8")
 
@@ -203,12 +204,12 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
             elif isinstance(item, type(oword)):
                 lscore = Levenshtein.ratio(oword, item)
             else:
-                raise ValueError("%s is not a normal, or unicode string" % item)
+                raise ValueError("{item} is not bytes nor str")
             if lscore > score:
                 res.append((item, lscore))
 
         # Sort by score (high scores on top of list)
-        res.sort(lambda x, y: -cmp(x[1], y[1]))
+        res = sorted(res, key=itemgetter(1), reverse=True)
 
         # Return first n terms without scores
         return [item[0] for item in res[:num]]
@@ -238,7 +239,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         try:
             fieldName = indexObjs[0].indexed_attrs[0]
         except IndexError:
-            raise ValueError("Found no index named %s" % indexName)
+            raise ValueError(f"Found no index named {indexName}")
 
         return fieldName
 
