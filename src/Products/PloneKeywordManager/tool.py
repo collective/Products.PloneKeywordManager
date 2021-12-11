@@ -138,7 +138,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
     def getKeywords(self, indexName="Subject"):
         processQueue()
         if indexName not in self.getKeywordIndexes():
-            raise ValueError("{indexName} is not a valid field")
+            raise ValueError(f"{indexName} is not a valid field")
 
         catalog = api.portal.get_tool("portal_catalog")
         keywords = catalog.uniqueValuesFor(indexName)
@@ -154,7 +154,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
     def getKeywordsWithLengths(self, indexName="Subject"):
         processQueue()
         if indexName not in self.getKeywordIndexes():
-            raise ValueError("{indexName} is not a valid field")
+            raise ValueError(f"{indexName} is not a valid field")
 
         catalog = api.portal.get_tool("portal_catalog")
         idx = catalog._catalog.getIndex(indexName)
@@ -165,7 +165,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
     def getKeywordLength(self, key, indexName="Subject"):
         processQueue()
         if indexName not in self.getKeywordIndexes():
-            raise ValueError("{indexName} is not a valid field")
+            raise ValueError(f"{indexName} is not a valid field")
 
         catalog = api.portal.get_tool("portal_catalog")
         idx = catalog._catalog.getIndex(indexName)
@@ -204,7 +204,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
             elif isinstance(item, type(oword)):
                 lscore = Levenshtein.ratio(oword, item)
             else:
-                raise ValueError("{item} is not bytes nor str")
+                raise ValueError(f"{item} is not bytes nor str")
             if lscore > score:
                 res.append((item, lscore))
 

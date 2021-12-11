@@ -1,3 +1,4 @@
+from plone import api
 from plone.dexterity.fti import DexterityFTI
 from Products.PloneKeywordManager.tests.base import PKMTestCase
 
@@ -11,8 +12,9 @@ class DexterityContentTestCase(PKMTestCase):
         test_type = self.portal.portal_types.test_type
         test_type.klass = "plone.dexterity.content.Item"
         test_type.behaviors = ("plone.app.dexterity.behaviors.metadata.IDublinCore",)
-        self.portal.invokeFactory("test_type", "test_content")
-        self.content = self.portal["test_content"]
+        self.content = api.content.create(
+            container=self.portal, type="test_type", id="test_type"
+        )
         self.content.setSubject("Keyword1 Keyword2 Keyword3".split())
         self.content.reindexObject()
 

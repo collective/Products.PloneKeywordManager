@@ -1,16 +1,16 @@
+from plone import api
 from plone.app.discussion.interfaces import IConversation
 from plone.app.discussion.interfaces import IDiscussionSettings
-from plone.registry.interfaces import IRegistry
 from Products.PloneKeywordManager.tests.base import PKMTestCase
 from zope.component import createObject
-from zope.component import queryUtility
 
 
 class NonAsciiKeywordsTestCase(PKMTestCase):
     def setUp(self):
         super().setUp()
-        self.portal.invokeFactory("Document", "keyword_doc")
-        self.document = self.portal["keyword_doc"]
+        self.document = api.content.create(
+            container=self.portal, type="Document", id="document"
+        )
         self.document.subject = [
             "Fr\\xfchst\\xfcck",
             "Mitagessen",
@@ -90,13 +90,15 @@ class NonAsciiKeywordsTestCase(PKMTestCase):
         self.portal.portal_catalog.addIndex("Language", "KeywordIndex")
         self.document.language = "en"
         self._action_change("en", "en-US", field="Language")
-        self.assertEqual(self.document.Language(), "en-US")
+        self.assertEqual(self.document.language, "en-US")
 
     def test_discussion_indexes_updated(self):
         # Allow discussion
-        registry = queryUtility(IRegistry)
-        discussion_settings = registry.forInterface(IDiscussionSettings)
-        discussion_settings.globally_enabled = True
+        api.portal.set_registry_record(
+            name="globally_enabled",
+            value=True,
+            interface=IDiscussionSettings,
+        )
         self.document.allow_discussion = True
         conversation = IConversation(self.document)
         comment = createObject("plone.Comment")

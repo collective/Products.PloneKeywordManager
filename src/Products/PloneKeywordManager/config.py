@@ -19,6 +19,6 @@ IGNORE_INDEXES = [
 # A list of indexes that should always be reindexed when merging or deleting
 # keywords on objects. Most people won't need this.
 ALWAYS_REINDEX = (
-    #'Subject',
+    # 'Subject',
     "SearchableText",
 )

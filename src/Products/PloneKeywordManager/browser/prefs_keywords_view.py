@@ -158,7 +158,7 @@ class PrefsKeywordsView(BrowserView):
 
         logger.info(self.context.translate(message))
         navroot_url = api.portal.get_navigation_root(self.context).absolute_url()
-        url = "%s/prefs_keywords_view" % navroot_url
+        url = (f"{navroot_url}/prefs_keywords_view",)
 
         query = dict()
         if self.request.get("field", False):
@@ -174,15 +174,6 @@ class PrefsKeywordsView(BrowserView):
 class KeywordsSearchResults(BrowserView):
     def __call__(self):
         items = []
-        try:
-            per_page = int(self.request.form.get("perPage"))
-        except ValueError:
-            per_page = 10
-        try:
-            page = int(self.request.form.get("page"))
-        except ValueError:
-            page = 1
-
         search_string = self.request.form.get("s")
         field = self.request.form.get("field")
 
@@ -196,8 +187,7 @@ class KeywordsSearchResults(BrowserView):
                     "title": result,
                     "description": "",
                     "state": "keyword",
-                    "url": "%s/prefs_keywords_view?field=%s&s=%s"
-                    % (navroot_url, field, result),
+                    "url": f"{navroot_url}/prefs_keywords_view?field={field}&s={result}",
                 }
             )
 
