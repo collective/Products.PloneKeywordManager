@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from plone.app.discussion.interfaces import IConversation
 from plone.app.discussion.interfaces import IDiscussionSettings
 from plone.registry.interfaces import IRegistry
@@ -9,14 +8,14 @@ from zope.component import queryUtility
 
 class NonAsciiKeywordsTestCase(PKMTestCase):
     def setUp(self):
-        super(NonAsciiKeywordsTestCase, self).setUp()
+        super().setUp()
         self.portal.invokeFactory("Document", "keyword_doc")
         self.document = self.portal["keyword_doc"]
         self.document.subject = [
-            u"Fr\\xfchst\\xfcck",
+            "Fr\\xfchst\\xfcck",
             "Mitagessen",
             "Abendessen",
-            u"Fr\\xfchessen",
+            "Fr\\xfchessen",
         ]
         self.document.reindexObject()
 
@@ -40,16 +39,16 @@ class NonAsciiKeywordsTestCase(PKMTestCase):
     def test_pref_keywords_action_change_keywords(self):
         """test the bugfix for prefs_keywords_action_change when keywords
         contains at least one element with non ASCII characters"""
-        self._action_change([u"Fr\\xfchst\\xfcck", "Mittagessen"], "Abendessen")
+        self._action_change(["Fr\\xfchst\\xfcck", "Mittagessen"], "Abendessen")
 
     def test_pref_keywords_action_change_changeto(self):
         """test the bugfix for prefs_keywords_action_change when change to
         contains non ASCII characters"""
-        self._action_change([u"Fr\\xfchst\\xfcck", "Mittagessen"], u"Fr\\xfchessen")
+        self._action_change(["Fr\\xfchst\\xfcck", "Mittagessen"], "Fr\\xfchessen")
 
     def test_pref_keywords_action_delete(self):
         """test the bugfix for prefs_keywords_action_delete"""
-        self._action_delete([u"Fr\\xfchst\\xfcck"])
+        self._action_delete(["Fr\\xfchst\\xfcck"])
 
     def test_only_one_index_is_updated(self):
         def search(**kw):
@@ -69,12 +68,12 @@ class NonAsciiKeywordsTestCase(PKMTestCase):
         self.assertEqual(search(Title="Bar"), [])
 
         # and remapping Keywords should reindex 'Subject'...
-        self.assertEqual(search(Subject=u"Fr\\xfchst\\xfcck"), [self.document])
-        self.assertEqual(search(Subject=u"Fr\\xfchessen"), [self.document])
-        self._action_delete([u"Fr\\xfchst\\xfcck"])
-        self._action_change([u"Fr\\xfchessen"], u"Zen")
-        self.assertEqual(search(Subject=u"Fr\\xfchst\\xfcck"), [])
-        self.assertEqual(search(Subject=u"Zen"), [self.document])
+        self.assertEqual(search(Subject="Fr\\xfchst\\xfcck"), [self.document])
+        self.assertEqual(search(Subject="Fr\\xfchessen"), [self.document])
+        self._action_delete(["Fr\\xfchst\\xfcck"])
+        self._action_change(["Fr\\xfchessen"], "Zen")
+        self.assertEqual(search(Subject="Fr\\xfchst\\xfcck"), [])
+        self.assertEqual(search(Subject="Zen"), [self.document])
 
         # ...but not 'Title'...
         self.assertEqual(search(Title="Bar"), [])
@@ -84,7 +83,7 @@ class NonAsciiKeywordsTestCase(PKMTestCase):
         self.assertEqual(search(Title="Bar"), [self.document])
 
     def test_getscoredmatches(self):
-        self.pkm.getScoredMatches(u"foo", ["foo", u"bar", "baz"], 7, 0.6)
+        self.pkm.getScoredMatches("foo", ["foo", "bar", "baz"], 7, 0.6)
 
     def test_monovalued_keyword(self):
         # use language only because it is the only monovalued field available by default

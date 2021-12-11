@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from plone.dexterity.interfaces import IDexterityContent
 from Products.CMFPlone.interfaces import INonInstallable
 from Products.PloneKeywordManager.compat import to_str
@@ -6,7 +5,7 @@ from zope.interface import implementer
 
 
 @implementer(INonInstallable)
-class HiddenProfiles(object):
+class HiddenProfiles:
     def getNonInstallableProfiles(self):
         """Hide uninstall profile from site-creation and quickinstaller."""
         return ["Products.PloneKeywordManager:uninstall"]

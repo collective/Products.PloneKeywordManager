@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from plone import api
 from Products.CMFCore.utils import getToolByName
 from Products.CMFPlone.PloneBatch import Batch

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2005 gocept gmbh & co. kg
 # See also LICENSE.txt
 from AccessControl import ClassSecurityInfo
@@ -48,7 +47,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
     )
 
     def _getFullIndexList(self, indexName):
-        idxs = set([indexName]).union(config.ALWAYS_REINDEX)
+        idxs = {indexName}.union(config.ALWAYS_REINDEX)
         return list(idxs)
 
     @security.protected(config.MANAGE_KEYWORDS_PERMISSION)
