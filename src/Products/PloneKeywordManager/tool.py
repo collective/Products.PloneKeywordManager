@@ -9,7 +9,6 @@ from plone.app.discussion.interfaces import IComment
 from plone.dexterity.interfaces import IDexterityContent
 from Products.CMFCore import permissions as CMFCorePermissions
 from Products.CMFCore.indexing import processQueue
-from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.utils import UniqueObject
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from Products.PloneKeywordManager import config
@@ -140,7 +139,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         if indexName not in self.getKeywordIndexes():
             raise ValueError("%s is not a valid field" % indexName)
 
-        catalog = getToolByName(self, "portal_catalog")
+        catalog = api.portal.get_tool("portal_catalog")
         keywords = catalog.uniqueValuesFor(indexName)
         # Filter out Null keywords.  The sorting breaks when None is indexed.
         def notNone(x):
@@ -156,7 +155,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         if indexName not in self.getKeywordIndexes():
             raise ValueError("%s is not a valid field" % indexName)
 
-        catalog = getToolByName(self, "portal_catalog")
+        catalog = api.portal.get_tool("portal_catalog")
         idx = catalog._catalog.getIndex(indexName)
         keywords = idx.uniqueValues(withLengths=1)
 
@@ -167,7 +166,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         if indexName not in self.getKeywordIndexes():
             raise ValueError("%s is not a valid field" % indexName)
 
-        catalog = getToolByName(self, "portal_catalog")
+        catalog = api.portal.get_tool("portal_catalog")
         idx = catalog._catalog.getIndex(indexName)
 
         try:
@@ -219,7 +218,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         meta type and filters out a subset of known indexes that should not be
         managed.
         """
-        catalog = getToolByName(self, "portal_catalog")
+        catalog = api.portal.get_tool("portal_catalog")
         idxs = catalog.index_objects()
         idxs = [
             i.id
@@ -234,7 +233,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         """The name of the index may not be the same as the field on the object, and we need
         the actual field name in order to find its mutator.
         """
-        catalog = getToolByName(self, "portal_catalog")
+        catalog = api.portal.get_tool("portal_catalog")
         indexObjs = [idx for idx in catalog.index_objects() if idx.getId() == indexName]
         try:
             fieldName = indexObjs[0].indexed_attrs[0]

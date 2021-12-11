@@ -18,8 +18,8 @@ Changelog
 
 - Update Italian Translations [cekk]
 
-- Drop official Python 2.7 support.
-  It may work, but we do not test it anymore.
+- Drop Python 2.7 support.
+  Update code and test setup.
   [jensens]
 
 

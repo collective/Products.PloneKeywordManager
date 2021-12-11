@@ -1,4 +1,4 @@
-from plone.dexterity.interfaces import IDexterityContent
+from plone import api
 from Products.CMFPlone.interfaces import INonInstallable
 from Products.PloneKeywordManager.compat import to_str
 from zope.interface import implementer
@@ -22,18 +22,15 @@ def importKeywords(context):
     if len(keywordlist) < 1:
         return
 
-    site = context.getSite()
-    id = "keywords"
-    doc = getattr(site, id, None)
+    portal = context.getportal()
+    cid = "keywords"
+    doc = getattr(portal, cid, None)
 
     if doc is None:
-        site.invokeFactory("Document", id, title="Keywords")
-        doc = getattr(site, id)
+        doc = api.content.create(
+            container=portal, type="Document", id=cid, title="Subjects"
+        )
 
     doc.setSubject(keywordlist)
-    if hasattr(IDexterityContent, "providedBy") and IDexterityContent.providedBy(doc):
-        doc.exclude_from_nav = True
-    else:
-        doc.setExcludeFromNav(True)
+    doc.exclude_from_nav = True
     doc.reindexObject()
-    doc.unmarkCreationFlag()

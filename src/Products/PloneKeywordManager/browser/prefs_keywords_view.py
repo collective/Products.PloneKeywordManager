@@ -1,7 +1,5 @@
 from plone import api
-from Products.CMFCore.utils import getToolByName
 from Products.CMFPlone.PloneBatch import Batch
-from Products.CMFPlone.utils import safe_encode
 from Products.Five import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from Products.PloneKeywordManager import keywordmanagerMessageFactory as _
@@ -10,13 +8,9 @@ from ZTUtils import make_query
 
 import json
 import logging
-import typing
 
 
 logger = logging.getLogger("Products.PloneKeywordManager")
-
-
-PLONE_5 = api.env.plone_version() >= "5"
 
 
 class PrefsKeywordsView(BrowserView):
@@ -28,10 +22,10 @@ class PrefsKeywordsView(BrowserView):
 
     def __init__(self, context, request):
         super().__init__(context, request)
-        self.pkm = getToolByName(self.context, "portal_keyword_manager")
+        self.pkm = api.portal.get_tool("portal_keyword_manager")
 
     def __call__(self):
-        self.is_plone_5 = PLONE_5
+        self.is_plone_5 = True
         if not self.request.form.get(
             "form.button.Merge", ""
         ) and not self.request.form.get("form.button.Delete", ""):
@@ -159,7 +153,7 @@ class PrefsKeywordsView(BrowserView):
         set the message and return
         """
         if message and msg_type:
-            pu = getToolByName(self.context, "plone_utils")
+            pu = api.portal.get_tool("plone_utils")
             pu.addPortalMessage(message, type=msg_type)
 
         logger.info(self.context.translate(message))
@@ -212,7 +206,7 @@ class KeywordsSearchResults(BrowserView):
         return json.dumps({"total": len(results), "items": items})
 
     def results(self, search_string, index_name):
-        pkm = getToolByName(self.context, "portal_keyword_manager")
+        pkm = api.portal.get_tool("portal_keyword_manager")
 
         num = 100
         score = 0.6
