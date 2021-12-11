@@ -1,18 +1,17 @@
 # -*- coding: utf-8 -*-
-import json
-import typing
-
 from plone import api
 from Products.CMFCore.utils import getToolByName
+from Products.CMFPlone.PloneBatch import Batch
+from Products.CMFPlone.utils import safe_encode
 from Products.Five import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from Products.PloneKeywordManager import keywordmanagerMessageFactory as _
 from Products.PloneKeywordManager.compat import to_str
-from Products.CMFPlone.utils import safe_encode
-from Products.CMFPlone.PloneBatch import Batch
 from ZTUtils import make_query
 
+import json
 import logging
+import typing
 
 
 logger = logging.getLogger("Products.PloneKeywordManager")

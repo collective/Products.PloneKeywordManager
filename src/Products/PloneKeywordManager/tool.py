@@ -2,8 +2,8 @@
 # Copyright (c) 2005 gocept gmbh & co. kg
 # See also LICENSE.txt
 from AccessControl import ClassSecurityInfo
-from Acquisition import aq_base
 from AccessControl.class_init import InitializeClass
+from Acquisition import aq_base
 from OFS.SimpleItem import SimpleItem
 from plone import api
 from plone.app.discussion.interfaces import IComment
@@ -17,6 +17,7 @@ from Products.PloneKeywordManager import config
 from Products.PloneKeywordManager.compat import to_str
 from Products.PloneKeywordManager.interfaces import IPloneKeywordManager
 from zope import interface
+
 
 # Python imports
 try:

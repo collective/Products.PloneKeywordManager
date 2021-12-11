@@ -26,6 +26,7 @@ from zope.i18nmessageid import MessageFactory
 
 import logging
 
+
 global cmf_keyword_manager_globals
 
 
