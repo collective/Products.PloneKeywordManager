@@ -22,4 +22,5 @@ parts/
 report.html
 selenium*
 var/
+venv/
 __pycache__
