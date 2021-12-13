@@ -1,4 +1,3 @@
-# -*- coding: latin1 -*-
 # Copyright (c) 2005 gocept gmbh & co. kg
 # See also LICENSE.txt
 # $Id$

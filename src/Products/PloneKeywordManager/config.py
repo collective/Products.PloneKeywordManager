@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 PROJECTNAME = "PloneKeywordManager"
 
 MANAGE_KEYWORDS_PERMISSION = "Manage Keywords"
@@ -20,6 +19,6 @@ IGNORE_INDEXES = [
 # A list of indexes that should always be reindexed when merging or deleting
 # keywords on objects. Most people won't need this.
 ALWAYS_REINDEX = (
-    #'Subject',
-    'SearchableText',
+    # 'Subject',
+    "SearchableText",
 )

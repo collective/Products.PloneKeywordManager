@@ -20,35 +20,35 @@ msgstr "Löschen"
 
 #: ./profiles/default/controlpanel.xml
 msgid "Keyword Manager"
-msgstr ""
+msgstr "Schlüsselwortverwaltung"
 
 #: ./browser/prefs_keywords_view.pt:202
 msgid "Keyword to apply"
-msgstr ""
+msgstr "Anzuwendende Schlüsselworte"
 
 #: ./browser/prefs_keywords_view.pt:207
 msgid "Merge / Replace"
-msgstr ""
+msgstr "Zusammenführen/ Ersetzen"
 
 #: ./browser/prefs_keywords_view.pt:207
 msgid "Merge all selected keywords and/or replace them by filled value"
-msgstr ""
+msgstr "Führe alle ausgewählten Schlüsselworte zusammen und/oder ersetze diese durch den eingegebenen Wert."
 
 #: ./browser/prefs_keywords_view.py:36
 msgid "Please provide a new term"
-msgstr ""
+msgstr "Bitte geben Sie einen neuen Begriff ein."
 
 #: ./browser/prefs_keywords_view.py:29
 msgid "Please select a valid keyword field"
-msgstr ""
+msgstr "Bitte wählen Sie ein gültiges Schlüsselwortfeld"
 
 #: ./browser/prefs_keywords_view.py:25
 msgid "Please select at least one keyword"
-msgstr ""
+msgstr "Bitte wählen Sie mindestens ein gültiges Schlüsselwort"
 
 #: ./browser/prefs_keywords_view.pt:214
 msgid "Remove all selected keywords"
-msgstr ""
+msgstr "Entfernen aller gewählten Schlüsselworte"
 
 #: ./browser/prefs_keywords_view.pt:141
 msgid "Search"
@@ -56,51 +56,51 @@ msgstr "Suchen"
 
 #: ./browser/prefs_keywords_view.pt:64
 msgid "Select Field"
-msgstr ""
+msgstr "Feld wählen"
 
 #: ./browser/prefs_keywords_view.pt:104
 msgid "View keywords"
-msgstr "Keywords anzeigen"
+msgstr "Schlüsselworte anzeigen"
 
 #. Default: "The Keyword Manager allows you to delete and merge keywords in your portal."
 #: ./browser/prefs_keywords_view.pt:33
 msgid "description_keyword_manager"
-msgstr "PloneKeywordManager erlaubt Keywords aus dem Portal zu entfernen oder zusammenzufassen."
+msgstr "PloneKeywordManager erlaubt Schlüsselworte aus dem Portal zu entfernen oder zusammenzufassen."
 
 #. Default: "No content in this site has any keywords assigned yet, so there's nothing to manage at this time. (To assign keywords to a piece of content, use the item's \"Categorization\" tab while editing.)"
 #: ./browser/prefs_keywords_view.pt:229
 msgid "description_no_keywords"
-msgstr "Bisher sind keine Keywords zugewiesen, in anderen Worten: es gibt noch nichts zu verwalten. Sie können Keywords unter \"Kategorien\" im \"Bearbeiten\" Karteireiter Ihrer Inhalte zuweisen."
+msgstr "Bisher sind keine Schlüsselworte zugewiesen, in anderen Worten: es gibt noch nichts zu verwalten. Sie können Schlüsselworte unter \"Kategorien\" im \"Bearbeiten\" Karteireiter Ihrer Inhalte zuweisen."
 
 #. Default: "Keyword Manager"
 #: ./browser/prefs_keywords_view.pt:23
 msgid "heading_keyword_manager"
-msgstr ""
+msgstr "Schlüsselwort-Verwaltung"
 
 #. Default: "Select one or more keywords, then set a replacement keyword and click on 'Merge / Replace' to replace all selected value by this one. Click on Delete to remove selected values."
 #: ./browser/prefs_keywords_view.pt:162
 msgid "help_keyword_assignments"
-msgstr ""
+msgstr "Wählen ein oder mehrere Schlüsselwort aus, geben Sie dann ein ErsatzSchlüsselwort an und klicken sie dann \"Zusammenführen/ Ersetzen\" umd alle ausgewählten Schlüsselworte durch zu ändern. Klicken Sie auf Entfernen um die ausgewählten Schlüsselworte zu entfernen."
 
 #. Default: "Choose Keyword Field/Index"
 #: ./browser/prefs_keywords_view.pt:43
 msgid "label_choose_keyword_field"
-msgstr ""
+msgstr "Wähle Feld/Index für Schlüsselworte"
 
 #. Default: "Keyword"
 #: ./browser/prefs_keywords_view.pt:124
 msgid "label_keyword"
-msgstr ""
+msgstr "Schlüsselwort"
 
 #. Default: "Keyword assignments"
 #: ./browser/prefs_keywords_view.pt:159
 msgid "label_keyword_assignments"
-msgstr "Zugewiesene Keywords"
+msgstr "Zugewiesene Schlüsselworte"
 
 #. Default: "Keyword Field"
 #: ./browser/prefs_keywords_view.pt:48
 msgid "label_keyword_field"
-msgstr ""
+msgstr "Schlüsselwortfeld"
 
 #. Default: "List alphabetically"
 #: ./browser/prefs_keywords_view.pt:80
@@ -110,12 +110,12 @@ msgstr "Alphabetisch auflisten"
 #. Default: "Search by keyword"
 #: ./browser/prefs_keywords_view.pt:118
 msgid "label_search_by_keyword"
-msgstr "Suche nach Keyword"
+msgstr "Suche nach einem Schlüsselwort"
 
 #. Default: "Select..."
 #: ./browser/prefs_keywords_view.pt:130
 msgid "label_select"
-msgstr ""
+msgstr "Auswwählen..."
 
 #. Default: "View range"
 #: ./browser/prefs_keywords_view.pt:85
@@ -125,10 +125,10 @@ msgstr "Bereich anzeigen"
 #. Default: "Changed ${from} to ${to} for ${num} object(s)."
 #: ./browser/prefs_keywords_view.py:50
 msgid "msg_changed_keywords"
-msgstr ""
+msgstr "In ${num} Inhalt(en) wurde ${from} zu ${to} geändert."
 
 #. Default: "Deleted ${keywords} for ${num} object(s)."
 #: ./browser/prefs_keywords_view.py:65
 msgid "msg_deleted_keywords"
-msgstr ""
+msgstr "Von ${num} Inhalt(en) wurden ${keywords} entfernt"
 

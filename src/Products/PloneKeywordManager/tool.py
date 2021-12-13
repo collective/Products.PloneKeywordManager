@@ -1,22 +1,22 @@
-# -*- coding: utf-8 -*-
 # Copyright (c) 2005 gocept gmbh & co. kg
 # See also LICENSE.txt
 from AccessControl import ClassSecurityInfo
-from Acquisition import aq_base
 from AccessControl.class_init import InitializeClass
+from Acquisition import aq_base
 from OFS.SimpleItem import SimpleItem
+from operator import itemgetter
 from plone import api
 from plone.app.discussion.interfaces import IComment
 from plone.dexterity.interfaces import IDexterityContent
 from Products.CMFCore import permissions as CMFCorePermissions
 from Products.CMFCore.indexing import processQueue
-from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.utils import UniqueObject
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from Products.PloneKeywordManager import config
 from Products.PloneKeywordManager.compat import to_str
 from Products.PloneKeywordManager.interfaces import IPloneKeywordManager
 from zope import interface
+
 
 # Python imports
 try:
@@ -138,34 +138,36 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
     def getKeywords(self, indexName="Subject"):
         processQueue()
         if indexName not in self.getKeywordIndexes():
-            raise ValueError("%s is not a valid field" % indexName)
+            raise ValueError(f"{indexName} is not a valid field")
 
-        catalog = getToolByName(self, "portal_catalog")
+        catalog = api.portal.get_tool("portal_catalog")
         keywords = catalog.uniqueValuesFor(indexName)
         # Filter out Null keywords.  The sorting breaks when None is indexed.
-        def notNone(x): return x is not None
+        def notNone(x):
+            return x is not None
+
         keywords = filter(notNone, keywords)
 
-        #can we turn this into a yield?
+        # can we turn this into a yield?
         return list(sorted(keywords, key=lambda x: x.lower()))
 
     def getKeywordsWithLengths(self, indexName="Subject"):
         processQueue()
         if indexName not in self.getKeywordIndexes():
-            raise ValueError("%s is not a valid field" % indexName)
+            raise ValueError(f"{indexName} is not a valid field")
 
-        catalog = getToolByName(self, "portal_catalog")
+        catalog = api.portal.get_tool("portal_catalog")
         idx = catalog._catalog.getIndex(indexName)
         keywords = idx.uniqueValues(withLengths=1)
 
-        return list(sorted(keywords, key=lambda x,y: x.lower()))
+        return list(sorted(keywords, key=lambda x, y: x.lower()))
 
     def getKeywordLength(self, key, indexName="Subject"):
         processQueue()
         if indexName not in self.getKeywordIndexes():
-            raise ValueError("%s is not a valid field" % indexName)
+            raise ValueError(f"{indexName} is not a valid field")
 
-        catalog = getToolByName(self, "portal_catalog")
+        catalog = api.portal.get_tool("portal_catalog")
         idx = catalog._catalog.getIndex(indexName)
 
         try:
@@ -177,14 +179,11 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
 
         return count
 
-
-
-
     @security.protected(config.MANAGE_KEYWORDS_PERMISSION)
     def getScoredMatches(self, word, possibilities, num, score, context=None):
-        """ Take a word,
-            compare it to a list of possibilities,
-            return max. num matches > score).
+        """Take a word,
+        compare it to a list of possibilities,
+        return max. num matches > score).
         """
         if not USE_LEVENSHTEIN:
             # No levenshtein module around. Fall back to difflib
@@ -194,8 +193,8 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         res = []
 
         # Search for all similar terms in possibilities
-        if isinstance(word, str):
-            oword = unicode(word, "utf-8")
+        if isinstance(word, bytes):
+            oword = str(word, encoding="utf-8")
         else:
             oword = word.encode("utf-8")
 
@@ -205,12 +204,12 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
             elif isinstance(item, type(oword)):
                 lscore = Levenshtein.ratio(oword, item)
             else:
-                raise ValueError("%s is not a normal, or unicode string" % item)
+                raise ValueError(f"{item} is not bytes nor str")
             if lscore > score:
                 res.append((item, lscore))
 
         # Sort by score (high scores on top of list)
-        res.sort(lambda x, y: -cmp(x[1], y[1]))
+        res = sorted(res, key=itemgetter(1), reverse=True)
 
         # Return first n terms without scores
         return [item[0] for item in res[:num]]
@@ -220,7 +219,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
         meta type and filters out a subset of known indexes that should not be
         managed.
         """
-        catalog = getToolByName(self, "portal_catalog")
+        catalog = api.portal.get_tool("portal_catalog")
         idxs = catalog.index_objects()
         idxs = [
             i.id
@@ -233,14 +232,14 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
     @security.private
     def fieldNameForIndex(self, indexName):
         """The name of the index may not be the same as the field on the object, and we need
-           the actual field name in order to find its mutator.
+        the actual field name in order to find its mutator.
         """
-        catalog = getToolByName(self, "portal_catalog")
+        catalog = api.portal.get_tool("portal_catalog")
         indexObjs = [idx for idx in catalog.index_objects() if idx.getId() == indexName]
         try:
             fieldName = indexObjs[0].indexed_attrs[0]
         except IndexError:
-            raise ValueError("Found no index named %s" % indexName)
+            raise ValueError(f"Found no index named {indexName}")
 
         return fieldName
 

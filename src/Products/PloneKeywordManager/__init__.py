@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 ###
 ##
 # Plone-Keyword-Manager
@@ -25,6 +24,7 @@ from Products.PloneKeywordManager import tool
 from zope.i18nmessageid import MessageFactory
 
 import logging
+
 
 global cmf_keyword_manager_globals
 

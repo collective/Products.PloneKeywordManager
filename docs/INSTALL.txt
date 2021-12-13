@@ -1,31 +1,11 @@
 Products.PloneKeywordManager Installation
 =========================================
 
-To install Products.PloneKeywordManager into the global Python environment (or a workingenv),
-using a traditional Zope 2 instance, you can do this:
+This package is designed as a Plone add-on package.
 
- * When you're reading this you have probably already run
-   ``easy_install Products.PloneKeywordManager``. Find out how to install setuptools
-   (and EasyInstall) here:
-   http://peak.telecommunity.com/DevCenter/EasyInstall
+https://docs.plone.org/manage/installing/installing_addons.html
 
- * If you are using Zope 2.9 (not 2.10), get `pythonproducts`_ and install it
-   via::
-
-       python setup.py install --home /path/to/instance
-
-   into your Zope instance.
-
- * Create a file called ``Products.PloneKeywordManager-configure.zcml`` in the
-   ``/path/to/instance/etc/package-includes`` directory.  The file
-   should only contain this::
-
-       <include package="Products.PloneKeywordManager" />
-
-.. _pythonproducts: http://plone.org/products/pythonproducts
-
-
-Alternatively, if you are using zc.buildout and the plone.recipe.zope2instance
+Using zc.buildout and the plone.recipe.zope2instance
 recipe to manage your project, you can do this:
 
   * Add ``Products.PloneKeywordManager`` to the list of eggs to install, e.g.:
@@ -52,9 +32,8 @@ recipe to manage your project, you can do this:
 
     $ ./bin/buildout
 
-You can skip the ZCML slug if you are going to explicitly include the package
-from another package's configure.zcml file.
-
+Once installed, restart your plone instance and visit Site Setup ( /@@overview-controlpanel)
+From there, open the Add-ons Panel, select "Keyword Manager" and click 'install'
 
 Because its top level Python namespace package is called ``Products``, this
 package can also be installed in Zope 2 as an old style **Zope 2 Product**.

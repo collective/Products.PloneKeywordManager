@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Setup tests for this package."""
 from plone import api
 from plone.app.testing import setRoles
@@ -27,10 +26,10 @@ class TestSetup(unittest.TestCase):
 
     def test_browserlayer(self):
         """Test that IPloneKeywordManagerLayer is registered."""
+        from plone.browserlayer import utils
         from Products.PloneKeywordManager.browser.interfaces import (
             IPloneKeywordManagerLayer,
         )
-        from plone.browserlayer import utils
 
         self.assertIn(IPloneKeywordManagerLayer, utils.registered_layers())
 
@@ -55,9 +54,9 @@ class TestUninstall(unittest.TestCase):
 
     def test_browserlayer_removed(self):
         """Test that IPloneKeywordManagerLayer is removed."""
+        from plone.browserlayer import utils
         from Products.PloneKeywordManager.browser.interfaces import (
             IPloneKeywordManagerLayer,
         )
-        from plone.browserlayer import utils
 
         self.assertNotIn(IPloneKeywordManagerLayer, utils.registered_layers())

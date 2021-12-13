@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 def to_str(s):
     if isinstance(s, bytes):
         s = s.decode("utf-8")

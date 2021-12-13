@@ -1,7 +1,8 @@
 <configure
-   xmlns="http://namespaces.zope.org/zope"
-   xmlns:browser="http://namespaces.zope.org/browser"
-   i18n_domain="Products.PloneKeywordManager">
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    i18n_domain="Products.PloneKeywordManager"
+    >
 
   <permission
       id="plone_keyword_manager.UsePloneKeywordManager"
@@ -9,20 +10,20 @@
       />
 
   <browser:page
-      for="*"
       name="prefs_keywords_view"
-      template="prefs_keywords_view.pt"
+      for="*"
       class=".prefs_keywords_view.PrefsKeywordsView"
+      template="prefs_keywords_view.pt"
       permission="plone_keyword_manager.UsePloneKeywordManager"
       layer=".interfaces.IPloneKeywordManagerLayer"
       />
 
   <browser:page
-      for="*"
       name="keywordsmanager-search-json"
+      for="*"
       class=".prefs_keywords_view.KeywordsSearchResults"
       permission="plone_keyword_manager.UsePloneKeywordManager"
       layer=".interfaces.IPloneKeywordManagerLayer"
-  />
+      />
 
 </configure>

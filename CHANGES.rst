@@ -1,10 +1,10 @@
 Changelog
 =========
-   
+
 
 4.0.0 (unreleased)
------------------- 
-- Improvements to form performance when site has an extreme amount of keywords. 
+------------------
+- Improvements to form performance when site has an extreme amount of keywords.
   Fixes `issue #17 <https://github.com/collective/Products.PloneKeywordManager/issues/17>`_.
   [flipmcf]
 
@@ -17,6 +17,12 @@ Changelog
 - Highlight Whitespace in keyword values enhancement [flipmcf]
 
 - Update Italian Translations [cekk]
+
+- Update German Translations [jensens]
+
+- Drop Python 2.7 support.
+  Update code and test setup.
+  [jensens]
 
 
 3.0.3 (2021-01-27)
