@@ -1,5 +1,5 @@
 graft docs
 graft src
-include *.rst *.cfg *.txt
+include *.rst *.cfg *.txt *.ini
 exclude **/__pycache__/* **/*.pyc
-exclude .coveragerc
+exclude .coveragerc .installed.cfg
