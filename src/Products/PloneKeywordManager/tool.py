@@ -47,7 +47,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
     )
 
     def _getFullIndexList(self, indexName):
-        idxs = {indexName}.union(config.ALWAYS_REINDEX)
+        idxs = set([indexName]).union(config.ALWAYS_REINDEX)
         return list(idxs)
 
     @security.protected(config.MANAGE_KEYWORDS_PERMISSION)
