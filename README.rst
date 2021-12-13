@@ -12,7 +12,7 @@
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
     :target: https://github.com/ambv/black
     :alt: Code style: black
-    
+
 
 Plone Keyword Manager
 =====================
@@ -77,23 +77,21 @@ Each time you run this import step, the ``Keywords`` document's keywords will be
 Source Code
 ===========
 
-Source code of this project is in the
+Source code and issue tracker of this project is in the
 `Plone Collective <https://github.com/collective/Products.PloneKeywordManager>`_
 
 For instructions how to contribute please read the `Collective Information Page <http://collective.github.io//>`_
 
-Further development focuses on Plone 5.1 and higher.
+Further development focuses on Plone 5.2 on Python 3.7 and higher.
 
 Credits
 =======
 
-PloneKeywordManager was mainly coded by Maik Jablonski during the Plone Paderborn Sprint (September 2003),
+PloneKeywordManager was mainly coded by Maik Jablonski during the Plone Paderborn Sprint (back in September 2003),
 founded by the Bertelsmann Foundation.
-
-Main code -- `Maik Jablonski <mailto:maik.jablonski@uni-bielefeld.de>`_
-
+Initial code by `Maik Jablonski <mailto:maik.jablonski@uni-bielefeld.de>`_
 User Interface updates and Setup Code -- Alexander Limi from Plone Solutions.
-
 Thanks to Joe Geldart from `Netalley Networks <http://www.netalleynetworks.com>`_ for updating the template to Plone 2.0 format.
+We would also like to thank Maik for letting us put this code in the `Collective <http://collective.github.com/>`_ - so it can be improved and expanded easiely.
 
-We would also like to thank Maik for letting us put this code in the `Collective <http://collective.github.com/>`_ - so it can be improved and expanded by the Collective developers.
+These days the add-on is developed within the Plone Collective by a `group of volunteers <https://github.com/collective/Products.PloneKeywordManager/graphs/contributors>`_.
