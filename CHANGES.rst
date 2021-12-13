@@ -18,6 +18,8 @@ Changelog
 
 - Update Italian Translations [cekk]
 
+- Update German Translations [jensens]
+
 - Drop Python 2.7 support.
   Update code and test setup.
   [jensens]
