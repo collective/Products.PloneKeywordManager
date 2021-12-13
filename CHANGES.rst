@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-4.0.0 (unreleased)
+4.0.0 (2021-12-13)
 ------------------
 - Improvements to form performance when site has an extreme amount of keywords.
   Fixes `issue #17 <https://github.com/collective/Products.PloneKeywordManager/issues/17>`_.
