@@ -22,7 +22,7 @@ def importKeywords(context):
     if len(keywordlist) < 1:
         return
 
-    portal = context.getportal()
+    portal = context.getSite()
     cid = "keywords"
     doc = getattr(portal, cid, None)
 
