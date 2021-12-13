@@ -87,7 +87,7 @@ Further development focuses on Plone 5.2 on Python 3.7 and higher.
 Credits
 =======
 
-PloneKeywordManager was mainly coded by `Maik Jablonski <mailto:maik.jablonski@uni-bielefeld.de>` during the Plone Paderborn Sprint (back in September 2003),
+PloneKeywordManager was mainly coded by `Maik Jablonski <mailto:maik.jablonski@uni-bielefeld.de>`_ during the Plone Paderborn Sprint (back in September 2003),
 founded by the Bertelsmann Foundation. First user interface updates and setup code by Alexander Limi from Plone Solutions.
 Joe Geldart from `Netalley Networks <http://www.netalleynetworks.com>`_ updated the template to Plone 2.0 format.
 We would also like to thank Maik for letting us put this code in the `Collective <http://collective.github.com/>`_ - so it can be improved and expanded easiely.
