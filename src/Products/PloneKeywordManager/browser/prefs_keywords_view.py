@@ -158,7 +158,7 @@ class PrefsKeywordsView(BrowserView):
 
         logger.info(self.context.translate(message))
         navroot_url = api.portal.get_navigation_root(self.context).absolute_url()
-        url = (f"{navroot_url}/prefs_keywords_view",)
+        url = f"{navroot_url}/prefs_keywords_view"
 
         query = dict()
         if self.request.get("field", False):
