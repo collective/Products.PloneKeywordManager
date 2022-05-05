@@ -5,7 +5,17 @@ Changelog
 4.0.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fixed issue in renaming keywords.
+  Fixes `issue #70 <https://github.com/collective/Products.PloneKeywordManager/issues/70>`_. [flipmcf]
+  
+- Fix Redirection after form submit
+  Fixes `issue #68 <https://github.com/collective/Products.PloneKeywordManager/issues/68>`_. [flipmcf]
+  Fixes `issue #66 <https://github.com/collective/Products.PloneKeywordManager/issues/68>`_. [jensens, flipmcf]
+    
+- Fix issue with search links from related keywords
+  Fixes `issue #67 <https://github.com/collective/Products.PloneKeywordManager/issues/70>`_. [abl123, flipmcf]
+  
+- Plone 4 specific code removal and updating comments / docstrings [flipmcf]
 
 
 4.0.0 (2021-12-13)
