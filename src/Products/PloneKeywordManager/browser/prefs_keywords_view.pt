@@ -201,17 +201,8 @@ nav.pagination {
                                          id string:item-${item_id};
                                          onclick string: document.forms['keyword_edit_form'].changeto.value='${item}';; return true;;" />
                   <label tal:content="item" tal:attributes="for string:item-${item_id};">Keyword</label>
-                  <tal:p5 tal:condition="view/is_plone_5">
-                    <a href="#" tal:attributes="href string:${portal_url}/@@search?${field}=${keyword_quote}">
-                      <span class="icon-search"></span></a>
-                  </tal:p5>
-                  <tal:p4 tal:condition="not: view/is_plone_5">
-                    <a href="#" tal:attributes="href string:${portal_url}/@@search?${field}=${keyword_quote}">
-                      <img i18n:attributes="alt"
-                           i18n:domain="plone"
-                           tal:attributes="src string:${portal_url}/search_icon.png;"
-                           alt="Search"/></a>
-                  </tal:p4>
+                  <a href="#" tal:attributes="href string:${portal_url}/@@search?${field}=${keyword_quote}">
+                  <span class="icon-search"></span></a>
                  </span>
                </span>
              </div>
