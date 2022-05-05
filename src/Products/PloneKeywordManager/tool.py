@@ -54,11 +54,12 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
     def change(self, old_keywords, new_keyword, context=None, indexName="Subject"):
         """Updates all objects using the old_keywords.
 
-        Objects using the old_keywords will be using the new_keywords
+        Objects using the old_keywords will be using the new_keyword
         afterwards.
 
         Returns the number of objects that have been updated.
         """
+
         # #MOD Dynamic field getting
         query = {indexName: old_keywords}
         if context is not None:
@@ -73,6 +74,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
             ]
             query[indexName] = old_keywords
             querySet = api.content.find(**query)
+
         for item in querySet:
             obj = item.getObject()
             # #MOD Dynamic field getting
@@ -94,7 +96,8 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
                 # MONOVALUED FIELD
                 value = new_keyword
 
-        self.updateObject(obj, indexName, value)
+            self.updateObject(obj, indexName, value)
+
         return len(querySet)
 
     @security.protected(config.MANAGE_KEYWORDS_PERMISSION)

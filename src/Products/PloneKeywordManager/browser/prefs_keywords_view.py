@@ -106,7 +106,7 @@ class PrefsKeywordsView(BrowserView):
             changeto = 'Foo'
 
             we search for all objects with the keywords 'foo', 'foo1', or 'foo_' in the subject field
-            we remove these keywords from the field 'subect'
+            we remove these keywords from the field 'subject'
             we then add the keyword 'Foo' (if it didn't alreay exist) to the subject field.
             we save all those objects.
 
