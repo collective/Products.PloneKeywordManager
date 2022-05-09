@@ -18,7 +18,7 @@ Plone Keyword Manager
 =====================
 
 Plone Keyword Manager allows you to change, merge and delete keywords (aka tags or subjects) in Plone and updates all corresponding objects automatically.
-It uses a similiarity search to support you in identifying similar keywords.
+It uses a similarity search to support you in identifying similar keywords.
 PloneKeywordManager helps you to build an inductive vocabulary with several people working on the same Plone site.
 Keywords can be cleaned up from time to time by a site-manager to create a consistent vocabulary.
 
@@ -30,7 +30,7 @@ Installation
 ============
 
 In your buildout add ``Products.PloneKeywordManager`` to your instances eggs section or policy packages ``setup.py``.
-If you want similiarity search add ``Products.PloneKeywordManager[Levenshtein]`` instead.
+If you want similarity search add ``Products.PloneKeywordManager[Levenshtein]`` instead.
 
 Run buildout.
 Activate it at Site Setups Add Ons page.
@@ -90,7 +90,7 @@ Credits
 PloneKeywordManager was mainly coded by `Maik Jablonski <mailto:maik.jablonski@uni-bielefeld.de>`_ during the Plone Paderborn Sprint (back in September 2003),
 founded by the Bertelsmann Foundation. First user interface updates and setup code by Alexander Limi from Plone Solutions.
 Joe Geldart from `Netalley Networks <http://www.netalleynetworks.com>`_ updated the template to Plone 2.0 format.
-We would also like to thank Maik for letting us put this code in the `Collective <http://collective.github.com/>`_ - so it can be improved and expanded easiely.
+We would also like to thank Maik for letting us put this code in the `Collective <http://collective.github.com/>`_ - so it can be improved and expanded easily.
 
 After this, many people updated the code, templates and setup to follow up with the Plone releases.
 
