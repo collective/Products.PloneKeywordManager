@@ -26,11 +26,6 @@ from zope.i18nmessageid import MessageFactory
 import logging
 
 
-global cmf_keyword_manager_globals
-
-
-cmf_keyword_manager_globals = globals()
-
 keywordmanagerMessageFactory = MessageFactory("Products.PloneKeywordManager")
 logger = logging.getLogger("Products.PloneKeywordManager")
 
