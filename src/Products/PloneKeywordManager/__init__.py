@@ -17,10 +17,6 @@
 # http://trific.ath.cx/resources/python/levenshtein/
 ##
 ###
-from AccessControl.Permission import registerPermissions
-from Products.CMFCore.utils import ToolInit
-from Products.PloneKeywordManager import config
-from Products.PloneKeywordManager import tool
 from zope.i18nmessageid import MessageFactory
 
 import logging
@@ -28,16 +24,3 @@ import logging
 
 keywordmanagerMessageFactory = MessageFactory("Products.PloneKeywordManager")
 logger = logging.getLogger("Products.PloneKeywordManager")
-
-
-registerPermissions(
-    [(config.MANAGE_KEYWORDS_PERMISSION, [])], ("Manager", "Site Administrator")
-)
-
-
-def initialize(context):
-
-    new_tool = ToolInit(
-        config.TOOL_NAME, tools=(tool.PloneKeywordManager,), icon="tool.gif"
-    )
-    new_tool.initialize(context)
