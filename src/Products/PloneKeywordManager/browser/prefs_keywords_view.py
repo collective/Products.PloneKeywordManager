@@ -3,16 +3,13 @@ from Products.CMFPlone.PloneBatch import Batch
 from Products.Five import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from Products.PloneKeywordManager import keywordmanagerMessageFactory as _
+from Products.PloneKeywordManager import logger
 from Products.PloneKeywordManager.interfaces import IKeywordManager
 from Products.PloneKeywordManager.compat import to_str
 from ZTUtils import make_query
 from zope.component import getUtility
 
 import json
-import logging
-
-
-logger = logging.getLogger("Products.PloneKeywordManager")
 
 
 class PrefsKeywordsView(BrowserView):
