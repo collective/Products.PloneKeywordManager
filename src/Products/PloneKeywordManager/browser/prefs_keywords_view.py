@@ -25,7 +25,6 @@ class PrefsKeywordsView(BrowserView):
         self.pkm = api.portal.get_tool("portal_keyword_manager")
 
     def __call__(self):
-        self.is_plone_5 = True
         if not self.request.form.get(
             "form.button.Merge", ""
         ) and not self.request.form.get("form.button.Delete", ""):
