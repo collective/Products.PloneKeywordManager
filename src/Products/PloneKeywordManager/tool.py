@@ -82,13 +82,10 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
             value = self.getFieldValue(obj, indexName)
             if isinstance(value, (list, tuple)):
                 # MULTIVALUED FIELD
+                value = set(value)
+                value = value - set(old_keywords)
+                value.add(new_keyword)
                 value = list(value)
-                for element in old_keywords:
-                    while (element in value) and (element != new_keyword):
-                        value[value.index(element)] = new_keyword
-
-                # dedupe new Keyword list (an issue when combining multiple keywords)
-                value = list(set(value))
             elif isinstance(value, set):
                 value = value - set(old_keywords)
                 value.add(new_keyword)
