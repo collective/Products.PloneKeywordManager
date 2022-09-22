@@ -21,23 +21,6 @@ class NonAsciiKeywordsTestCase(PKMTestCase):
         ]
         self.document.reindexObject()
 
-    # def test_show_non_ascii_bugs(self):
-    #     """
-    #     this demonstrates two bugs in the UI, which appear only with non-ASCII keywords.
-    #     it is commented out, as will obviously fail after the bugfixes.
-    #     """
-    #     self.assertRaises(
-    #         UnicodeDecodeError,
-    #         self._action_change,
-    #         [u"Fr\\xfchst\\xfcck".decode("utf-8"), "Mittagessen"],
-    #         "Abendessen",
-    #     )
-    #     self.assertRaises(
-    #         UnicodeDecodeError,
-    #         self._action_delete,
-    #         [u"Fr\\xfchst\\xfcck".decode("utf-8")],
-    #     )
-
     def test_pref_keywords_action_change_keywords(self):
         """test the bugfix for prefs_keywords_action_change when keywords
         contains at least one element with non ASCII characters"""
