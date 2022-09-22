@@ -5,8 +5,8 @@
 from zope.interface import Interface
 
 
-class IPloneKeywordManager(Interface):
-    """A portal tool for managing keywords"""
+class IKeywordManager(Interface):
+    """A utility that allows to manage keywords"""
 
     def change(old_keywords, new_keyword):
         """Updates all objects using the old_keywords.

@@ -1,8 +1,9 @@
-from plone import api
 from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
 from Products.PloneKeywordManager.testing import PLONEKEYWORDMANAGER_INTEGRATION_TESTING
+from Products.PloneKeywordManager.interfaces import IKeywordManager
 from zope.component import getMultiAdapter
+from zope.component import getUtility
 
 import unittest
 
@@ -15,7 +16,7 @@ class BaseIntegrationTestCase(unittest.TestCase):
         self.portal = self.layer["portal"]
         self.request = self.layer["request"]
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
-        self.pkm = api.portal.get_tool("portal_keyword_manager")
+        self.pkm = getUtility(IKeywordManager)
 
 
 class PKMTestCase(BaseIntegrationTestCase):

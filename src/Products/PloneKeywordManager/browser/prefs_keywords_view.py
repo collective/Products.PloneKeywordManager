@@ -3,8 +3,10 @@ from Products.CMFPlone.PloneBatch import Batch
 from Products.Five import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from Products.PloneKeywordManager import keywordmanagerMessageFactory as _
+from Products.PloneKeywordManager.interfaces import IKeywordManager
 from Products.PloneKeywordManager.compat import to_str
 from ZTUtils import make_query
+from zope.component import getUtility
 
 import json
 import logging
@@ -22,7 +24,7 @@ class PrefsKeywordsView(BrowserView):
 
     def __init__(self, context, request):
         super().__init__(context, request)
-        self.pkm = api.portal.get_tool("portal_keyword_manager")
+        self.pkm = getUtility(IKeywordManager)
 
     def __call__(self):
         if not self.request.form.get(

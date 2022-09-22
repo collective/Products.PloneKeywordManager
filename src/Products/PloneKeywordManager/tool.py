@@ -1,20 +1,17 @@
 # Copyright (c) 2005 gocept gmbh & co. kg
 # See also LICENSE.txt
 from AccessControl import ClassSecurityInfo
-from AccessControl.class_init import InitializeClass
 from Acquisition import aq_base
-from OFS.SimpleItem import SimpleItem
 from operator import itemgetter
 from plone import api
 from plone.app.discussion.interfaces import IComment
 from plone.dexterity.interfaces import IDexterityContent
 from Products.CMFCore import permissions as CMFCorePermissions
 from Products.CMFCore.indexing import processQueue
-from Products.CMFCore.utils import UniqueObject
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from Products.PloneKeywordManager import config
 from Products.PloneKeywordManager.compat import to_str
-from Products.PloneKeywordManager.interfaces import IPloneKeywordManager
+from Products.PloneKeywordManager.interfaces import IKeywordManager
 from zope import interface
 
 
@@ -29,8 +26,8 @@ except ImportError:
     USE_LEVENSHTEIN = False
 
 
-@interface.implementer(IPloneKeywordManager)
-class PloneKeywordManager(UniqueObject, SimpleItem):
+@interface.implementer(IKeywordManager)
+class KeywordManager:
     """A portal wide tool for managing keywords within Plone."""
 
     plone_tool = 1
@@ -289,6 +286,3 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
             return fieldVal()
         else:
             return fieldVal
-
-
-InitializeClass(PloneKeywordManager)
