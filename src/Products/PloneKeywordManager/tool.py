@@ -6,9 +6,7 @@ from operator import itemgetter
 from plone import api
 from plone.app.discussion.interfaces import IComment
 from plone.dexterity.interfaces import IDexterityContent
-from Products.CMFCore import permissions as CMFCorePermissions
 from Products.CMFCore.indexing import processQueue
-from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from Products.PloneKeywordManager import config
 from Products.PloneKeywordManager.compat import to_str
 from Products.PloneKeywordManager.interfaces import IKeywordManager
@@ -28,20 +26,11 @@ except ImportError:
 
 @interface.implementer(IKeywordManager)
 class KeywordManager:
-    """A portal wide tool for managing keywords within Plone."""
+    """A utility to manage keywords within Plone."""
 
-    plone_tool = 1
-
-    id = "portal_keyword_manager"
-    meta_type = "Plone Keyword Manager Tool"
     security = ClassSecurityInfo()
 
     manage_options = ({"label": "Overview", "action": "manage_overview"},)
-
-    security.declareProtected(CMFCorePermissions.ManagePortal, "manage_overview")
-    manage_overview = PageTemplateFile(
-        "www/explainTool", globals(), __name__="manage_overview"
-    )
 
     def _getFullIndexList(self, indexName):
         idxs = set([indexName]).union(config.ALWAYS_REINDEX)
