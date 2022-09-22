@@ -4,6 +4,7 @@ from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
 from Products.CMFPlone.utils import get_installer
 from Products.PloneKeywordManager.testing import PLONEKEYWORDMANAGER_INTEGRATION_TESTING
+from Products.PloneKeywordManager.setuphandlers import importKeywords
 
 import unittest
 
@@ -32,6 +33,27 @@ class TestSetup(unittest.TestCase):
         )
 
         self.assertIn(IPloneKeywordManagerLayer, utils.registered_layers())
+
+    def test_add_keywords_from_profile(self):
+        """Check that the setuphandlers code imports the keywords."""
+        class FakeContext:
+            def readDataFile(self, filename):
+                return "\n".join(new_keywords)
+
+            def getSite(self):
+                return api.portal.get()
+
+        setRoles(self.portal, TEST_USER_ID, ["Manager"])
+
+        new_keywords = ("apple", "pear", "pineapple", "cherries")
+        self.assertNotIn("keywords", self.portal.objectIds())
+        context = FakeContext()
+        importKeywords(context)
+        catalog = api.portal.get_tool("portal_catalog")
+        self.assertIn("keywords", self.portal.objectIds())
+        keywords_on_obj = self.portal.keywords.Subject()
+        for keyword in new_keywords:
+            self.assertIn(keyword, keywords_on_obj)
 
 
 class TestUninstall(unittest.TestCase):
