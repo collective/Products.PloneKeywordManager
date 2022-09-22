@@ -83,7 +83,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
             if isinstance(value, (list, tuple)):
                 # MULTIVALUED FIELD
                 value = set(value)
-                value = value- set(old_keywords)
+                value = value - set(old_keywords)
                 value.add(new_keyword)
                 value = list(value)
             elif isinstance(value, set):
