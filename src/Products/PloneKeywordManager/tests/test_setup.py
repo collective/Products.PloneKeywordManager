@@ -5,6 +5,7 @@ from plone.app.testing import TEST_USER_ID
 from Products.CMFPlone.utils import get_installer
 from Products.PloneKeywordManager.testing import PLONEKEYWORDMANAGER_INTEGRATION_TESTING
 from Products.PloneKeywordManager.setuphandlers import importKeywords
+from Products.PloneKeywordManager.upgrades import to_4
 
 import unittest
 
@@ -54,6 +55,16 @@ class TestSetup(unittest.TestCase):
         keywords_on_obj = self.portal.keywords.Subject()
         for keyword in new_keywords:
             self.assertIn(keyword, keywords_on_obj)
+
+    def test_upgrade_setp_to_4(self):
+        """Check that the persistent tool is removed"""
+        self.portal
+        setRoles(self.portal, TEST_USER_ID, ["Manager"])
+        api.content.create(
+            container=self.portal, type="Document", id="portal_keyword_manager"
+        )
+        to_4(self.portal.portal_setup)
+        self.assertNotIn("portal_keyword_manager", self.portal.objectIds())
 
 
 class TestUninstall(unittest.TestCase):
