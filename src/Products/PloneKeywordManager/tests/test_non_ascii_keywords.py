@@ -6,6 +6,7 @@ from zope.component import createObject
 
 import unittest
 
+
 class NonAsciiKeywordsTestCase(PKMTestCase):
     def setUp(self):
         super().setUp()

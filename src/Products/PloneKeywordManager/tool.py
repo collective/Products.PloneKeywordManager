@@ -142,6 +142,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
 
         catalog = api.portal.get_tool("portal_catalog")
         keywords = catalog.uniqueValuesFor(indexName)
+
         # Filter out Null keywords.  The sorting breaks when None is indexed.
         def notNone(x):
             return x is not None
