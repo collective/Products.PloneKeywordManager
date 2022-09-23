@@ -1,8 +1,8 @@
 Changelog
 =========
 
-4.0.2 (unreleased)
-------------------
+5.0.0a1 (2022-09-23)
+--------------------
 
 - Avoid a double loop by using set operations. [gforcada]
 
