@@ -6,6 +6,11 @@ Changelog
 
 - Avoid a double loop by using set operations. [gforcada]
 
+- Clean up old code. [gforcada]
+
+- Turn the tool into a utility.
+  Fixes `issue #15 <https://github.com/collective/Products.PloneKeywordManager/issues/15>`_. [gforcada]
+
 4.0.1 (2022-05-06)
 ------------------
 

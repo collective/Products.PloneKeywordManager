@@ -35,4 +35,7 @@
       factory=".setuphandlers.HiddenProfiles"
       name="PloneKeywordManager-hiddenprofiles"
       />
+  <utility
+      factory=".tool.KeywordManager"
+      />
 </configure>

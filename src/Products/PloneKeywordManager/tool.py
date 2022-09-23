@@ -1,20 +1,15 @@
 # Copyright (c) 2005 gocept gmbh & co. kg
 # See also LICENSE.txt
 from AccessControl import ClassSecurityInfo
-from AccessControl.class_init import InitializeClass
 from Acquisition import aq_base
-from OFS.SimpleItem import SimpleItem
 from operator import itemgetter
 from plone import api
 from plone.app.discussion.interfaces import IComment
 from plone.dexterity.interfaces import IDexterityContent
-from Products.CMFCore import permissions as CMFCorePermissions
 from Products.CMFCore.indexing import processQueue
-from Products.CMFCore.utils import UniqueObject
-from Products.PageTemplates.PageTemplateFile import PageTemplateFile
 from Products.PloneKeywordManager import config
 from Products.PloneKeywordManager.compat import to_str
-from Products.PloneKeywordManager.interfaces import IPloneKeywordManager
+from Products.PloneKeywordManager.interfaces import IKeywordManager
 from zope import interface
 
 
@@ -29,22 +24,13 @@ except ImportError:
     USE_LEVENSHTEIN = False
 
 
-@interface.implementer(IPloneKeywordManager)
-class PloneKeywordManager(UniqueObject, SimpleItem):
-    """A portal wide tool for managing keywords within Plone."""
+@interface.implementer(IKeywordManager)
+class KeywordManager:
+    """A utility to manage keywords within Plone."""
 
-    plone_tool = 1
-
-    id = "portal_keyword_manager"
-    meta_type = "Plone Keyword Manager Tool"
     security = ClassSecurityInfo()
 
     manage_options = ({"label": "Overview", "action": "manage_overview"},)
-
-    security.declareProtected(CMFCorePermissions.ManagePortal, "manage_overview")
-    manage_overview = PageTemplateFile(
-        "www/explainTool", globals(), __name__="manage_overview"
-    )
 
     def _getFullIndexList(self, indexName):
         idxs = set([indexName]).union(config.ALWAYS_REINDEX)
@@ -142,6 +128,7 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
 
         catalog = api.portal.get_tool("portal_catalog")
         keywords = catalog.uniqueValuesFor(indexName)
+
         # Filter out Null keywords.  The sorting breaks when None is indexed.
         def notNone(x):
             return x is not None
@@ -150,17 +137,6 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
 
         # can we turn this into a yield?
         return list(sorted(keywords, key=lambda x: x.lower()))
-
-    def getKeywordsWithLengths(self, indexName="Subject"):
-        processQueue()
-        if indexName not in self.getKeywordIndexes():
-            raise ValueError(f"{indexName} is not a valid field")
-
-        catalog = api.portal.get_tool("portal_catalog")
-        idx = catalog._catalog.getIndex(indexName)
-        keywords = idx.uniqueValues(withLengths=1)
-
-        return list(sorted(keywords, key=lambda x, y: x.lower()))
 
     def getKeywordLength(self, key, indexName="Subject"):
         processQueue()
@@ -299,6 +275,3 @@ class PloneKeywordManager(UniqueObject, SimpleItem):
             return fieldVal()
         else:
             return fieldVal
-
-
-InitializeClass(PloneKeywordManager)

@@ -1,8 +1,4 @@
-PROJECTNAME = "PloneKeywordManager"
-
 MANAGE_KEYWORDS_PERMISSION = "Manage Keywords"
-
-TOOL_NAME = "Plone Keyword Manager Tool"
 
 # Meta type of the keyword indexes. If you're one of those crazy people that use
 # custom indexes, you'll want to update this.

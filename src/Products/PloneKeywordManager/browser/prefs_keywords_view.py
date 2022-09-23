@@ -3,14 +3,13 @@ from Products.CMFPlone.PloneBatch import Batch
 from Products.Five import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from Products.PloneKeywordManager import keywordmanagerMessageFactory as _
+from Products.PloneKeywordManager import logger
+from Products.PloneKeywordManager.interfaces import IKeywordManager
 from Products.PloneKeywordManager.compat import to_str
 from ZTUtils import make_query
+from zope.component import getUtility
 
 import json
-import logging
-
-
-logger = logging.getLogger("Products.PloneKeywordManager")
 
 
 class PrefsKeywordsView(BrowserView):
@@ -22,10 +21,9 @@ class PrefsKeywordsView(BrowserView):
 
     def __init__(self, context, request):
         super().__init__(context, request)
-        self.pkm = api.portal.get_tool("portal_keyword_manager")
+        self.pkm = getUtility(IKeywordManager)
 
     def __call__(self):
-        self.is_plone_5 = True
         if not self.request.form.get(
             "form.button.Merge", ""
         ) and not self.request.form.get("form.button.Delete", ""):
