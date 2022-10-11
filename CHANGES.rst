@@ -4,8 +4,7 @@ Changelog
 5.0.0a2 (unreleased)
 --------------------
 
-- Nothing changed yet.
-
+- No change since last release.
 
 5.0.0a1 (2022-09-23)
 --------------------
