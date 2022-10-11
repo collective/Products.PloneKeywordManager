@@ -1,8 +1,8 @@
 Changelog
 =========
 
-5.0.0a2 (unreleased)
---------------------
+5.0.0 (2022-10-11)
+------------------
 
 - No change since last release.
 
