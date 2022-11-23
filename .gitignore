@@ -24,3 +24,11 @@ selenium*
 var/
 venv/
 __pycache__
+
+# mxdev
+/instance/
+/.make-sentinels/
+/*-mxdev.txt
+/reports/
+/sources/
+/venv/
