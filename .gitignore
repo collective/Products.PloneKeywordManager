@@ -16,7 +16,6 @@ include/
 lib/
 library-settings.txt
 log.html
-Makefile
 output.xml
 parts/
 report.html
