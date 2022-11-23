@@ -4,10 +4,10 @@ from Products.Five import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from Products.PloneKeywordManager import keywordmanagerMessageFactory as _
 from Products.PloneKeywordManager import logger
-from Products.PloneKeywordManager.interfaces import IKeywordManager
 from Products.PloneKeywordManager.compat import to_str
-from ZTUtils import make_query
+from Products.PloneKeywordManager.interfaces import IKeywordManager
 from zope.component import getUtility
+from ZTUtils import make_query
 
 import json
 

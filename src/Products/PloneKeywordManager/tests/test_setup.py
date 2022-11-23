@@ -3,8 +3,8 @@ from plone import api
 from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
 from Products.CMFPlone.utils import get_installer
-from Products.PloneKeywordManager.testing import PLONEKEYWORDMANAGER_INTEGRATION_TESTING
 from Products.PloneKeywordManager.setuphandlers import importKeywords
+from Products.PloneKeywordManager.testing import PLONEKEYWORDMANAGER_INTEGRATION_TESTING
 from Products.PloneKeywordManager.upgrades import to_4
 
 import unittest
@@ -37,6 +37,7 @@ class TestSetup(unittest.TestCase):
 
     def test_add_keywords_from_profile(self):
         """Check that the setuphandlers code imports the keywords."""
+
         class FakeContext:
             def readDataFile(self, filename):
                 return "\n".join(new_keywords)
