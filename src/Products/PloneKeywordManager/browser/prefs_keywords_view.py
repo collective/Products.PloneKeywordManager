@@ -151,8 +151,7 @@ class PrefsKeywordsView(BrowserView):
         set the message and return
         """
         if message and msg_type:
-            pu = api.portal.get_tool("plone_utils")
-            pu.addPortalMessage(message, type=msg_type)
+            api.portal.show_message(message, request=self.request, type=msg_type)
 
         logger.info(self.context.translate(message))
         navroot_url = api.portal.get_navigation_root(self.context).absolute_url()
