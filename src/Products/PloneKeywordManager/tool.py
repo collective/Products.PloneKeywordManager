@@ -127,16 +127,11 @@ class KeywordManager:
             raise ValueError(f"{indexName} is not a valid field")
 
         catalog = api.portal.get_tool("portal_catalog")
-        keywords = catalog.uniqueValuesFor(indexName)
-
-        # Filter out Null keywords.  The sorting breaks when None is indexed.
-        def notNone(x):
-            return x is not None
-
-        keywords = filter(notNone, keywords)
+        keywords = [x for x in catalog.uniqueValuesFor(indexName) if x is not None]
+        keywords.sort(key=lambda x: x.lower())
 
         # can we turn this into a yield?
-        return list(sorted(keywords, key=lambda x: x.lower()))
+        return keywords
 
     def getKeywordLength(self, key, indexName="Subject"):
         processQueue()
@@ -182,13 +177,13 @@ class KeywordManager:
             else:
                 raise ValueError(f"{item} is not bytes nor str")
             if lscore > score:
-                res.append((item, lscore))
+                res.append((lscore, item))
 
-        # Sort by score (high scores on top of list)
-        res = sorted(res, key=itemgetter(1), reverse=True)
+        # Sort by score and alphabet (high scores on top of list)
+        res.sort(reverse=True)
 
         # Return first n terms without scores
-        return [item[0] for item in res[:num]]
+        return [item[1] for item in res[:num]]
 
     def getKeywordIndexes(self):
         """Gets a list of indexes from the catalog. Uses config.py to choose the
