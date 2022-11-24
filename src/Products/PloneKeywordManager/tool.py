@@ -163,19 +163,13 @@ class KeywordManager:
         # Levenshtein is around, so let's use it.
         res = []
 
-        # Search for all similar terms in possibilities
-        if isinstance(word, bytes):
-            oword = str(word, encoding="utf-8")
-        else:
-            oword = word.encode("utf-8")
-
         for item in possibilities:
-            if isinstance(item, type(word)):
-                lscore = Levenshtein.ratio(word, item)
-            elif isinstance(item, type(oword)):
-                lscore = Levenshtein.ratio(oword, item)
+            if word.lower() in item.lower():
+                # if the word is a substring always include it
+                lscore = 1
             else:
-                raise ValueError(f"{item} is not bytes nor str")
+                lscore = Levenshtein.ratio(word, item)
+
             if lscore > score:
                 res.append((lscore, item))
 
