@@ -18,12 +18,4 @@
       layer=".interfaces.IPloneKeywordManagerLayer"
       />
 
-  <browser:page
-      name="keywordsmanager-search-json"
-      for="*"
-      class=".prefs_keywords_view.KeywordsSearchResults"
-      permission="plone_keyword_manager.UsePloneKeywordManager"
-      layer=".interfaces.IPloneKeywordManagerLayer"
-      />
-
 </configure>
