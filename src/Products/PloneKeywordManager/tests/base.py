@@ -1,7 +1,7 @@
 from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
-from Products.PloneKeywordManager.testing import PLONEKEYWORDMANAGER_INTEGRATION_TESTING
 from Products.PloneKeywordManager.interfaces import IKeywordManager
+from Products.PloneKeywordManager.testing import PLONEKEYWORDMANAGER_INTEGRATION_TESTING
 from zope.component import getMultiAdapter
 from zope.component import getUtility
 

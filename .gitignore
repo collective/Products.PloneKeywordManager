@@ -16,7 +16,6 @@ include/
 lib/
 library-settings.txt
 log.html
-Makefile
 output.xml
 parts/
 report.html
@@ -24,3 +23,11 @@ selenium*
 var/
 venv/
 __pycache__
+
+# mxdev
+/instance/
+/.make-sentinels/
+/*-mxdev.txt
+/reports/
+/sources/
+/venv/

@@ -1,10 +1,11 @@
 Changelog
 =========
 
-5.0.1 (unreleased)
+6.0.0 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Update management template to Plone 6 only with Bootstrap 5.
+  [petschki]
 
 
 5.0.0 (2022-10-11)
@@ -27,14 +28,14 @@ Changelog
 
 - Fixed issue in renaming keywords.
   Fixes `issue #70 <https://github.com/collective/Products.PloneKeywordManager/issues/70>`_. [flipmcf]
-  
+
 - Fix Redirection after form submit
   Fixes `issue #68 <https://github.com/collective/Products.PloneKeywordManager/issues/68>`_. [flipmcf]
   Fixes `issue #66 <https://github.com/collective/Products.PloneKeywordManager/issues/68>`_. [jensens, flipmcf]
-    
+
 - Fix issue with search links from related keywords
   Fixes `issue #67 <https://github.com/collective/Products.PloneKeywordManager/issues/70>`_. [abl123, flipmcf]
-  
+
 - Plone 4 specific code removal and updating comments / docstrings [flipmcf]
 
 

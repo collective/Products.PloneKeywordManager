@@ -4,10 +4,10 @@ from Products.Five import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from Products.PloneKeywordManager import keywordmanagerMessageFactory as _
 from Products.PloneKeywordManager import logger
-from Products.PloneKeywordManager.interfaces import IKeywordManager
 from Products.PloneKeywordManager.compat import to_str
-from ZTUtils import make_query
+from Products.PloneKeywordManager.interfaces import IKeywordManager
 from zope.component import getUtility
+from ZTUtils import make_query
 
 import json
 
@@ -151,8 +151,7 @@ class PrefsKeywordsView(BrowserView):
         set the message and return
         """
         if message and msg_type:
-            pu = api.portal.get_tool("plone_utils")
-            pu.addPortalMessage(message, type=msg_type)
+            api.portal.show_message(message, request=self.request, type=msg_type)
 
         logger.info(self.context.translate(message))
         navroot_url = api.portal.get_navigation_root(self.context).absolute_url()
@@ -167,38 +166,3 @@ class PrefsKeywordsView(BrowserView):
             query["b_start"] = self.request["b_start"]
 
         self.request.RESPONSE.redirect(f"{url}?{make_query(**query)}")
-
-
-class KeywordsSearchResults(BrowserView):
-    def __call__(self):
-        items = []
-        search_string = self.request.form.get("s")
-        field = self.request.form.get("field")
-
-        results = self.results(search_string, index_name=field)
-        navroot_url = api.portal.get_navigation_root(self.context).absolute_url()
-
-        for result in results:
-            items.append(
-                {
-                    "id": result,
-                    "title": result,
-                    "description": "",
-                    "state": "keyword",
-                    "url": f"{navroot_url}/prefs_keywords_view?field={field}&s={result}",
-                }
-            )
-
-        self.request.response.setHeader("Content-type", "application/json")
-
-        return json.dumps({"total": len(results), "items": items})
-
-    def results(self, search_string, index_name):
-        pkm = api.portal.get_tool("portal_keyword_manager")
-
-        num = 100
-        score = 0.6
-        all_keywords = pkm.getKeywords(indexName=index_name)
-        return pkm.getScoredMatches(
-            search_string, all_keywords, num, score, context=self.context
-        )
