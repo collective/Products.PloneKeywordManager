@@ -1,10 +1,10 @@
 Changelog
 =========
 
-5.0.1 (unreleased)
+6.0.0 (unreleased)
 ------------------
 
-- Update management template to Plone 6/Bootstrap 5
+- Update management template to Plone 6 only with Bootstrap 5.
   [petschki]
 
 
