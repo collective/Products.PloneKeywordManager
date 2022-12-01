@@ -1,7 +1,7 @@
 Changelog
 =========
 
-6.0.0 (unreleased)
+6.0.0 (2022-12-01)
 ------------------
 
 Breaking Changes:
