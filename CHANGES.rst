@@ -4,7 +4,9 @@ Changelog
 6.0.0 (unreleased)
 ------------------
 
-- Update management template to Plone 6 only with Bootstrap 5.
+Breaking Changes:
+
+- Version 6+ is for Plone 6+ only. Update management template to Plone 6 with Bootstrap 5.
   [petschki]
 
 
