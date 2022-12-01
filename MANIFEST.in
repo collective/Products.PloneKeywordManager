@@ -2,4 +2,4 @@ graft docs
 graft src
 include *.rst *.cfg *.txt *.ini
 exclude **/__pycache__/* **/*.pyc
-exclude .coveragerc .installed.cfg
+exclude .coveragerc .installed.cfg Makefile *.yaml
