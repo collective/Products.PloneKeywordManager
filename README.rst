@@ -73,6 +73,12 @@ Leave this document in the private state so only an administrator will be able t
 Each time you run this import step, the ``Keywords`` document's keywords will be completely replaced with the contents of the ``keywords.txt`` file.
 
 
+Version Information
+===================
+
+- 6.x is for Plone 6+
+- 3.x - 5.x Plone 5
+- for Plone 4.3 use versions <3
 
 Source Code
 ===========
@@ -81,8 +87,6 @@ Source code and issue tracker of this project is in the
 `Plone Collective <https://github.com/collective/Products.PloneKeywordManager>`_
 
 For instructions how to contribute please read the `Collective Information Page <http://collective.github.io//>`_
-
-Further development focuses on Plone 5.2 on Python 3.7 and higher.
 
 Credits
 =======
