@@ -194,7 +194,7 @@ class KeywordsSearchResults(BrowserView):
         return json.dumps({"total": len(results), "items": items})
 
     def results(self, search_string, index_name):
-        pkm = api.portal.get_tool("portal_keyword_manager")
+        pkm = getUtility(IKeywordManager)
 
         num = 100
         score = 0.6

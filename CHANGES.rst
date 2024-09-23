@@ -4,7 +4,7 @@ Changelog
 5.0.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix live search by using utility instead of former and removed tool. [ksuess]
 
 
 5.0.0 (2022-10-11)
