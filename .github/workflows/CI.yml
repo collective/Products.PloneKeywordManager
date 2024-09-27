@@ -9,25 +9,25 @@ on:
 jobs:
   build:
     strategy:
+      # We want to see all failures:
+      fail-fast: false
       matrix:
         config:
         # [Python version, tox env]
-        - ["3.6",   "plone52-py36"]
-        - ["3.7",   "plone52-py37"]
-        - ["3.8",   "plone52-py38"]
-        - ["3.7",   "plone60-py37"]
-        - ["3.8",   "plone60-py38"]
-        - ["3.9",   "plone60-py39"]
-    runs-on: ubuntu-latest
+        - ["3.7",   "plone52-py37", "ubuntu-22.04"]
+        - ["3.8",   "plone52-py38", "ubuntu-24.04"]
+        - ["3.8",   "plone60-py38", "ubuntu-24.04"]
+        - ["3.9",   "plone60-py39", "ubuntu-latest"]
+    runs-on: ${{ matrix.config[2] }}
     name: ${{ matrix.config[1] }}
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.config[0] }}
     - name: Cache Python Packages
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       with:
         path: |
           ~/.cache/pip

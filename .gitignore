@@ -24,3 +24,4 @@ selenium*
 var/
 venv/
 __pycache__
+.tox/
