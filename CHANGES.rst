@@ -1,7 +1,7 @@
 Changelog
 =========
 
-5.0.1 (unreleased)
+5.0.1 (2024-10-10)
 ------------------
 
 - Fix live search by using utility instead of former and removed tool. [ksuess]
