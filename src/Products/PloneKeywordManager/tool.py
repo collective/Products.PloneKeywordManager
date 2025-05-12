@@ -4,13 +4,20 @@ from AccessControl import ClassSecurityInfo
 from Acquisition import aq_base
 from operator import itemgetter
 from plone import api
-from plone.app.discussion.interfaces import IComment
 from plone.dexterity.interfaces import IDexterityContent
 from Products.CMFCore.indexing import processQueue
 from Products.PloneKeywordManager import config
 from Products.PloneKeywordManager.compat import to_str
 from Products.PloneKeywordManager.interfaces import IKeywordManager
 from zope import interface
+
+
+try:
+    from plone.app.discussion.interfaces import IComment
+except ImportError:
+
+    class IComment:
+        """Dummy class for compatibility with Plone without p.a.discussion installed/available"""
 
 
 # Python imports

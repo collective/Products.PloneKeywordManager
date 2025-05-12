@@ -4,7 +4,8 @@ Changelog
 6.0.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix for use with Plone 6.1 and no plone.app.discussion available.
+  [jensens]
 
 
 6.0.0 (2022-12-01)
