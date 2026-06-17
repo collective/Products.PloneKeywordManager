@@ -40,7 +40,7 @@ class KeywordManager:
     manage_options = ({"label": "Overview", "action": "manage_overview"},)
 
     def _getFullIndexList(self, indexName):
-        idxs = set([indexName]).union(config.ALWAYS_REINDEX)
+        idxs = {indexName}.union(config.ALWAYS_REINDEX)
         return list(idxs)
 
     @security.protected(config.MANAGE_KEYWORDS_PERMISSION)
