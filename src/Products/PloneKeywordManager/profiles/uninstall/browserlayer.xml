@@ -1,5 +1,7 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <layers>
-  <layer name="Products.PloneKeywordManager"
-         interface="Products.PloneKeywordManager.browser.interfaces.IPloneKeywordManagerLayer" remove="True"/>
+  <layer interface="Products.PloneKeywordManager.browser.interfaces.IPloneKeywordManagerLayer"
+         name="Products.PloneKeywordManager"
+         remove="True"
+  />
 </layers>

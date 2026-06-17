@@ -1,10 +1,11 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <rolemap>
   <permissions>
-    <permission name="PloneKeywordManager: Use PloneKeywordManager"
-                acquire="True">
-      <role name="Manager"/>
-      <role name="Site Administrator"/>
+    <permission acquire="True"
+                name="PloneKeywordManager: Use PloneKeywordManager"
+    >
+      <role name="Manager" />
+      <role name="Site Administrator" />
     </permission>
   </permissions>
 
