@@ -2,7 +2,6 @@
 # See also LICENSE.txt
 from AccessControl import ClassSecurityInfo
 from Acquisition import aq_base
-from operator import itemgetter
 from plone import api
 from plone.dexterity.interfaces import IDexterityContent
 from Products.CMFCore.indexing import processQueue

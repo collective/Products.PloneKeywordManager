@@ -9,8 +9,6 @@ from Products.PloneKeywordManager.interfaces import IKeywordManager
 from zope.component import getUtility
 from ZTUtils import make_query
 
-import json
-
 
 class PrefsKeywordsView(BrowserView):
     """
