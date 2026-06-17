@@ -1,12 +1,12 @@
 Changelog
 =========
 
-6.0.1 (unreleased)
-------------------
+.. You should *NOT* be adding new change log entries to this file.
+   You should create a file in the news directory instead.
+   For helpful instructions, please see:
+   https://github.com/plone/plone.releaser/blob/master/ADD-A-NEWS-ITEM.rst
 
-- Fix for use with Plone 6.1 and no plone.app.discussion available.
-  [jensens]
-
+.. towncrier release notes start
 
 6.0.0 (2022-12-01)
 ------------------
@@ -103,7 +103,7 @@ Breaking Changes:
 3.0.0 (2019-03-14)
 ------------------
 
-- Fix problem with non-visible changes due to a side effect with collective.indexing beeing merged in core.
+- Fix problem with non-visible changes due to a side effect with collective.indexing being merged in core.
   [jensens]
 
 - Python 3, Plone 5.2 compatibility.
@@ -177,7 +177,7 @@ Breaking Changes:
 2.0 (2013-04-24)
 ----------------
 
-- take plone.app.multilingual into acount and set Language=all on change.
+- take plone.app.multilingual into account and set Language=all on change.
   [jensens]
 
 - Use png icon as gif icon has been removed.
@@ -195,7 +195,7 @@ Breaking Changes:
   file is empty. (useful for sites not having Document globally allowed)
   [fRiSi]
 
-- Allow `Site Administrators` too access the keyword managment
+- Allow `Site Administrators` to access the keyword management
   [fRiSi]
 
 - Make installation possible for dexterity-based Documents [pysailor]

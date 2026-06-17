@@ -52,7 +52,6 @@ class TestSetup(unittest.TestCase):
         self.assertNotIn("keywords", self.portal.objectIds())
         context = FakeContext()
         importKeywords(context)
-        catalog = api.portal.get_tool("portal_catalog")
         self.assertIn("keywords", self.portal.objectIds())
         keywords_on_obj = self.portal.keywords.Subject()
         for keyword in new_keywords:

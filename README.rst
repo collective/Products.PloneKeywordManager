@@ -33,7 +33,7 @@ In your buildout add ``Products.PloneKeywordManager`` to your instances eggs sec
 If you want similarity search add ``Products.PloneKeywordManager[Levenshtein]`` instead.
 
 Run buildout.
-Activate it at Site Setups Add Ons page.
+Activate it at Site Setups Add-ons page.
 
 
 Usage

@@ -2,7 +2,6 @@
 # See also LICENSE.txt
 from AccessControl import ClassSecurityInfo
 from Acquisition import aq_base
-from operator import itemgetter
 from plone import api
 from plone.dexterity.interfaces import IDexterityContent
 from Products.CMFCore.indexing import processQueue
@@ -10,7 +9,6 @@ from Products.PloneKeywordManager import config
 from Products.PloneKeywordManager.compat import to_str
 from Products.PloneKeywordManager.interfaces import IKeywordManager
 from zope import interface
-
 
 try:
     from plone.app.discussion.interfaces import IComment
@@ -40,7 +38,7 @@ class KeywordManager:
     manage_options = ({"label": "Overview", "action": "manage_overview"},)
 
     def _getFullIndexList(self, indexName):
-        idxs = set([indexName]).union(config.ALWAYS_REINDEX)
+        idxs = {indexName}.union(config.ALWAYS_REINDEX)
         return list(idxs)
 
     @security.protected(config.MANAGE_KEYWORDS_PERMISSION)

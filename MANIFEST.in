@@ -1,5 +1,8 @@
+global-exclude *pyc
+include setup.py
+include *.rst *.cfg
 graft docs
 graft src
-include *.rst *.cfg *.txt *.ini
-exclude **/__pycache__/* **/*.pyc
-exclude .coveragerc .installed.cfg Makefile *.yaml
+exclude .coveragerc
+recursive-exclude news *
+exclude news *.yml __pycache__
