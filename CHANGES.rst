@@ -1,12 +1,12 @@
 Changelog
 =========
 
-6.0.1 (unreleased)
-------------------
+.. You should *NOT* be adding new change log entries to this file.
+   You should create a file in the news directory instead.
+   For helpful instructions, please see:
+   https://github.com/plone/plone.releaser/blob/master/ADD-A-NEWS-ITEM.rst
 
-- Fix for use with Plone 6.1 and no plone.app.discussion available.
-  [jensens]
-
+.. towncrier release notes start
 
 6.0.0 (2022-12-01)
 ------------------
