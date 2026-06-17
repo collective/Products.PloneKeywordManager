@@ -76,7 +76,7 @@ class PrefsKeywordsView(BrowserView):
 
     def getNumObjects(self, keyword, indexName):
         """
-        return the number of indexed objects with the specificed keyword
+        return the number of indexed objects with the specified keyword
         :param keyword: string
         :return: int
         """
@@ -103,7 +103,7 @@ class PrefsKeywordsView(BrowserView):
 
             we search for all objects with the keywords 'foo', 'foo1', or 'foo_' in the subject field
             we remove these keywords from the field 'subject'
-            we then add the keyword 'Foo' (if it didn't alreay exist) to the subject field.
+            we then add the keyword 'Foo' (if it didn't already exist) to the subject field.
             we save all those objects.
 
           we should also rebuild the index, but hey... that's work.
