@@ -290,6 +290,7 @@
                           title="Rename"
                           type="submit"
                           i18n:attributes="value; title"
+                          i18n:translate=""
                   >replace / rename selected keyword(s)</button>
                 </div>
               </div>
@@ -303,6 +304,7 @@
                         title="Delete"
                         type="submit"
                         i18n:attributes="value; title"
+                        i18n:translate=""
                 >Delete selected keywords</button>
               </div>
             </div>
