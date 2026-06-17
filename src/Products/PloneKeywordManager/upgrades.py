@@ -1,7 +1,6 @@
 from plone import api
 from Products.PloneKeywordManager import logger
 
-
 default_profile = "profile-Products.PloneKeywordManager:default"
 uninstall_profile = "profile-Products.PloneKeywordManager:uninstall"
 

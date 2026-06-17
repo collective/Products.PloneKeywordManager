@@ -21,6 +21,5 @@ from zope.i18nmessageid import MessageFactory
 
 import logging
 
-
 keywordmanagerMessageFactory = MessageFactory("Products.PloneKeywordManager")
 logger = logging.getLogger("Products.PloneKeywordManager")

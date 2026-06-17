@@ -11,7 +11,6 @@ from Products.PloneKeywordManager.compat import to_str
 from Products.PloneKeywordManager.interfaces import IKeywordManager
 from zope import interface
 
-
 try:
     from plone.app.discussion.interfaces import IComment
 except ImportError:
