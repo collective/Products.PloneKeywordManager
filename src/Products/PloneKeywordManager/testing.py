@@ -18,6 +18,7 @@ class PloneKeywordManagerLayer(PloneSandboxLayer):
         self.loadZCML(package=Products.PloneKeywordManager)
 
     def setUpPloneSite(self, portal):
+        applyProfile(portal, "plone.app.discussion:default")
         applyProfile(portal, "Products.PloneKeywordManager:default")
 
 
